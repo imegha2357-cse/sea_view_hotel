@@ -5,6 +5,7 @@ import SmartImg from '../../components/SmartImg';
 import { EASE } from '../../components/Motion';
 import { authMessage, useAuth } from '../../lib/auth';
 import { firebaseReady, NOT_CONFIGURED } from '../../lib/firebase';
+import { usePageMeta } from '../../lib/seo';
 
 // Staff-only sign-in. There is no sign-up here: admin accounts are created with `npm run create-users`.
 export default function AdminLogin() {
@@ -15,9 +16,7 @@ export default function AdminLogin() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
 
-  useEffect(() => {
-    document.title = 'Staff sign in | Hotel Sea View';
-  }, []);
+  usePageMeta('Staff sign in | Hotel Sea View', 'Staff access to the Hotel Sea View enquiry desk.', { noindex: true });
   useEffect(() => {
     if (!loading && user && isAdmin) nav('/admin', { replace: true });
   }, [user, isAdmin, loading]);

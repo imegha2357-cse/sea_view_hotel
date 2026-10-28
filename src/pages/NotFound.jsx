@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom';
+import { usePageMeta } from '../lib/seo';
 
 export default function NotFound() {
+  usePageMeta('Page not found | Hotel Sea View', 'This page does not exist.', { noindex: true });
   return (
     <main id="main" className="page">
       <div className="container prose">

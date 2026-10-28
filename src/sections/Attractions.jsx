@@ -11,7 +11,7 @@ export default function Attractions() {
         <div className="strip" tabIndex={0} aria-label="Nearby places, scroll sideways">
           {ATTRACTIONS.map((a, i) => (
             <Reveal key={a.name} i={i} className="place" as="article">
-              <SmartImg name={a.image} />
+              <SmartImg name={a.image} sizes="(max-width: 600px) 80vw, 25vw" width={828} />
               <div className="cap">
                 <h3>{a.name}</h3>
                 <p>{a.text}</p>

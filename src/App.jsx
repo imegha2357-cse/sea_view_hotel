@@ -10,6 +10,7 @@ import Privacy from './pages/Privacy';
 import NotFound from './pages/NotFound';
 import Login from './pages/Login';
 import AdminLogin from './pages/admin/AdminLogin';
+import CookieConsent from './components/CookieConsent';
 
 // Dashboards load only when someone signs in, keeping the public page light.
 const Account = lazy(() => import('./pages/account/Account'));
@@ -60,6 +61,7 @@ export default function App() {
           </Routes>
         </Suspense>
       </AnimatePresence>
+      <CookieConsent />
     </MotionConfig>
   );
 }

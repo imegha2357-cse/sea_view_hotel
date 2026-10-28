@@ -63,7 +63,7 @@ export default function Rooms({ onEnquire }) {
               >
                 <div className="media">
                   {r.tags.includes('sea') && <span className="badge">Sea view</span>}
-                  <SmartImg name={r.image} />
+                  <SmartImg name={r.image} sizes="(max-width: 600px) 100vw, (max-width: 1080px) 50vw, 33vw" width={828} />
                 </div>
                 <div className="body">
                   <h3>{r.name}</h3>
@@ -96,7 +96,7 @@ export default function Rooms({ onEnquire }) {
                   ×
                 </button>
                 <div className="media">
-                  <SmartImg name={open.image} eager />
+                  <SmartImg name={open.image} eager sizes="(max-width: 860px) 100vw, 520px" width={1200} />
                 </div>
                 <motion.div className="info" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.25 }}>
                   <span className="eyebrow">{open.view}</span>

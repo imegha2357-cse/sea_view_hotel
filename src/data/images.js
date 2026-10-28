@@ -38,11 +38,24 @@ const SOURCE = import.meta.env.VITE_IMAGE_SOURCE === 'local' ? 'local' : 'remote
 export const localName = (path) => path.split('/').pop();
 export const remoteUrl = (path) => `${BASE}/${path}`;
 
-export function img(key) {
+// FR-09 / PRD 10.2: serve resized, compressed copies (AVIF/WebP) through Vercel Image Optimization.
+// The widths must match "images.sizes" in vercel.json. Set VITE_IMAGE_CDN=off to disable
+// (for example when hosting on Firebase Hosting instead of Vercel).
+export const IMAGE_WIDTHS = [480, 828, 1200, 1920];
+const CDN = import.meta.env.PROD && import.meta.env.VITE_IMAGE_CDN !== 'off';
+
+const cdnUrl = (url, w) => `/_vercel/image?url=${encodeURIComponent(url)}&w=${w}&q=75`;
+
+export function img(key, { width = 1200 } = {}) {
   const item = IMAGE_MANIFEST[key];
   if (!item) throw new Error(`Unknown image key: ${key}`);
+  const original = SOURCE === 'local' ? `/images/${localName(item.path)}` : remoteUrl(item.path);
+  const isPng = item.path.endsWith('.png');
+  const useCdn = CDN && !isPng;
+  const w = IMAGE_WIDTHS.find((x) => x >= width) || IMAGE_WIDTHS[IMAGE_WIDTHS.length - 1];
   return {
-    src: SOURCE === 'local' ? `/images/${localName(item.path)}` : remoteUrl(item.path),
+    src: useCdn ? cdnUrl(original, w) : original,
+    srcSet: useCdn ? IMAGE_WIDTHS.map((x) => `${cdnUrl(original, x)} ${x}w`).join(', ') : undefined,
     fallback: remoteUrl(item.path),
     alt: item.alt,
   };

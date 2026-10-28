@@ -1,5 +1,6 @@
 import { LayoutGroup, motion } from 'framer-motion';
 import { useActiveSection } from '../hooks/useScroll';
+import { TESTIMONIALS } from '../data/content';
 
 const LINKS = [
   { id: 'about', label: 'Overview' },
@@ -7,6 +8,7 @@ const LINKS = [
   { id: 'facilities', label: 'Facilities' },
   { id: 'dining', label: 'Dining & events' },
   { id: 'gallery', label: 'Gallery' },
+  ...(TESTIMONIALS.length ? [{ id: 'reviews', label: 'Reviews' }] : []),
   { id: 'nearby', label: 'Nearby' },
   { id: 'location', label: 'Location' },
   { id: 'faq', label: 'FAQs' },

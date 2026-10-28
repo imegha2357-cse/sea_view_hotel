@@ -1,6 +1,7 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth, connectAuthEmulator } from 'firebase/auth';
 import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore';
+import { initializeAppCheck, ReCaptchaV3Provider } from 'firebase/app-check';
 
 const env = import.meta.env;
 
@@ -17,6 +18,12 @@ const config = {
 export const firebaseReady = Boolean(config.apiKey && config.projectId && config.appId);
 
 export const app = firebaseReady ? initializeApp(config) : null;
+// PRD 10.4 abuse protection: Firebase App Check with reCAPTCHA v3, when a site key is supplied.
+// After it reports traffic in the console, turn on enforcement for Firestore and Authentication.
+if (app && env.VITE_RECAPTCHA_SITE_KEY && env.VITE_USE_EMULATORS !== 'true') {
+  initializeAppCheck(app, { provider: new ReCaptchaV3Provider(env.VITE_RECAPTCHA_SITE_KEY), isTokenAutoRefreshEnabled: true });
+}
+
 export const auth = app ? getAuth(app) : null;
 export const db = app ? getFirestore(app) : null;
 

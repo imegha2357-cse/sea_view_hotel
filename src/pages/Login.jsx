@@ -5,6 +5,7 @@ import SmartImg from '../components/SmartImg';
 import { EASE } from '../components/Motion';
 import { authMessage, useAuth } from '../lib/auth';
 import { firebaseReady, NOT_CONFIGURED } from '../lib/firebase';
+import { usePageMeta } from '../lib/seo';
 
 function AuthField({ id, label, type = 'text', value, onChange, autoComplete, required = true }) {
   return (
@@ -26,9 +27,7 @@ export default function Login() {
   const [info, setInfo] = useState('');
   const set = (k) => (e) => setF((s) => ({ ...s, [k]: e.target.value }));
 
-  useEffect(() => {
-    document.title = 'Guest sign in | Hotel Sea View';
-  }, []);
+  usePageMeta('Guest sign in | Hotel Sea View', 'Sign in to track your Hotel Sea View enquiries.', { noindex: true });
   useEffect(() => {
     if (!loading && user) nav(isAdmin ? '/admin' : loc.state?.from || '/account', { replace: true });
   }, [user, isAdmin, loading]);

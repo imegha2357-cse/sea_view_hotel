@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom';
 import { HOTEL, mapsLink } from '../data/content';
 import { Brand, NAV } from './Header';
+import { analyticsEnabled } from '../lib/analytics';
+import { openCookieSettings } from './CookieConsent';
 
 export default function Footer() {
   return (
@@ -62,6 +64,11 @@ export default function Footer() {
         <span>© {new Date().getFullYear()} Hotel Sea View, Kanyakumari</span>
         <span style={{ display: 'flex', gap: 18, flexWrap: 'wrap' }}>
           <Link to="/privacy">Privacy notice</Link>
+          {analyticsEnabled && (
+            <button type="button" className="footer-link" onClick={openCookieSettings}>
+              Cookie settings
+            </button>
+          )}
           <Link to="/login">Guest sign in</Link>
           <Link to="/admin/login">Staff sign in</Link>
         </span>

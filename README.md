@@ -69,6 +69,18 @@ npm run deploy    # builds and deploys hosting + rules to Firebase
 
 Local testing without touching production: set `VITE_USE_EMULATORS=true`, run `firebase emulators:start`, then `npm run dev`.
 
+## Optional features (switch on in `.env` or Vercel environment variables)
+
+| Variable | Turns on |
+| --- | --- |
+| `VITE_GA_ID` | Google Analytics 4 with a cookie consent banner (FR-12). Nothing loads until the visitor allows it. |
+| `VITE_RECAPTCHA_SITE_KEY` | Firebase App Check bot protection for the enquiry form and logins. |
+| `VITE_IMAGE_CDN=off` | Disables Vercel photo resizing (use when hosting elsewhere). |
+
+To show reviews, add approved quotes to `TESTIMONIALS` in `src/data/content.js`; the Reviews section appears automatically.
+
+See `HANDOVER.md` for PRD coverage, known limitations, third-party services and the acceptance test status.
+
 ## How enquiries work (PRD section 6)
 
 1. The guest fills the form (or the booking bar pre-fills dates). Validation runs in the browser and again in `firestore.rules` on the server.
@@ -86,7 +98,7 @@ Marked `CONFIRM` in `src/data/content.js`:
 - Room sizes for all rooms except Standard, and a distinct Corner Deluxe description
 - Rate display decision (currently enquiry-only)
 - Bar opening hours, conference hall capacity and equipment
-- Approved testimonials (section stays hidden while the list is empty)
+- Approved testimonials (the Reviews section stays hidden while the list is empty)
 - Final privacy notice (`src/pages/Privacy.jsx` is a draft), data retention period
 - Final logo files, brand colours and fonts (current tokens are the PRD proposal)
 

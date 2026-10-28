@@ -457,3 +457,23 @@ p { margin: 0; }
 .about-copy h2 { font-size: clamp(30px, 4.4vw, 48px); }
 .enquiry-aside h2 { font-size: clamp(32px, 4.4vw, 52px); }
 @media (max-width: 860px) { .scroll-cue { display: none; } .hero-content { padding-bottom: 110px; } }
+
+/* ---------- Reviews (WS-09, #85) ---------- */
+.reviews { position: relative; max-width: 820px; margin: 0 auto; text-align: center; min-height: 220px; display: grid; justify-items: center; gap: 24px; }
+.quote-mark { font-family: var(--display); font-size: 96px; line-height: 0.6; color: var(--sand); height: 40px; }
+.review { margin: 0; display: grid; gap: 18px; }
+.review blockquote { margin: 0; font-family: var(--display); font-size: clamp(20px, 2.6vw, 28px); line-height: 1.4; color: var(--teal); }
+.review figcaption { font-size: 14px; color: var(--muted); display: grid; gap: 2px; }
+.review figcaption b { color: var(--charcoal); font-weight: 600; }
+.review-dots { display: flex; gap: 10px; }
+.review-dots button { width: 9px; height: 9px; padding: 0; border-radius: 50%; border: 0; background: var(--line); cursor: pointer; transition: background-color 200ms, transform 200ms; }
+.review-dots button.on { background: var(--teal); transform: scale(1.25); }
+
+/* ---------- Cookie consent (PRD 10.4) ---------- */
+.consent { position: fixed; z-index: 95; left: max(16px, env(safe-area-inset-left, 0px)); right: max(16px, env(safe-area-inset-right, 0px)); bottom: calc(16px + env(safe-area-inset-bottom, 0px)); max-width: 720px; margin: 0 auto; background: var(--white); color: var(--charcoal); border: 1px solid var(--line); box-shadow: 0 16px 40px rgba(23, 59, 58, 0.18); padding: 20px 22px; display: flex; gap: 18px 24px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+.consent h2 { font-size: 20px; margin-bottom: 4px; }
+.consent p { font-size: 14px; color: var(--muted); max-width: 52ch; }
+.consent-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.consent-actions .btn { min-height: 42px; padding: 10px 18px; font-size: 12px; }
+.footer-link { border: 0; background: none; padding: 0; color: inherit; font: inherit; cursor: pointer; }
+.footer-link:hover { color: var(--ivory); }

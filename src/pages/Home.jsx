@@ -11,14 +11,20 @@ import Attractions from '../sections/Attractions';
 import Location from '../sections/Location';
 import Faq from '../sections/Faq';
 import Enquire from '../sections/Enquire';
+import Testimonials from '../sections/Testimonials';
 import { WaveDivider } from '../components/Motion';
+import { usePageMeta } from '../lib/seo';
 
 export default function Home() {
   const [prefill, setPrefill] = useState(null);
   const merge = (p) => setPrefill((s) => ({ ...(s || {}), ...p }));
 
+  usePageMeta(
+    'Hotel Sea View, Kanyakumari | Sea-View Rooms by the Beach',
+    'Hotel Sea View on East Car Street, Kanyakumari: sea-view rooms facing the sunrise, Vivekananda Rock and Thiruvalluvar Statue, a multi-cuisine restaurant and 24-hour room service. Enquire on WhatsApp or online.'
+  );
+
   useEffect(() => {
-    document.title = 'Hotel Sea View, Kanyakumari | Sea-View Rooms by the Beach';
     if (window.location.hash) {
       const el = document.getElementById(window.location.hash.slice(1));
       if (el) setTimeout(() => el.scrollIntoView(), 50);
@@ -37,6 +43,7 @@ export default function Home() {
       <Experiences />
       <WaveDivider />
       <Gallery />
+      <Testimonials />
       <Attractions />
       <Location />
       <Faq />

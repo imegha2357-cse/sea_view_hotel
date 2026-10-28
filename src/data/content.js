@@ -179,7 +179,9 @@ export const FAQS = [
   // CONFIRM and add: check-in / check-out times, cancellation policy, child policy, pets.
 ];
 
-// WS-09: only client-approved testimonials with permission. Leave empty to hide the section.
+// WS-09: only client-approved testimonials, published with the guest's permission and accurate attribution.
+// The section stays hidden while this list is empty. Add entries in this shape:
+// { quote: 'Exact approved words of the guest.', name: 'Guest name or initials', from: 'City', date: 'Month Year', source: 'Google review' }
 export const TESTIMONIALS = [];
 
 export const ENQUIRY_STATUSES = ['New', 'Contacted', 'Availability Checked', 'Awaiting Guest', 'Confirmed', 'Cancelled', 'Closed'];

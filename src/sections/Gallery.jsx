@@ -43,7 +43,7 @@ export default function Gallery() {
               aria-label={`Open photo: ${img(g.image).alt}`}
             >
               <motion.div layoutId={`gal-${cat}-${g.image}`}>
-                <SmartImg name={g.image} />
+                <SmartImg name={g.image} sizes="(max-width: 600px) 50vw, 25vw" width={480} />
               </motion.div>
             </motion.button>
           ))}
@@ -61,7 +61,7 @@ function Lightbox({ items, cat, index, setIndex }) {
   const trackRef = useRef(null);
   const [offset, setOffset] = useState(0);
   const item = items[index];
-  const meta = img(item.image);
+  const meta = img(item.image, { width: 1920 });
 
   const go = (d) => {
     setDir(d);
@@ -111,8 +111,10 @@ function Lightbox({ items, cat, index, setIndex }) {
             key={item.image}
             className="lb-img"
             src={meta.src}
+            srcSet={meta.srcSet}
+            sizes="100vw"
             onError={(e) => {
-              if (e.currentTarget.src !== meta.fallback) e.currentTarget.src = meta.fallback;
+              if (e.currentTarget.src !== meta.fallback) { e.currentTarget.removeAttribute('srcset'); e.currentTarget.src = meta.fallback; }
             }}
             alt={meta.alt}
             layoutId={`gal-${cat}-${item.image}`}
@@ -138,10 +140,10 @@ function Lightbox({ items, cat, index, setIndex }) {
       <div className="thumbs" ref={stripRef}>
         <div className="thumbs-track" ref={trackRef} style={{ transform: `translateX(${offset}px)` }}>
           {items.map((g, k) => {
-            const m = img(g.image);
+            const m = img(g.image, { width: 480 });
             return (
               <button key={g.image} className={k === index ? 'on' : ''} onClick={() => { setDir(k > index ? 1 : -1); setIndex(k); }} aria-label={`Photo ${k + 1}`}>
-                <img src={m.src} alt="" loading="lazy" onError={(e) => { if (e.currentTarget.src !== m.fallback) e.currentTarget.src = m.fallback; }} />
+                <img src={m.src} alt="" loading="lazy" onError={(e) => { if (e.currentTarget.src !== m.fallback) { e.currentTarget.removeAttribute('srcset'); e.currentTarget.src = m.fallback; } }} />
               </button>
             );
           })}

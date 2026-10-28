@@ -6,6 +6,7 @@ import { emptyEnquiry, MESSAGE_MAX, submitEnquiry, todayISO, validateEnquiry, wh
 import { useAuth } from '../lib/auth';
 import { CheckCircle, ChatIcon } from './Icons';
 import { EASE } from './Motion';
+import { trackEvent } from '../lib/analytics';
 
 function Field({ id, label, error, children, className = '', staticLabel }) {
   return (
@@ -99,6 +100,7 @@ export default function EnquiryForm({ prefill, compact = false, onSubmitted }) {
     try {
       await submitEnquiry(v, user);
       setDoneData(v);
+      trackEvent('generate_lead', { method: 'website_form', room_type: v.room_type || 'any' });
       setState('done');
       onSubmitted?.();
     } catch (err) {

@@ -41,7 +41,7 @@ export default function Hero() {
               animate={{ scale: 1 }}
               transition={{ duration: DURATION / 1000 + 1.2, ease: EASE }}
             >
-              <SmartImg name={SLIDES[i]} eager={i === 0} style={{ width: '100%', height: '100%' }} />
+              <SmartImg name={SLIDES[i]} eager={i === 0} sizes="100vw" width={1920} style={{ width: '100%', height: '100%' }} />
             </motion.div>
           </motion.div>
         </AnimatePresence>

@@ -1,11 +1,9 @@
-import { useEffect } from 'react';
 import { HOTEL } from '../data/content';
+import { usePageMeta } from '../lib/seo';
 
 // DRAFT. PRD 10.4 requires a client-approved privacy notice before launch.
 export default function Privacy() {
-  useEffect(() => {
-    document.title = 'Privacy notice | Hotel Sea View';
-  }, []);
+  usePageMeta('Privacy notice | Hotel Sea View', 'How Hotel Sea View, Kanyakumari collects and uses the details you send in a booking enquiry.');
   return (
     <main id="main" className="page">
       <div className="container prose">
