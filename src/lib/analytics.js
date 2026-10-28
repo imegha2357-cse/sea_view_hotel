@@ -2,7 +2,9 @@
 // measurement ID (VITE_GA_ID) AND the visitor accepts analytics cookies.
 // Nothing is loaded or stored before consent. Without VITE_GA_ID this file does nothing.
 
-export const GA_ID = import.meta.env.VITE_GA_ID || '';
+// Measurement ID from the client's Firebase / Google Analytics property. Set VITE_GA_ID=off to disable.
+const RAW = import.meta.env.VITE_GA_ID || 'G-R1LGWTMCRK';
+export const GA_ID = RAW === 'off' ? '' : RAW;
 export const analyticsEnabled = Boolean(GA_ID);
 
 const KEY = 'seaview-consent';

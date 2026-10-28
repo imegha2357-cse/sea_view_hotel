@@ -5,13 +5,25 @@ import { initializeAppCheck, ReCaptchaV3Provider } from 'firebase/app-check';
 
 const env = import.meta.env;
 
+// Firebase web config for the "sea-view-hotel" project. These values identify the project and are
+// public by design; access is controlled by firestore.rules and Authentication, not by hiding them.
+// VITE_FIREBASE_* environment variables override them (e.g. for a staging project).
+const DEFAULTS = {
+  apiKey: 'AIzaSyDNpIuuY_cmh6dLaaq8HUe_d5nQJPXy5KY',
+  authDomain: 'sea-view-hotel.firebaseapp.com',
+  projectId: 'sea-view-hotel',
+  storageBucket: 'sea-view-hotel.firebasestorage.app',
+  messagingSenderId: '667027835296',
+  appId: '1:667027835296:web:56d0d4af24dc17e6c2bcc5',
+};
+
 const config = {
-  apiKey: env.VITE_FIREBASE_API_KEY,
-  authDomain: env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: env.VITE_FIREBASE_APP_ID,
+  apiKey: env.VITE_FIREBASE_API_KEY || DEFAULTS.apiKey,
+  authDomain: env.VITE_FIREBASE_AUTH_DOMAIN || DEFAULTS.authDomain,
+  projectId: env.VITE_FIREBASE_PROJECT_ID || DEFAULTS.projectId,
+  storageBucket: env.VITE_FIREBASE_STORAGE_BUCKET || DEFAULTS.storageBucket,
+  messagingSenderId: env.VITE_FIREBASE_MESSAGING_SENDER_ID || DEFAULTS.messagingSenderId,
+  appId: env.VITE_FIREBASE_APP_ID || DEFAULTS.appId,
 };
 
 // The public site still renders without Firebase; forms and logins show a clear setup message instead.
