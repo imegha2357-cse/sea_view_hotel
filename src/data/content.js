@@ -1,0 +1,185 @@
+// All hotel facts below are taken from the current hotelseaview.in pages and rewritten.
+// Items marked CONFIRM need client approval before launch (PRD sections 11 and 15).
+
+export const HOTEL = {
+  name: 'Hotel Sea View',
+  shortName: 'Sea View',
+  city: 'Kanyakumari',
+  addressLines: ['East Car Street', 'Kanyakumari, Tamil Nadu 629 702', 'India'],
+  phone: '+91 94894 74968',
+  phoneHref: '+919489474968',
+  whatsapp: '919489474968',
+  restaurantPhone: '+91 76959 59109',
+  restaurantPhoneHref: '+917695959109',
+  email: 'sales@hotelseaview.in',
+  facebook: 'https://www.facebook.com/hotelseaviewkanyakumari',
+  mapQuery: 'Hotel Sea View, East Car Street, Kanyakumari, Tamil Nadu 629702',
+  // CONFIRM: check-in / check-out times are not published on the current site.
+  checkIn: null,
+  checkOut: null,
+};
+
+export const mapsLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(HOTEL.mapQuery)}`;
+export const mapsEmbed = `https://www.google.com/maps?q=${encodeURIComponent(HOTEL.mapQuery)}&output=embed`;
+
+export const ABOUT = {
+  eyebrow: 'Welcome to Hotel Sea View',
+  title: 'Sunrise over the sea, from the heart of Kanyakumari',
+  body: [
+    'Hotel Sea View stands on East Car Street, close to the beach and a few minutes from the Kanyakumari bus terminus. Several rooms look out over the sea towards the Vivekananda Rock Memorial and the Thiruvalluvar Statue, so you can watch the sunrise without leaving your room.',
+    'Every room has a private bathroom, television and direct-dial telephone, with room service around the clock. Our travel desk arranges sightseeing and package tours across the region.',
+  ],
+  highlights: [
+    { title: 'Sunrise views', text: 'Sea-facing rooms look towards the Vivekananda Rock Memorial and Thiruvalluvar Statue.' },
+    { title: 'Near the beach', text: 'Walk to the shore; the bus terminus is a few minutes away.' },
+    { title: '24-hour room service', text: 'Meals and help at any hour of the day or night.' },
+    { title: 'Travel desk', text: 'Sightseeing and package tours arranged by our team.' },
+  ],
+};
+
+export const ROOMS = [
+  {
+    id: 'standard',
+    name: 'Standard Room',
+    image: 'roomStandard',
+    view: 'City view',
+    tags: ['city'],
+    summary: 'Wooden furnishings, a work area and views over the town as the evening lights come on.',
+    beds: 'King or twin',
+    occupancy: '2 adults + 2 children under 6',
+    size: '300 sq ft',
+    features: ['Private bathroom', 'Television', 'Direct-dial phone', 'Work area'],
+  },
+  {
+    id: 'deluxe-seaview',
+    name: 'Deluxe Seaview Room',
+    image: 'roomDeluxe',
+    view: 'Sea view',
+    tags: ['sea'],
+    summary: 'Faces the sea, the Vivekananda Rock Memorial and the Thiruvalluvar Statue. Watch the sunrise from your bed.',
+    beds: 'King or twin',
+    occupancy: '2 adults + 2 children under 6',
+    size: null, // CONFIRM room size
+    features: ['Sunrise from the bed', 'Private bathroom', 'Television', 'Work area'],
+  },
+  {
+    id: 'corner-deluxe',
+    name: 'Corner Deluxe Room',
+    image: 'roomCorner',
+    view: 'Sea view',
+    tags: ['sea'],
+    summary: 'A corner room with sea views on the sunrise side of the hotel.',
+    beds: 'King or twin',
+    occupancy: '2 adults + 2 children under 6',
+    size: null, // CONFIRM room size and a distinct description
+    features: ['Sunrise from the bed', 'Private bathroom', 'Television'],
+  },
+  {
+    id: 'twin',
+    name: 'Twin Room (interconnected)',
+    image: 'roomTwin',
+    view: 'Sea and city view',
+    tags: ['sea', 'family'],
+    summary: 'Two interconnected rooms for families staying together. One balcony faces the sea and sunrise; the other overlooks the town.',
+    beds: 'King or twin',
+    occupancy: '4 adults + 4 children under 6',
+    size: null, // CONFIRM room size
+    features: ['Two balconies', 'Interconnecting door', 'Sea and city views'],
+  },
+  {
+    id: 'executive-suite',
+    name: 'Executive Suite',
+    image: 'roomSuite',
+    view: 'Sea view',
+    tags: ['sea'],
+    summary: 'Our most spacious stay, with views over the sea to the island memorials and sunrise from the bed.',
+    beds: 'King or twin',
+    occupancy: '2 adults + 2 children under 6',
+    size: null, // CONFIRM room size
+    features: ['Sunrise from the bed', 'Sea views', 'Work area'],
+  },
+];
+
+export const ROOM_TYPES = ROOMS.map((r) => r.name);
+
+// Rates are enquiry-only until the client confirms the rate-display decision (PRD 15).
+export const RATE_NOTE = 'Rates depend on dates and availability. Send an enquiry and we will reply with prices.';
+
+export const FACILITIES = [
+  { icon: 'parking', label: 'Free parking' },
+  { icon: 'wifi', label: 'Wi-Fi' },
+  { icon: 'breakfast', label: 'Daily breakfast' },
+  { icon: 'bell', label: '24-hour room service' },
+  { icon: 'laundry', label: 'Laundry service' },
+  { icon: 'ac', label: 'Air-conditioned restaurant' },
+  { icon: 'map', label: 'Travel desk and tours' },
+  { icon: 'sun', label: 'Sunrise views' },
+];
+
+export const EXPERIENCES = [
+  {
+    id: 'restaurant',
+    tab: 'Restaurant',
+    title: 'Sea View Restaurant',
+    images: ['restaurant1', 'restaurant2'],
+    text: 'A fully air-conditioned, multi-cuisine restaurant serving Indian, Chinese and Continental dishes, with vegetarian and non-vegetarian menus.',
+    details: ['Indian, Chinese and Continental', 'Vegetarian and non-vegetarian', `Reservations: +91 76959 59109`],
+  },
+  {
+    id: 'bar',
+    tab: 'Wave Bar',
+    title: 'Wave Bar',
+    images: ['bar1', 'bar2'],
+    text: 'Unwind with a drink before dinner or a nightcap after a day of sightseeing. A snack menu is served alongside.',
+    details: ['Wines, spirits and cocktails', 'Snack menu'], // CONFIRM opening hours
+  },
+  {
+    id: 'meetings',
+    tab: 'Meetings',
+    title: 'Conference Hall',
+    images: ['meeting'],
+    text: 'A meeting room for business gatherings and family events, with our team on hand to look after the details.',
+    details: ['Meetings and small events', 'Catering from our restaurant'], // CONFIRM capacity and equipment
+  },
+];
+
+export const ATTRACTIONS = [
+  { name: 'Vivekananda Rock Memorial', image: 'vivekananda', text: 'The island memorial and its glass bridge, reached by ferry from the shore.' },
+  { name: 'Thiruvalluvar Statue', image: 'thiruvalluvar', text: 'The tall stone statue of the Tamil poet beside the rock memorial.' },
+  { name: 'Kanyakumari Beach', image: 'beach', text: 'Where three seas meet, a short walk from the hotel.' },
+  { name: 'Gandhi Memorial Mandapam', image: 'gandhi', text: 'Memorial hall on the seafront.' },
+  { name: 'Sunset Point', image: 'sunset', text: 'A favourite spot to watch the evening sky.' },
+];
+
+export const GALLERY = [
+  { image: 'roomDeluxe', cat: 'Rooms' },
+  { image: 'front', cat: 'Hotel' },
+  { image: 'restaurant1', cat: 'Dining' },
+  { image: 'vivekananda', cat: 'Views' },
+  { image: 'roomSuite', cat: 'Rooms' },
+  { image: 'bar1', cat: 'Dining' },
+  { image: 'thiruvalluvar', cat: 'Views' },
+  { image: 'roomCorner', cat: 'Rooms' },
+  { image: 'frontAlt', cat: 'Hotel' },
+  { image: 'restaurant2', cat: 'Dining' },
+  { image: 'sunset', cat: 'Views' },
+  { image: 'roomTwin', cat: 'Rooms' },
+  { image: 'meeting', cat: 'Hotel' },
+  { image: 'beach', cat: 'Views' },
+  { image: 'roomStandard', cat: 'Rooms' },
+  { image: 'bar2', cat: 'Dining' },
+];
+
+export const FAQS = [
+  { q: 'How do I book a room?', a: 'Send an enquiry on this page or message us on WhatsApp. Our team confirms availability, price and booking terms with you directly. The website does not confirm reservations by itself.' },
+  { q: 'Is parking available?', a: 'Yes. Parking is free for hotel guests.' },
+  { q: 'Which rooms have a sea view?', a: 'The Deluxe Seaview Room, Corner Deluxe Room, Executive Suite and one side of the interconnected Twin Room face the sea and the sunrise.' },
+  { q: 'Is room service available at night?', a: 'Yes. Room service runs 24 hours a day.' },
+  { q: 'Can you arrange sightseeing?', a: 'Our travel desk arranges local sightseeing and package tours. Ask at reception or mention it in your enquiry.' },
+  // CONFIRM and add: check-in / check-out times, cancellation policy, child policy, pets.
+];
+
+// WS-09: only client-approved testimonials with permission. Leave empty to hide the section.
+export const TESTIMONIALS = [];
+
+export const ENQUIRY_STATUSES = ['New', 'Contacted', 'Availability Checked', 'Awaiting Guest', 'Confirmed', 'Cancelled', 'Closed'];

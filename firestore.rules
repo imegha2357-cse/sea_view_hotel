@@ -1,0 +1,74 @@
+rules_version = '2';
+
+// PRD 7.2: deny public reads, validate every field on the server, least-privilege access.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() { return request.auth != null; }
+    function isAdmin() { return signedIn() && exists(/databases/$(database)/documents/admins/$(request.auth.uid)); }
+
+    function validStatus(s) {
+      return s in ['New', 'Contacted', 'Availability Checked', 'Awaiting Guest', 'Confirmed', 'Cancelled', 'Closed'];
+    }
+    function optString(d, k, max) {
+      return !(k in d) || d[k] == null || (d[k] is string && d[k].size() <= max);
+    }
+    function validNewEnquiry(d) {
+      return d.keys().hasOnly(['guest_name', 'phone', 'email', 'check_in', 'check_out', 'adults', 'children',
+                               'room_type', 'message', 'source', 'status', 'userId', 'created_at', 'updated_at'])
+        && d.guest_name is string && d.guest_name.size() > 0 && d.guest_name.size() <= 80
+        && d.phone is string && d.phone.matches('^\\+?[0-9][0-9 \\-]{8,16}$')
+        && (d.email == null || (d.email is string && d.email.matches('^[^\\s@]+@[^\\s@]+\\.[^\\s@]{2,}$') && d.email.size() <= 120))
+        && d.check_in is timestamp && d.check_out is timestamp
+        && d.check_in > request.time - duration.value(2, 'd')
+        && d.check_out > d.check_in
+        && d.check_out < request.time + duration.value(730, 'd')
+        && d.adults is int && d.adults >= 1 && d.adults <= 20
+        && d.children is int && d.children >= 0 && d.children <= 20
+        && optString(d, 'room_type', 60)
+        && optString(d, 'message', 1000)
+        && d.source == 'website_form'
+        && d.status == 'New'
+        && d.created_at == request.time && d.updated_at == request.time
+        && (d.userId == null || (signedIn() && d.userId == request.auth.uid));
+    }
+
+    match /booking_enquiries/{id} {
+      // Anyone may submit a valid enquiry; nobody but staff can list or read them,
+      // except a signed-in guest reading their own.
+      allow create: if validNewEnquiry(request.resource.data);
+      allow read: if isAdmin() || (signedIn() && resource.data.userId == request.auth.uid);
+      // Staff may change only status, notes and the update time.
+      allow update: if isAdmin()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'staff_notes', 'updated_at'])
+        && validStatus(request.resource.data.status)
+        && optString(request.resource.data, 'staff_notes', 2000)
+        && request.resource.data.updated_at == request.time;
+      allow delete: if false; // retention/deletion handled by agreed procedure (PRD 7.2)
+    }
+
+    match /users/{uid} {
+      allow read: if (signedIn() && request.auth.uid == uid) || isAdmin();
+      allow create: if signedIn() && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['name', 'phone', 'email', 'role', 'createdAt'])
+        && request.resource.data.role == 'guest'
+        && request.resource.data.name is string && request.resource.data.name.size() <= 80
+        && request.resource.data.phone is string && request.resource.data.phone.size() <= 20;
+      allow update: if signedIn() && request.auth.uid == uid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['name', 'phone'])
+        && request.resource.data.name is string && request.resource.data.name.size() <= 80
+        && request.resource.data.phone is string && request.resource.data.phone.size() <= 20;
+      allow delete: if false;
+    }
+
+    // Admin membership is managed only with the Admin SDK (npm run create-users) or the Firebase console.
+    match /admins/{uid} {
+      allow read: if signedIn() && request.auth.uid == uid;
+      allow write: if false;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
