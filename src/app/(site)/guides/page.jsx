@@ -10,7 +10,7 @@ export const metadata = meta('/guides');
 export default function Guides() {
   return (
     <>
-      <PageTop image="beach" title="Kanyakumari guides" text="Short guides to help you plan your visit." trail={[{ label: 'Guides', href: '/guides' }]} />
+      <PageTop slot="guides" title="Kanyakumari guides" text="Short guides to help you plan your visit." trail={[{ label: 'Guides', href: '/guides' }]} />
       <section className="sec" style={{ paddingTop: 24 }}>
         <div className="container wide guide-grid">
           {GUIDES.map((g, i) => (

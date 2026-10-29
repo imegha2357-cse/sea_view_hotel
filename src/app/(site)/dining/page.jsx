@@ -10,7 +10,7 @@ export default function Dining() {
   const bar = EXPERIENCES.find((e) => e.id === 'bar');
   return (
     <>
-      <PageTop image="restaurant1" title="Dining" text="Sea View Restaurant, the Wave Bar and room service around the clock." trail={[{ label: 'Dining', href: '/dining' }]} />
+      <PageTop slot="dining" title="Dining" text="Sea View Restaurant, the Wave Bar and room service around the clock." trail={[{ label: 'Dining', href: '/dining' }]} />
       <section className="sec" style={{ paddingTop: 24 }}>
         <div className="container wide">
           <Split id="restaurant" images={restaurant.images} tag="Multi-cuisine" title={restaurant.title} text={restaurant.text} list={restaurant.details}>

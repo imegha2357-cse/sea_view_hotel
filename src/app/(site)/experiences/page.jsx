@@ -11,7 +11,7 @@ export const metadata = meta('/experiences');
 export default function Experiences() {
   return (
     <>
-      <PageTop image="vivekananda" title="Experiences" text="The landmarks at the tip of India, with sightseeing from our travel desk." trail={[{ label: 'Experiences', href: '/experiences' }]} />
+      <PageTop slot="experiences" title="Experiences" text="The landmarks at the tip of India, with sightseeing from our travel desk." trail={[{ label: 'Experiences', href: '/experiences' }]} />
       <section className="sec" style={{ paddingTop: 24 }}>
         <div className="container wide">
           {ATTRACTIONS.map((a, i) => (

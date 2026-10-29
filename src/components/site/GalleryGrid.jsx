@@ -31,14 +31,14 @@ export default function GalleryGrid({ items, filters = true }) {
           {list.map((g, i) => (
             <motion.button
               layout
-              key={g.image}
+              key={`${g.image}-${g.cat}`}
               className={`g-tile zoom-hover ${cat === 'All' ? SHAPES[i % SHAPES.length] : ''}`}
               initial={{ opacity: 0, scale: 0.96 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.96 }}
               transition={{ duration: 0.45, ease: EASE }}
               onClick={() => setLb(i)}
-              aria-label={`Open photo: ${photo(g.image).alt}`}
+              aria-label={`Open photo: ${g.alt || photo(g.image)?.alt || g.cat || "Hotel Sea View"}`}
             >
               <Photo k={g.image} sizes="(max-width: 900px) 50vw, 33vw" alt="" />
               <span>{g.cat}</span>

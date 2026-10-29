@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Brand from './Brand';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useState } from 'react';
 import { ATTRACTIONS, HOTEL } from '@/data/content';
@@ -158,6 +159,10 @@ export default function Footer() {
           <Link href="/dining#bar">Wave Bar</Link>
           <Link href="/meetings">Conference Hall</Link>
         </div>
+
+        <Link href="/" className="ftr-logo" aria-label="Hotel Sea View, home">
+          <Brand light stacked />
+        </Link>
 
         <div className="ftr-bottom">
           <span>© {new Date().getFullYear()} Hotel Sea View, Kanyakumari. All rights reserved.</span>

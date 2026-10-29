@@ -1,17 +1,19 @@
-import { GALLERY } from '@/data/content';
+import { getSite } from '@/lib/cms-server';
 import { meta } from '@/lib/meta';
 import PageTop from '@/components/site/PageTop';
 import GalleryGrid from '@/components/site/GalleryGrid';
 
 export const metadata = meta('/gallery');
+export const revalidate = 600;
 
-export default function Gallery() {
+export default async function Gallery() {
+  const { gallery } = await getSite();
   return (
     <>
-      <PageTop image="building" title="Gallery" trail={[{ label: 'Gallery', href: '/gallery' }]} />
+      <PageTop slot="gallery" title="Gallery" trail={[{ label: 'Gallery', href: '/gallery' }]} />
       <section className="sec" style={{ paddingTop: 24 }}>
         <div className="container wide">
-          <GalleryGrid items={GALLERY} />
+          {gallery.length ? <GalleryGrid items={gallery} /> : <p className="empty-note">New photos are on the way.</p>}
         </div>
       </section>
     </>

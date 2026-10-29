@@ -12,7 +12,7 @@ export default function Policies() {
   return (
     <>
       <JsonLd data={faqLd()} />
-      <PageTop image="entrance" title="Hotel policies" text={`If something is not covered here, call ${HOTEL.phone}.`} trail={[{ label: 'Policies', href: '/policies' }]} />
+      <PageTop slot="policies" title="Hotel policies" text={`If something is not covered here, call ${HOTEL.phone}.`} trail={[{ label: 'Policies', href: '/policies' }]} />
       <section className="sec" style={{ paddingTop: 24 }}>
         <div className="container wide">
           <div className="policy-grid">

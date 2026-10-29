@@ -11,12 +11,13 @@ import { sourceLabel } from '../../lib/attribution';
 import { ENQUIRY_STATUSES } from '../../data/content';
 import Brand from '@/components/site/Brand';
 import { EASE } from '../../components/Motion';
-import { addDemoEnquiries, removeDemoEnquiries } from '../../lib/demo';
+import { removeDemoEnquiries } from '../../lib/demo';
 import Drawer from './Drawer';
 import Reports from './Reports';
 import AvailabilityEditor from './AvailabilityEditor';
 import Inbox from './Inbox';
 import ManualEntry from './ManualEntry';
+import ContentManager from './content/ContentManager';
 
 const pillClass = (s) => `pill st-${s.replace(/ /g, '-')}`;
 const OPEN = ['New', 'Contacted', 'Availability Checked', 'Awaiting Guest'];
@@ -58,6 +59,7 @@ const TABS = [
   ['availability', 'Availability'],
   ['reports', 'Reports'],
   ['inbox', 'Inbox'],
+  ['content', 'Website'],
 ];
 
 export default function AdminDashboard() {
@@ -189,18 +191,12 @@ export default function AdminDashboard() {
                   Add phone or walk-in enquiry
                 </button>
               )}
-              {canEdit &&
-                (demoCount ? (
-                  <button className="btn outline" disabled={demoBusy} onClick={() => runDemo(removeDemoEnquiries, (n) => `Removed ${n} demo enquiries.`)}>
-                    {demoBusy && <span className="spin dark" aria-hidden="true" />}
-                    Remove {demoCount} demo enquiries
-                  </button>
-                ) : (
-                  <button className="btn outline" disabled={demoBusy || !rows} onClick={() => runDemo(addDemoEnquiries, (n) => `Added ${n} demo enquiries, marked Demo.`)}>
-                    {demoBusy && <span className="spin dark" aria-hidden="true" />}
-                    Add 15 demo enquiries
-                  </button>
-                ))}
+              {canEdit && demoCount > 0 && (
+                <button className="btn outline" disabled={demoBusy} onClick={() => runDemo(removeDemoEnquiries, (n) => `Removed ${n} demo enquiries.`)}>
+                  {demoBusy && <span className="spin dark" aria-hidden="true" />}
+                  Remove {demoCount} demo enquiries
+                </button>
+              )}
               <button className="btn outline" onClick={() => exportCsv(filtered)} disabled={!filtered.length}>
                 Export CSV
               </button>
@@ -289,8 +285,8 @@ export default function AdminDashboard() {
                           <span className="sub">{r.phone}</span>
                         </td>
                         <td className="num">
-                          {formatDate(r.check_in)} → {formatDate(r.check_out)}
-                          <span className="sub">{nightsLabel(r.check_in, r.check_out)}</span>
+                          {r.check_in ? `${formatDate(r.check_in)} → ${formatDate(r.check_out)}` : 'Dates not given'}
+                          {r.check_in && <span className="sub">{nightsLabel(r.check_in, r.check_out)}</span>}
                         </td>
                         <td className="num">{r.enquiry_type && r.enquiry_type !== 'stay' ? `${r.event_guests || '?'} (${r.enquiry_type})` : `${r.adults}A${r.children ? ` · ${r.children}C` : ''}`}</td>
                         <td>{r.room_type || 'Any'}</td>
@@ -319,6 +315,7 @@ export default function AdminDashboard() {
         {tab === 'availability' && <AvailabilityEditor canEdit={canEdit} me={me} />}
         {tab === 'reports' && <Reports rows={rows || []} />}
         {tab === 'inbox' && <Inbox canEdit={canEdit} />}
+        {tab === 'content' && <ContentManager canEdit={canEdit} me={me} />}
       </main>
 
       <AnimatePresence>

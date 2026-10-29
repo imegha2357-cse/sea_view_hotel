@@ -16,7 +16,7 @@ export default function Contact() {
   ];
   return (
     <>
-      <PageTop image="entrance" title="Contact us" trail={[{ label: 'Contact', href: '/contact' }]} />
+      <PageTop slot="contact" title="Contact us" trail={[{ label: 'Contact', href: '/contact' }]} />
       <section className="sec" style={{ paddingTop: 24 }}>
         <div className="container wide">
           <div className="contact-grid">

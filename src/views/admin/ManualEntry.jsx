@@ -5,11 +5,12 @@ import { motion } from 'framer-motion';
 import { fb } from '../../lib/firebase';
 import { todayISO } from '../../lib/enquiry';
 import { lockScroll, unlockScroll } from '../../lib/scroll';
-import { ROOM_TYPES } from '../../data/content';
+import { useSiteData } from '@/components/SiteData';
 import { EASE } from '../../components/Motion';
 
 // Feature #49: staff record enquiries that arrive by phone, walk-in or email, so every lead is in one list.
 export default function ManualEntry({ onClose, me }) {
+  const { rooms } = useSiteData();
   const [v, setV] = useState({ source: 'phone', guest_name: '', phone: '', email: '', check_in: '', check_out: '', adults: 2, children: 0, room_type: '', message: '', status: 'New' });
   const [err, setErr] = useState('');
   const [busy, setBusy] = useState(false);
@@ -121,8 +122,8 @@ export default function ManualEntry({ onClose, me }) {
           </label>
           <select id="m-room" value={v.room_type} onChange={f('room_type')}>
             <option value="">No preference</option>
-            {ROOM_TYPES.map((r) => (
-              <option key={r}>{r}</option>
+            {rooms.map((r) => (
+              <option key={r.id}>{r.name}</option>
             ))}
           </select>
           <label className="lbl" htmlFor="m-msg">

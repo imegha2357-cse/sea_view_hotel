@@ -1,9 +1,9 @@
 // One list of public pages with their title and description (PRD 10.1: unique per page).
-// Used by the pages themselves and by scripts/prerender.mjs, which writes per-page HTML and sitemap.xml.
-import { GUIDES, ROOMS } from './content.js';
+// Room pages are added from the admin-managed rooms (see rooms/[id]/page.jsx and sitemap.js).
+import { GUIDES } from './content.js';
 
 // Keep descriptions under about 160 characters, cut at a word.
-const clip = (s, n = 160) => (s.length <= n ? s : `${s.slice(0, s.lastIndexOf(' ', n - 1))}…`);
+export const clip = (s, n = 160) => (s.length <= n ? s : `${s.slice(0, s.lastIndexOf(' ', n - 1))}…`);
 
 export const PAGES = [
   {
@@ -16,16 +16,9 @@ export const PAGES = [
   {
     path: '/rooms',
     title: 'Rooms and suites | Hotel Sea View, Kanyakumari',
-    description: 'Compare the five room types at Hotel Sea View, Kanyakumari: Standard, Deluxe Seaview, Corner Deluxe, interconnected Twin Rooms and the Executive Suite.',
+    description: 'Rooms and suites at Hotel Sea View, Kanyakumari: sea-view rooms facing the sunrise, city-view and family rooms. Compare views, beds and sizes.',
     priority: '0.9',
   },
-  ...ROOMS.map((r) => ({
-    path: `/rooms/${r.id}`,
-    title: `${r.name} | Hotel Sea View, Kanyakumari`,
-    description: clip(`${r.summary} ${r.view}. Sleeps ${r.occupancy}.`),
-    priority: '0.8',
-    room: r.id,
-  })),
   {
     path: '/dining',
     title: 'Dining | Sea View Restaurant and Wave Bar, Kanyakumari',

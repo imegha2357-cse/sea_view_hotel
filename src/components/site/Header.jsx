@@ -3,8 +3,9 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { MAIN_NAV, MENU_PROMO } from '@/data/nav';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { buildNav, MENU_PROMO } from '@/data/nav';
+import { useSiteData } from '@/components/SiteData';
 import { HOTEL } from '@/data/content';
 import { useAuth } from '@/lib/auth';
 import { lockScroll, unlockScroll } from '@/lib/scroll';
@@ -68,7 +69,7 @@ function MegaPanel({ item, onNavigate }) {
   );
 }
 
-function MobileDrawer({ onClose, account }) {
+function MobileDrawer({ onClose, account, nav }) {
   const [open, setOpen] = useState(null);
   useEffect(() => {
     lockScroll();
@@ -88,7 +89,7 @@ function MobileDrawer({ onClose, account }) {
         </button>
       </div>
       <nav aria-label="Main">
-        {MAIN_NAV.map((item, i) => {
+        {nav.map((item, i) => {
           const subs = [...(item.tiles || []), ...(item.columns || []).flat()];
           const uniq = subs.filter((s, k) => subs.findIndex((x) => x.href === s.href) === k);
           return (
@@ -144,6 +145,8 @@ function MobileDrawer({ onClose, account }) {
 }
 
 export default function Header() {
+  const { rooms, offers } = useSiteData();
+  const MAIN_NAV = useMemo(() => buildNav({ rooms, offers }), [rooms, offers]);
   const pathname = usePathname();
   const { user, isAdmin } = useAuth();
   const [hero, setHero] = useState(true);
@@ -270,7 +273,7 @@ export default function Header() {
         </AnimatePresence>
         <AnimatePresence>{openId && <motion.div className="mega-scrim" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={close} onMouseEnter={hoverClose} aria-hidden="true" />}</AnimatePresence>
       </header>
-      <AnimatePresence>{drawer && <MobileDrawer onClose={() => setDrawer(false)} account={account} />}</AnimatePresence>
+      <AnimatePresence>{drawer && <MobileDrawer onClose={() => setDrawer(false)} account={account} nav={MAIN_NAV} />}</AnimatePresence>
     </>
   );
 }

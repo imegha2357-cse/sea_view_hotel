@@ -4,7 +4,7 @@ import { formatDate } from '../../lib/enquiry';
 // Feature #48: ready-made WhatsApp replies. Staff fill in the [brackets] before sending.
 export function templates(r) {
   const first = String(r.guest_name || '').split(' ')[0] || 'there';
-  const dates = `${formatDate(r.check_in)} to ${formatDate(r.check_out)}`;
+  const dates = r.check_in && r.check_out ? `${formatDate(r.check_in)} to ${formatDate(r.check_out)}` : 'your dates';
   const room = r.room_type || 'a room';
   const list = [
     {

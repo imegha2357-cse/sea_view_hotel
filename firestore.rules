@@ -35,7 +35,7 @@ service cloud.firestore {
       return ['guest_name', 'phone', 'email', 'check_in', 'check_out', 'adults', 'children',
               'room_type', 'message', 'source', 'status', 'userId', 'created_at', 'updated_at',
               'enquiry_type', 'event_guests', 'pickup', 'addons', 'callback_time', 'promo_code',
-              'referrer', 'utm_source', 'utm_medium', 'utm_campaign', 'privacy_consent_at', 'lang'];
+              'referrer', 'utm_source', 'utm_medium', 'utm_campaign', 'privacy_consent_at', 'lang', 'channel'];
     }
     function validExtras(d) {
       return optIn(d, 'enquiry_type', ['stay', 'event', 'meeting'])
@@ -48,7 +48,17 @@ service cloud.firestore {
         && optString(d, 'utm_source', 100)
         && optString(d, 'utm_medium', 100)
         && optString(d, 'utm_campaign', 100)
-        && optString(d, 'lang', 8);
+        && optString(d, 'lang', 8)
+        && optIn(d, 'channel', ['whatsapp', 'form']);
+    }
+
+    // Dates are optional on the enquiry form: either both are given (and sensible) or both are null.
+    function validDates(d) {
+      return (d.check_in == null && d.check_out == null)
+        || (d.check_in is timestamp && d.check_out is timestamp
+          && d.check_in > request.time - duration.value(2, 'd')
+          && d.check_out > d.check_in
+          && d.check_out < request.time + duration.value(730, 'd'));
     }
 
     function validNewEnquiry(d) {
@@ -56,10 +66,7 @@ service cloud.firestore {
         && d.guest_name is string && d.guest_name.size() > 0 && d.guest_name.size() <= 80
         && d.phone is string && d.phone.matches('^\\+?[0-9][0-9 \\-]{8,16}$')
         && (d.email == null || (d.email is string && d.email.matches('^[^\\s@]+@[^\\s@]+\\.[^\\s@]{2,}$') && d.email.size() <= 120))
-        && d.check_in is timestamp && d.check_out is timestamp
-        && d.check_in > request.time - duration.value(2, 'd')
-        && d.check_out > d.check_in
-        && d.check_out < request.time + duration.value(730, 'd')
+        && validDates(d)
         && d.adults is int && d.adults >= 1 && d.adults <= 20
         && d.children is int && d.children >= 0 && d.children <= 20
         && optString(d, 'room_type', 60)
@@ -194,6 +201,104 @@ service cloud.firestore {
         && request.resource.data.at == request.time;
       allow read: if isAdmin();
       allow delete: if canEdit();
+    }
+
+    // ---------- Website content managed from the admin panel ----------
+    // Everyone can read it (it is the public website); only staff who can edit may change it.
+    function optList(d, k, max) {
+      return !(k in d) || d[k] == null || (d[k] is list && d[k].size() <= max);
+    }
+    function optNum(d, k) {
+      return !(k in d) || d[k] == null || d[k] is int || d[k] is float;
+    }
+    function optBool(d, k) {
+      return !(k in d) || d[k] is bool;
+    }
+
+    match /rooms/{id} {
+      allow read: if true;
+      allow delete: if canEdit();
+      allow create, update: if canEdit()
+        && id.matches('^[a-z0-9][a-z0-9-]{0,59}$')
+        && request.resource.data.keys().hasOnly(['name', 'category', 'summary', 'description', 'view', 'beds',
+             'occupancy', 'guests', 'size', 'rate', 'features', 'amenities', 'images', 'order', 'published',
+             'updated_at', 'updated_by'])
+        && request.resource.data.name is string && request.resource.data.name.size() > 0 && request.resource.data.name.size() <= 80
+        && optString(request.resource.data, 'category', 60)
+        && optString(request.resource.data, 'summary', 400)
+        && optString(request.resource.data, 'description', 4000)
+        && optString(request.resource.data, 'view', 80)
+        && optString(request.resource.data, 'beds', 80)
+        && optString(request.resource.data, 'occupancy', 80)
+        && optString(request.resource.data, 'size', 40)
+        && optString(request.resource.data, 'updated_by', 120)
+        && optInt(request.resource.data, 'guests', 1, 50)
+        && optNum(request.resource.data, 'rate')
+        && optNum(request.resource.data, 'order')
+        && optBool(request.resource.data, 'published')
+        && optList(request.resource.data, 'features', 20)
+        && optList(request.resource.data, 'amenities', 40)
+        && optList(request.resource.data, 'images', 20);
+    }
+
+    match /offers/{code} {
+      allow read: if true;
+      allow delete: if canEdit();
+      allow create, update: if canEdit()
+        && code.matches('^[A-Za-z0-9_-]{1,30}$')
+        && request.resource.data.keys().hasOnly(['code', 'title', 'tag', 'text', 'includes', 'image', 'room', 'type',
+             'order', 'published', 'updated_at', 'updated_by'])
+        && request.resource.data.title is string && request.resource.data.title.size() > 0 && request.resource.data.title.size() <= 100
+        && optString(request.resource.data, 'code', 30)
+        && optString(request.resource.data, 'tag', 40)
+        && optString(request.resource.data, 'text', 1000)
+        && optString(request.resource.data, 'image', 80)
+        && optString(request.resource.data, 'room', 60)
+        && optString(request.resource.data, 'updated_by', 120)
+        && optIn(request.resource.data, 'type', ['stay', 'event', 'meeting'])
+        && optNum(request.resource.data, 'order')
+        && optBool(request.resource.data, 'published')
+        && optList(request.resource.data, 'includes', 12);
+    }
+
+    match /site/content {
+      allow read: if true;
+      allow write: if canEdit()
+        && request.resource.data.keys().hasOnly(['seeded', 'categories', 'hero', 'gallery', 'banners', 'updated_at', 'updated_by'])
+        && optBool(request.resource.data, 'seeded')
+        && optList(request.resource.data, 'categories', 12)
+        && optList(request.resource.data, 'hero', 12)
+        && optList(request.resource.data, 'gallery', 120)
+        && (!('banners' in request.resource.data) || request.resource.data.banners is map)
+        && optString(request.resource.data, 'updated_by', 120);
+    }
+
+    // Photos uploaded in the admin panel, stored as compressed WebP/JPEG text (base64), max ~730 KB each.
+    function validMediaInfo(d) {
+      return d.mime in ['image/webp', 'image/jpeg', 'image/png']
+        && d.name is string && d.name.size() <= 120
+        && d.w is int && d.w > 0 && d.w <= 6000
+        && d.h is int && d.h > 0 && d.h <= 6000
+        && d.size is int && d.size > 0 && d.size <= 760000
+        && optString(d, 'alt', 200)
+        && optString(d, 'created_by', 120);
+    }
+    match /media/{id} {
+      allow read: if true;
+      allow delete: if canEdit();
+      allow create, update: if canEdit()
+        && id.matches('^[A-Za-z0-9_-]{6,40}$')
+        && request.resource.data.keys().hasOnly(['data', 'mime', 'name', 'w', 'h', 'size', 'alt', 'created_at', 'created_by'])
+        && request.resource.data.data is string && request.resource.data.data.size() <= 1000000
+        && validMediaInfo(request.resource.data);
+    }
+    match /media_meta/{id} {
+      allow read: if true;
+      allow delete: if canEdit();
+      allow create, update: if canEdit()
+        && id.matches('^[A-Za-z0-9_-]{6,40}$')
+        && request.resource.data.keys().hasOnly(['mime', 'name', 'w', 'h', 'size', 'alt', 'created_at', 'created_by'])
+        && validMediaInfo(request.resource.data);
     }
 
     match /{document=**} {

@@ -20,11 +20,13 @@ export function cloudinaryLoader({ src, width, quality }) {
 export default function Photo({ k, alt, sizes = '100vw', priority = false, fill = true, className = '', quality, style }) {
   const p = photo(k);
   const [loaded, setLoaded] = useState(false);
+  if (!p) return null;
   return (
     <Image
       src={p.src}
       alt={alt ?? p.alt}
       {...(fill ? { fill: true } : { width: p.width, height: p.height })}
+      unoptimized={false}
       sizes={sizes}
       priority={priority}
       quality={quality || 85}

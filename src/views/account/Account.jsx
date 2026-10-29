@@ -7,7 +7,8 @@ import { fb } from '../../lib/firebase';
 import { useAuth, useIdleSignOut } from '../../lib/auth';
 import { formatDate, nightsLabel, whatsappUrl } from '../../lib/enquiry';
 import { downloadText, stayIcs, toISODate } from '../../lib/ics';
-import { GOOGLE_REVIEW_URL, HOTEL, ROOMS } from '../../data/content';
+import { GOOGLE_REVIEW_URL, HOTEL } from '../../data/content';
+import { useSiteData } from '@/components/SiteData';
 import EnquiryForm from '../../components/EnquiryForm';
 import Brand from '@/components/site/Brand';
 import { EASE } from '../../components/Motion';
@@ -146,7 +147,7 @@ function EnquiryCard({ it, i, author, onRebook }) {
       <div>
         <h3>{it.room_type || TYPE_LABEL[it.enquiry_type] || 'Any room'}</h3>
         <p className="meta">
-          {formatDate(it.check_in)} to {formatDate(it.check_out)} · {nightsLabel(it.check_in, it.check_out)} ·{' '}
+          {it.check_in ? `${formatDate(it.check_in)} to ${formatDate(it.check_out)} · ${nightsLabel(it.check_in, it.check_out)}` : 'Dates not given'} ·{' '}
           {it.enquiry_type && it.enquiry_type !== 'stay' ? `${it.event_guests || '?'} guests` : `${it.adults} adults${it.children ? `, ${it.children} children` : ''}`}
         </p>
         <p className="meta">Sent {formatDate(it.created_at)}</p>
@@ -164,7 +165,7 @@ function EnquiryCard({ it, i, author, onRebook }) {
             {it.checkin ? 'Edit online check-in' : 'Online check-in'}
           </button>
         )}
-        {!past && it.status !== 'Cancelled' && (
+        {!past && it.check_in && it.status !== 'Cancelled' && (
           <button className="text-btn" onClick={() => downloadText('hotel-sea-view-stay.ics', stayIcs(stay))}>
             Add to calendar
           </button>
@@ -190,6 +191,7 @@ function EnquiryCard({ it, i, author, onRebook }) {
 }
 
 export default function Account() {
+  const { rooms } = useSiteData();
   const { user, profile, logout, saveProfile } = useAuth();
   const idleWarn = useIdleSignOut(30);
   const [items, setItems] = useState(null);
@@ -206,7 +208,7 @@ export default function Account() {
   useEffect(() => {
     setP({ name: profile?.name || user?.displayName || '', phone: profile?.phone || '' });
     setPrefs({ floor: '', bed: '', diet: '', notes: '', ...(profile?.preferences || {}) });
-    setSavedRooms(profile?.saved_rooms || []);
+    setSavedRooms((profile?.saved_rooms || []).filter((id) => rooms.some((r) => r.id === id)));
   }, [profile, user]);
 
   useEffect(() => {
@@ -227,7 +229,7 @@ export default function Account() {
     e.preventDefault();
     setSaved('');
     try {
-      await saveProfile({ ...p, preferences: prefs, saved_rooms: savedRooms });
+      await saveProfile({ ...p, preferences: prefs, saved_rooms: savedRooms.filter((id) => rooms.some((r) => r.id === id)) });
       setSaved('Saved');
     } catch {
       setSaved('Could not save. Try again.');
@@ -382,7 +384,7 @@ export default function Account() {
                 </div>
                 <fieldset className="addons">
                   <legend>Saved rooms</legend>
-                  {ROOMS.map((r) => (
+                  {rooms.map((r) => (
                     <label key={r.id} className="check">
                       <input type="checkbox" checked={savedRooms.includes(r.id)} onChange={() => toggleRoom(r.id)} />
                       <span>

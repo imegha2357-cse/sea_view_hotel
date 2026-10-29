@@ -1,13 +1,14 @@
 // Header and footer structure, modelled on the Taj layout but pointing only at things Hotel Sea View has.
-import { ATTRACTIONS, HOTEL, OFFERS, ROOMS } from './content.js';
+import { ATTRACTIONS, HOTEL } from './content.js';
 
-export const MAIN_NAV = [
+// Rooms and offers come from the admin panel, so the menu is built from the live data.
+export const buildNav = ({ rooms = [], offers = [] } = {}) => [
   {
     id: 'stay',
     label: 'Stay',
     href: '/rooms',
     // Image tiles, like the Taj "Memberships" panel
-    tiles: ROOMS.map((r) => ({ label: r.name, href: `/rooms/${r.id}`, image: r.image })),
+    tiles: rooms.slice(0, 6).map((r) => ({ label: r.name, href: `/rooms/${r.id}`, image: r.image })),
   },
   {
     id: 'dining',
@@ -35,7 +36,7 @@ export const MAIN_NAV = [
     id: 'offers',
     label: 'Offers',
     href: '/offers',
-    tiles: OFFERS.map((o) => ({ label: o.title, href: `/offers#${o.code.toLowerCase()}`, image: o.image })),
+    tiles: offers.slice(0, 5).map((o) => ({ label: o.title, href: `/offers#${o.code.toLowerCase()}`, image: o.image })),
   },
   {
     id: 'events',

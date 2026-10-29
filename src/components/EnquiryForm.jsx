@@ -3,12 +3,14 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Link } from '@/lib/router';
-import { OFFERS, ROOM_TYPES } from '../data/content';
+import { HOTEL } from '../data/content';
+import { useSiteData } from './SiteData';
 import {
   ADDONS,
   CALLBACK_TIMES,
   draft,
   emptyEnquiry,
+  enquiryMessage,
   ENQUIRY_TYPES,
   estimate,
   MESSAGE_MAX,
@@ -19,7 +21,7 @@ import {
   submitEnquiry,
   todayISO,
   validateEnquiry,
-  whatsappUrl,
+  waLink,
 } from '../lib/enquiry';
 import { blockedInStay, fetchBlockedDates } from '../lib/availability';
 import { preloadFirebase } from '../lib/firebase';
@@ -82,6 +84,10 @@ function Counter({ label, value, min, max, onChange, hint }) {
 
 export default function EnquiryForm({ prefill, compact = false, onSubmitted, defaultType = 'stay' }) {
   const { user, profile } = useAuth();
+  const { rooms, offers } = useSiteData();
+  const [waUrl, setWaUrl] = useState('');
+  const [waText, setWaText] = useState('');
+  const [copied, setCopied] = useState(false);
   const [v, setV] = useState(() => ({ ...emptyEnquiry(profile || (user ? { email: user.email, name: user.displayName } : null)), enquiry_type: defaultType }));
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState(false);
@@ -131,46 +137,54 @@ export default function EnquiryForm({ prefill, compact = false, onSubmitted, def
   }, [v, state]);
 
   const blockedNights = useMemo(() => blockedInStay(blocked, v.check_in, v.check_out), [blocked, v.check_in, v.check_out]);
-  const est = estimate(v);
-  const offer = offerFor(v.promo_code);
+  const est = estimate(v, rooms);
+  const offer = offerFor(v.promo_code, offers);
   const isStay = v.enquiry_type === 'stay';
 
   const update = (patch) =>
     setV((s) => {
       const next = { ...s, ...patch };
-      if (touched) setErrors(validateEnquiry(next, { blockedNights: blockedInStay(blocked, next.check_in, next.check_out) }));
+      if (touched) setErrors(validateEnquiry(next, { blockedNights: blockedInStay(blocked, next.check_in, next.check_out), rooms }));
       return next;
     });
   const set = (k) => (e) => update({ [k]: e.target.type === 'checkbox' ? e.target.checked : e.target.value });
   const toggleAddon = (id) => update({ addons: v.addons.includes(id) ? v.addons.filter((a) => a !== id) : [...v.addons, id] });
 
-  const submit = async (e) => {
+  // Requirement: the form opens WhatsApp with the enquiry written out. The guest reviews it and presses
+  // Send in WhatsApp; this page never claims the message was sent. WhatsApp is opened straight from the
+  // click (so browsers do not block it); a copy is then saved for the staff dashboard in the background.
+  const submit = (e) => {
     e.preventDefault();
     setTouched(true);
-    const errs = validateEnquiry(v, { blockedNights });
+    const errs = validateEnquiry(v, { blockedNights, rooms });
     setErrors(errs);
     if (Object.keys(errs).length) {
       const first = formRef.current?.querySelector(`[name="${Object.keys(errs)[0]}"]`);
       first?.focus();
       return;
     }
-    setState('sending');
+    const text = enquiryMessage(v, { offer });
+    const url = waLink(text);
+    // (window.open with 'noopener' always returns null, so the opener is cleared by hand instead.)
+    const win = window.open(url, '_blank');
+    if (win) win.opener = null;
+    setWaText(text);
+    setWaUrl(url);
+    setDoneData({ ...v, popupBlocked: !win });
+    setState('done');
     setServerError('');
+    draft.clear();
+    trackEvent('generate_lead', { method: 'whatsapp_form', room_type: v.room_type || 'any', enquiry_type: v.enquiry_type });
+    submitEnquiry(v, user).catch(() => {});
+    onSubmitted?.();
+  };
+
+  const copy = async () => {
     try {
-      await submitEnquiry(v, user);
-      setDoneData(v);
-      setState('done');
-      draft.clear();
-      trackEvent('generate_lead', { method: 'website_form', room_type: v.room_type || 'any', enquiry_type: v.enquiry_type });
-      onSubmitted?.();
-    } catch (err) {
-      setState('error');
-      setServerError(
-        err?.code === 'permission-denied'
-          ? 'We could not accept that enquiry. Please check the details, or message us on WhatsApp.'
-          : err?.message || 'Your enquiry was not sent. Check your connection and try again, or message us on WhatsApp.'
-      );
-    }
+      await navigator.clipboard.writeText(waText);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {}
   };
 
   const describedBy = (k) => (errors[k] ? `${k}-err` : undefined);
@@ -179,55 +193,37 @@ export default function EnquiryForm({ prefill, compact = false, onSubmitted, def
     <div className="form-card" ref={cardRef}>
       <AnimatePresence mode="wait">
         {state === 'done' && doneData ? (
-          // #93 success panel, shown only after Firestore confirms the write
-          <motion.div key="done" className="success" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: EASE }} role="status">
-            <CheckCircle />
-            <h3>Enquiry received</h3>
-            <dl className="summary">
-              <dt>Name</dt>
-              <dd>{doneData.guest_name}</dd>
-              <dt>Dates</dt>
-              <dd>
-                {doneData.check_in} to {doneData.check_out} ({nightsLabel(doneData.check_in, doneData.check_out)})
-              </dd>
-              <dt>Guests</dt>
-              <dd>
-                {doneData.enquiry_type === 'stay' ? `${doneData.adults} adults, ${doneData.children} children` : `${doneData.event_guests || 'Not given'} guests`}
-              </dd>
-              {doneData.room_type && (
-                <>
-                  <dt>Room</dt>
-                  <dd>{doneData.room_type}</dd>
-                </>
-              )}
-            </dl>
-            <p className="form-note">This is a request, not a confirmed booking. Our team will call or WhatsApp you on {doneData.phone} to confirm availability, price and booking terms.</p>
+          // Honest confirmation: WhatsApp has been opened; the enquiry is sent only when the guest presses Send there.
+          <motion.div key="done" className="success wa-done" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: EASE }} role="status">
+            <span className="wa-done-icon" aria-hidden="true">
+              <ChatIcon />
+            </span>
+            <h3>{doneData.popupBlocked ? 'Your WhatsApp message is ready' : 'WhatsApp is open with your message'}</h3>
+            <p className="wa-steps">
+              {doneData.popupBlocked
+                ? 'Tap “Open WhatsApp” below, check the message and press Send.'
+                : 'Check the message in WhatsApp and press Send. Your enquiry reaches us only when you send it there.'}
+            </p>
+            <pre className="wa-preview" aria-label="Your message">{waText}</pre>
             <div className="form-actions">
-              <button type="button" className="btn outline" onClick={() => downloadText('hotel-sea-view-stay.ics', stayIcs(doneData))}>
-                Save dates to calendar
+              <a className="btn solid" href={waUrl} target="_blank" rel="noreferrer">
+                <ChatIcon /> {doneData.popupBlocked ? 'Open WhatsApp' : 'Open WhatsApp again'}
+              </a>
+              <button type="button" className="btn outline" onClick={copy}>
+                {copied ? 'Message copied' : 'Copy message'}
               </button>
-              {user ? (
-                <Link to="/account" className="btn outline">
-                  View my enquiries
-                </Link>
-              ) : (
-                <Link to="/login" className="btn outline">
-                  Create an account to track it
-                </Link>
+              {doneData.check_in && doneData.check_out && (
+                <button type="button" className="btn outline" onClick={() => downloadText('hotel-sea-view-stay.ics', stayIcs(doneData))}>
+                  Save dates to calendar
+                </button>
               )}
-              <button
-                type="button"
-                className="text-btn"
-                onClick={() => {
-                  setState('idle');
-                  setV({ ...emptyEnquiry(profile), enquiry_type: defaultType });
-                  setTouched(false);
-                  setErrors({});
-                }}
-              >
-                Send another enquiry
+              <button type="button" className="text-btn" onClick={() => setState('idle')}>
+                Edit the enquiry
               </button>
             </div>
+            <p className="form-note">
+              No WhatsApp on this device? Call us on <a href={`tel:${HOTEL.phoneHref}`}>{HOTEL.phone}</a>. Our team confirms availability, price and booking terms with you; this is not a confirmed booking.
+            </p>
           </motion.div>
         ) : (
           <motion.form key="form" ref={formRef} onSubmit={submit} noValidate exit={{ opacity: 0, y: -12 }} transition={{ duration: 0.3 }} aria-label="Booking enquiry">
@@ -262,10 +258,10 @@ export default function EnquiryForm({ prefill, compact = false, onSubmitted, def
               <Field id="email" label="Email (optional)" error={errors.email} className="full">
                 <input id="email" name="email" placeholder=" " type="email" autoComplete="email" value={v.email} onChange={set('email')} aria-invalid={!!errors.email} aria-describedby={describedBy('email')} />
               </Field>
-              <Field id="check_in" label={isStay ? 'Check-in *' : 'Event date *'} error={errors.check_in} staticLabel>
+              <Field id="check_in" label={isStay ? 'Check-in (optional)' : 'Event date (optional)'} error={errors.check_in} staticLabel>
                 <input id="check_in" name="check_in" type="date" min={todayISO()} value={v.check_in} onChange={set('check_in')} aria-invalid={!!errors.check_in} aria-describedby={describedBy('check_in')} />
               </Field>
-              <Field id="check_out" label={isStay ? 'Check-out *' : 'Until *'} error={errors.check_out} staticLabel>
+              <Field id="check_out" label={isStay ? 'Check-out (optional)' : 'Until (optional)'} error={errors.check_out} staticLabel>
                 <input id="check_out" name="check_out" type="date" min={v.check_in || todayISO()} value={v.check_out} onChange={set('check_out')} aria-invalid={!!errors.check_out} aria-describedby={describedBy('check_out')} />
               </Field>
               <div className="full">
@@ -287,8 +283,8 @@ export default function EnquiryForm({ prefill, compact = false, onSubmitted, def
                   <Field id="room_type" label="Room preference" error={errors.room_type} className="full" staticLabel>
                     <select id="room_type" name="room_type" value={v.room_type} onChange={set('room_type')}>
                       <option value="">No preference</option>
-                      {ROOM_TYPES.map((r) => (
-                        <option key={r}>{r}</option>
+                      {rooms.map((r) => (
+                        <option key={r.id}>{r.name}</option>
                       ))}
                     </select>
                   </Field>
@@ -340,7 +336,7 @@ export default function EnquiryForm({ prefill, compact = false, onSubmitted, def
                         ))}
                       </fieldset>
                     )}
-                    {OFFERS.length > 0 && (
+                    {offers.length > 0 && (
                       <Field id="promo_code" label="Offer code" error={errors.promo_code}>
                         <input id="promo_code" name="promo_code" placeholder=" " value={v.promo_code} onChange={set('promo_code')} maxLength={30} />
                         {v.promo_code && <div className={`hint ${offer ? 'ok' : ''}`}>{offer ? `${offer.title}: noted for our team` : 'We will check this code'}</div>}
@@ -391,20 +387,13 @@ export default function EnquiryForm({ prefill, compact = false, onSubmitted, def
               )}
               <div className="full form-actions">
                 {/* #92 submit states */}
-                <button className="btn solid submit-btn" type="submit" disabled={state === 'sending'} aria-busy={state === 'sending'}>
-                  {state === 'sending' ? (
-                    <>
-                      <span className="spin" aria-hidden="true" /> Sending…
-                    </>
-                  ) : (
-                    'Send enquiry'
-                  )}
+                <button className="btn solid submit-btn" type="submit">
+                  <ChatIcon /> Continue to WhatsApp
                 </button>
-                <a className="btn outline wa" href={whatsappUrl(v)} target="_blank" rel="noreferrer">
-                  <ChatIcon /> Send on WhatsApp
-                </a>
               </div>
-              <p className="full form-note">This sends a request to our team. It does not confirm a booking or hold a room.</p>
+              <p className="full form-note">
+                This opens WhatsApp with your enquiry written out, ready for you to check and send to {HOTEL.name} on {HOTEL.phone}. It is not a confirmed booking.
+              </p>
             </div>
           </motion.form>
         )}

@@ -1,7 +1,7 @@
 // Unit tests for the booking logic (feature #79). Run with: npm test
 import { test } from 'vitest';
 import assert from 'node:assert/strict';
-import { emptyEnquiry, nights, validateEnquiry, whatsappUrl, todayISO } from '../src/lib/enquiry.js';
+import { emptyEnquiry, enquiryMessage, nights, validateEnquiry, waLink, whatsappUrl, todayISO } from '../src/lib/enquiry.js';
 import { blockedInStay, nightsBetween } from '../src/lib/availability.js';
 import { stayIcs } from '../src/lib/ics.js';
 import { sunOn } from '../src/lib/sun.js';
@@ -21,7 +21,28 @@ test('a complete enquiry passes validation', () => {
 
 test('required fields and consent are enforced', () => {
   const e = validateEnquiry({ ...emptyEnquiry() });
-  for (const k of ['guest_name', 'phone', 'check_in', 'check_out', 'privacy']) assert.ok(e[k], `missing error for ${k}`);
+  for (const k of ['guest_name', 'phone', 'privacy']) assert.ok(e[k], `missing error for ${k}`);
+});
+
+test('dates are optional, but one date alone is not accepted', () => {
+  const v = good();
+  assert.deepEqual(validateEnquiry({ ...v, check_in: '', check_out: '' }), {});
+  assert.ok(validateEnquiry({ ...v, check_out: '' }).check_out);
+  assert.ok(validateEnquiry({ ...v, check_in: '' }).check_in);
+});
+
+test('the WhatsApp enquiry message is complete and safely encoded', () => {
+  const v = { ...good(), room_type: 'Executive Suite', message: 'Sea view & early check-in? 100% please #1' };
+  const text = enquiryMessage(v);
+  assert.match(text, /Asha Rao/);
+  assert.match(text, /Executive Suite/);
+  assert.match(text, /\+91 98765 43210/);
+  const url = waLink(text);
+  assert.ok(url.startsWith('https://wa.me/919489474968?text='));
+  assert.equal(decodeURIComponent(url.split('text=')[1]), text);
+  assert.ok(!/[ &#%]/.test(url.split('text=')[1].replace(/%[0-9A-F]{2}/g, '')));
+  const noDates = enquiryMessage({ ...v, check_in: '', check_out: '' });
+  assert.match(noDates, /not decided/i);
 });
 
 test('phone numbers must have 10 to 13 digits', () => {
@@ -57,7 +78,7 @@ test('WhatsApp link carries the stay details, URL-encoded', () => {
   assert.ok(u.startsWith('https://wa.me/919489474968?text='));
   const text = decodeURIComponent(u.split('text=')[1]);
   assert.match(text, /Name: Asha Rao/);
-  assert.match(text, /Room preference: Executive Suite/);
+  assert.match(text, /Room: Executive Suite/);
 });
 
 test('calendar file is valid iCalendar with all-day dates', () => {
@@ -80,7 +101,6 @@ test('every page has a unique title and a description under 170 characters', () 
   const titles = new Set(PAGES.map((p) => p.title));
   assert.equal(titles.size, PAGES.length);
   for (const p of PAGES) assert.ok(p.description.length > 50 && p.description.length <= 170, p.path);
-  assert.equal(PAGES.filter((p) => p.room).length, ROOMS.length);
 });
 
 test('no invented prices: rooms without a confirmed rate show none', () => {

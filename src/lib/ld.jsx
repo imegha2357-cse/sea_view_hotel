@@ -1,7 +1,7 @@
 // Structured data (schema.org) built only from facts the hotel has published (PRD 10.1):
 // no ratings, review counts, prices, awards or coordinates.
-import { FAQS, HOTEL, ROOMS } from '@/data/content';
-import { PHOTOS } from '@/data/images';
+import { FAQS, HOTEL } from '@/data/content';
+import { PHOTOS, photoUrl } from '@/data/images';
 import { SITE_URL } from '@/data/site';
 
 const abs = (src) => `${SITE_URL}${src}`;
@@ -43,16 +43,15 @@ export const crumbsLd = (trail) => ({
   itemListElement: [{ label: 'Home', href: '/' }, ...trail].map((t, i) => ({ '@type': 'ListItem', position: i + 1, name: t.label, item: `${SITE_URL}${t.href}` })),
 });
 
-export const roomLd = (id) => {
-  const r = ROOMS.find((x) => x.id === id);
+export const roomLd = (r) => {
   return {
     '@context': 'https://schema.org',
     '@type': 'HotelRoom',
     name: r.name,
-    description: r.summary,
+    description: r.summary || r.description || undefined,
     url: `${SITE_URL}/rooms/${r.id}`,
-    image: abs(PHOTOS[r.image].src),
-    bed: r.beds,
+    image: photoUrl(r.images?.[0], SITE_URL) || undefined,
+    bed: r.beds || undefined,
     containedInPlace: { '@id': `${SITE_URL}/#hotel` },
   };
 };

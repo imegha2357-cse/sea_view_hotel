@@ -1,9 +1,8 @@
 import Link from 'next/link';
-import { ROOM_GROUPS, ROOMS } from '@/data/content';
 import Photo from '../Photo';
 import { Reveal } from './ui';
 
-const meta = (r) => [r.size, r.occupancy].filter(Boolean).join(' • ');
+const meta = (r) => [r.size, r.guests ? `Up to ${r.guests} guests` : r.occupancy].filter(Boolean).join(' • ');
 
 function Tile({ href, image, title, sub, i }) {
   return (
@@ -24,24 +23,27 @@ function Tile({ href, image, title, sub, i }) {
   );
 }
 
+const TOUR = { title: 'Room tour', meta: 'Watch the 73-second video', href: '/room-tour', image: 'tourPoster' };
+
 // Grid of tall room photos with names over them, broken up by text tiles that introduce each group.
-export default function RoomMosaic() {
+// Rooms and groups come from the admin panel.
+export default function RoomMosaic({ rooms = [], categories = [] }) {
   let k = 0;
+  const groups = categories.map((c) => ({ ...c, rooms: rooms.filter((r) => r.category === c.id) })).filter((g) => g.rooms.length);
+  const rest = rooms.filter((r) => !categories.some((c) => c.id === r.category));
+  if (rest.length) groups.push({ id: 'more', title: 'More rooms', text: 'Other room types at Hotel Sea View.', rooms: rest });
   return (
     <div className="mosaic">
-      {ROOM_GROUPS.map((g) => {
+      {groups.map((g, gi) => {
         const text = (
-          <Reveal key={`${g.title}-text`} i={k++ % 4} className="mosaic-text">
+          <Reveal key={`${g.id}-text`} i={k++ % 4} className="mosaic-text">
             <h3>{g.title}</h3>
-            <p>{g.text}</p>
+            {g.text && <p>{g.text}</p>}
           </Reveal>
         );
-        const tiles = g.rooms.map((id) => {
-          const r = ROOMS.find((x) => x.id === id);
-          return <Tile key={id} i={k++ % 4} href={`/rooms/${r.id}`} image={r.image} title={r.name} sub={meta(r)} />;
-        });
-        if (g.extra) tiles.push(<Tile key={g.extra.href} i={k++ % 4} href={g.extra.href} image={g.extra.image} title={g.extra.title} sub={g.extra.meta} />);
-        return g.textFirst ? [text, ...tiles] : [...tiles, text];
+        const tiles = g.rooms.map((r) => <Tile key={r.id} i={k++ % 4} href={`/rooms/${r.id}`} image={r.images[0] || 'building'} title={r.name} sub={meta(r)} />);
+        if (gi === groups.length - 1) tiles.push(<Tile key="tour" i={k++ % 4} href={TOUR.href} image={TOUR.image} title={TOUR.title} sub={TOUR.meta} />);
+        return gi % 2 === 0 ? [text, ...tiles] : [...tiles, text];
       })}
     </div>
   );

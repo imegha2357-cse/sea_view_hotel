@@ -1,26 +1,30 @@
 import Link from 'next/link';
-import { HOTEL, OFFERS } from '@/data/content';
+import { HOTEL } from '@/data/content';
+import { getOffers, getRooms } from '@/lib/cms-server';
 import { meta } from '@/lib/meta';
 import PageTop from '@/components/site/PageTop';
 import OfferCard from '@/components/site/OfferCard';
 import { Reveal } from '@/components/site/ui';
 
 export const metadata = meta('/offers');
+export const revalidate = 600;
 
-export default function Offers() {
+export default async function Offers() {
+  const [offers, rooms] = await Promise.all([getOffers(), getRooms()]);
+  const roomNames = rooms.map((r) => r.name);
   return (
     <>
-      <PageTop image="sunset" title="Offers and packages" text="Ways to make the most of Kanyakumari. Our team confirms each rate with your dates." trail={[{ label: 'Offers', href: '/offers' }]} />
+      <PageTop slot="offers" title="Offers and packages" text="Ways to make the most of Kanyakumari. Our team confirms each rate with your dates." trail={[{ label: 'Offers', href: '/offers' }]} />
       <section className="sec" style={{ paddingTop: 24 }}>
         <div className="container wide">
           <p className="notice" style={{ marginBottom: 28 }}>
             Every offer is an enquiry, not an instant booking: choose one, send your dates, and we reply with availability and the rate by phone or WhatsApp.
           </p>
-          {OFFERS.length ? (
+          {offers.length ? (
             <div className="offer-grid">
-              {OFFERS.map((o, i) => (
+              {offers.map((o, i) => (
                 <Reveal key={o.code} i={i % 3} id={o.code.toLowerCase()} className="offer-anchor">
-                  <OfferCard o={o} />
+                  <OfferCard o={o} roomNames={roomNames} />
                 </Reveal>
               ))}
             </div>

@@ -42,7 +42,7 @@ export default function Lightbox({ items, start = 0, onClose }) {
     <motion.div className="lb" role="dialog" aria-modal="true" aria-label="Photo gallery" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }} data-lenis-prevent>
       <div className="lb-top">
         <span aria-live="polite">
-          {i + 1} / {n} · {it.caption || photo(it.image).alt}
+          {i + 1} / {n} · {it.caption || it.alt || photo(it.image)?.alt || "Hotel Sea View"}
         </span>
         <button ref={closeRef} className="lb-close" onClick={onClose} aria-label="Close gallery">
           ×
@@ -66,7 +66,7 @@ export default function Lightbox({ items, start = 0, onClose }) {
               else if (info.offset.x > 60) go(-1);
             }}
           >
-            <Photo k={it.image} sizes="92vw" quality={90} />
+            <Photo k={it.image} sizes="92vw" quality={90} alt={it.alt || photo(it.image)?.alt || "Hotel Sea View photo"} />
           </motion.div>
         </AnimatePresence>
         <div className="lb-nav">

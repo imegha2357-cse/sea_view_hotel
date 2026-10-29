@@ -11,7 +11,7 @@ export const metadata = meta('/meetings');
 export default function Meetings() {
   return (
     <>
-      <PageTop image="meeting" title="Meetings and events" text="A conference hall for meetings, training and family functions." trail={[{ label: 'Meetings and events', href: '/meetings' }]} />
+      <PageTop slot="meetings" title="Meetings and events" text="A conference hall for meetings, training and family functions." trail={[{ label: 'Meetings and events', href: '/meetings' }]} />
       <section className="sec" style={{ paddingTop: 24 }}>
         <div className="container wide">
           <Split images={[MEETINGS.image]} tag="Conference hall" title={MEETINGS.title} text={MEETINGS.text} list={MEETINGS.facts} />

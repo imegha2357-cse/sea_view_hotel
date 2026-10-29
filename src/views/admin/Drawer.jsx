@@ -194,10 +194,10 @@ export default function Drawer({ r, onClose, me, staffList, canEdit, repeat }) {
               <dt>Type</dt>
               <dd>{r.enquiry_type === 'event' ? 'Wedding or event' : r.enquiry_type === 'meeting' ? 'Meeting' : 'Room stay'}</dd>
               <dt>{r.enquiry_type && r.enquiry_type !== 'stay' ? 'Dates' : 'Check-in'}</dt>
-              <dd>{formatDate(r.check_in)}</dd>
+              <dd>{r.check_in ? formatDate(r.check_in) : 'Not given'}</dd>
               <dt>Check-out</dt>
               <dd>
-                {formatDate(r.check_out)} ({nightsLabel(r.check_in, r.check_out)})
+                {r.check_out ? `${formatDate(r.check_out)} (${nightsLabel(r.check_in, r.check_out)})` : 'Not given'}
               </dd>
               <dt>Guests</dt>
               <dd>{r.enquiry_type && r.enquiry_type !== 'stay' ? `${r.event_guests || 'Not given'}` : `${r.adults} adults, ${r.children || 0} children`}</dd>

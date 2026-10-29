@@ -1,5 +1,5 @@
 import { firebaseReady, loadFirebase, NOT_CONFIGURED } from './firebase';
-import { HOTEL, ROOMS, ROOM_TYPES, OFFERS } from '../data/content';
+import { HOTEL } from '../data/content';
 import { getSource } from './attribution';
 import { reportError } from './errors';
 
@@ -13,6 +13,11 @@ const sentTimes = () => {
 };
 
 export const MESSAGE_MAX = 1000;
+
+// The hotel's official WhatsApp number (international format, digits only). Change it here, or set
+// NEXT_PUBLIC_WHATSAPP_NUMBER in Vercel, and every WhatsApp button and the enquiry form follow.
+export const WHATSAPP_NUMBER = (process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || HOTEL.whatsapp).replace(/\D/g, '');
+export const waLink = (text) => `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
 
 export const ENQUIRY_TYPES = [
   { id: 'stay', label: 'Room stay' },
@@ -65,7 +70,7 @@ const PHONE = /^\+?[0-9][0-9\s-]{8,16}$/;
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 // PRD 6.2 validation. Firestore rules repeat these checks on the server.
-export function validateEnquiry(v, { blockedNights = [] } = {}) {
+export function validateEnquiry(v, { blockedNights = [], rooms = null } = {}) {
   const e = {};
   const name = v.guest_name.trim();
   if (!name) e.guest_name = 'Enter your name.';
@@ -80,18 +85,21 @@ export function validateEnquiry(v, { blockedNights = [] } = {}) {
   if (v.newsletter && !v.email.trim()) e.email = 'Add an email to receive offers, or untick the offers box.';
 
   const isStay = v.enquiry_type === 'stay';
-  if (!v.check_in) e.check_in = isStay ? 'Choose a check-in date.' : 'Choose the event date.';
-  else if (v.check_in < todayISO()) e.check_in = 'That date is in the past.';
-  if (!v.check_out) e.check_out = isStay ? 'Choose a check-out date.' : 'Choose the end date.';
-  else if (v.check_in && v.check_out <= v.check_in) e.check_out = isStay ? 'Check-out must be after check-in.' : 'The end date must be after the start date.';
-  if (!e.check_in && !e.check_out && blockedNights.length)
-    e.check_out = `We are fully booked on ${blockedNights.length === 1 ? formatISO(blockedNights[0]) : `${blockedNights.length} of these nights`}. Try other dates or WhatsApp us.`;
+  // Dates are optional (a guest may not have fixed them yet), but if one is given both must make sense.
+  if (v.check_in || v.check_out) {
+    if (!v.check_in) e.check_in = isStay ? 'Add the check-in date too, or clear both dates.' : 'Add the start date too, or clear both dates.';
+    else if (v.check_in < todayISO()) e.check_in = 'That date is in the past.';
+    if (!v.check_out) e.check_out = isStay ? 'Add the check-out date too, or clear both dates.' : 'Add the end date too, or clear both dates.';
+    else if (v.check_in && v.check_out <= v.check_in) e.check_out = isStay ? 'Check-out must be after check-in.' : 'The end date must be after the start date.';
+    if (!e.check_in && !e.check_out && blockedNights.length)
+      e.check_out = `We are fully booked on ${blockedNights.length === 1 ? formatISO(blockedNights[0]) : `${blockedNights.length} of these nights`}. Try other dates or WhatsApp us.`;
+  }
 
   if (!Number.isInteger(+v.adults) || +v.adults < 1) e.adults = 'At least 1 adult.';
   if (!Number.isInteger(+v.children) || +v.children < 0) e.children = 'Enter 0 or more.';
   if (!isStay && v.event_guests !== '' && (!Number.isInteger(+v.event_guests) || +v.event_guests < 1 || +v.event_guests > 1000))
     e.event_guests = 'Enter a number of guests between 1 and 1000.';
-  if (v.room_type && !ROOM_TYPES.includes(v.room_type)) e.room_type = 'Choose a room from the list.';
+  if (v.room_type && (v.room_type.length > 60 || (rooms && !rooms.some((r) => r.name === v.room_type)))) e.room_type = 'Choose a room from the list.';
   if (v.promo_code && v.promo_code.length > 30) e.promo_code = 'That code is too long.';
   if (v.message.length > MESSAGE_MAX) e.message = `Keep the message under ${MESSAGE_MAX} characters.`;
   if (!v.privacy) e.privacy = 'Please confirm you have read the privacy notice.';
@@ -99,7 +107,7 @@ export function validateEnquiry(v, { blockedNights = [] } = {}) {
 }
 
 export const formatISO = (iso) =>
-  iso ? new Date(`${iso}T12:00:00`).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '[date]';
+  iso ? new Date(`${iso}T12:00:00`).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'not decided';
 
 export async function submitEnquiry(v, user) {
   if (!firebaseReady) throw new Error(NOT_CONFIGURED);
@@ -110,10 +118,11 @@ export async function submitEnquiry(v, user) {
   }
   // Feature #82: one enquiry a minute and at most five a day from the same browser.
   const recent = sentTimes().filter((t) => Date.now() - t < 86400000);
-  if (recent.length && Date.now() - recent[recent.length - 1] < 60000) throw new Error('You sent an enquiry a moment ago. Please wait a minute before sending another, or WhatsApp us.');
-  if (recent.length >= 5) throw new Error('You have sent several enquiries today. Our team will reply to them; for anything urgent, please call or WhatsApp us.');
+  // The guest still gets WhatsApp; only the copy for the staff dashboard is skipped.
+  if (recent.length && Date.now() - recent[recent.length - 1] < 60000) return { id: 'throttled' };
+  if (recent.length >= 5) return { id: 'throttled' };
   const { db, F } = await loadFirebase();
-  const toDate = (iso) => F.Timestamp.fromDate(new Date(`${iso}T12:00:00`));
+  const toDate = (iso) => (iso ? F.Timestamp.fromDate(new Date(`${iso}T12:00:00`)) : null);
   const src = getSource();
   const isStay = v.enquiry_type === 'stay';
   const data = {
@@ -138,6 +147,7 @@ export async function submitEnquiry(v, user) {
     utm_campaign: src.utm_campaign || null,
     lang: (navigator.language || 'en').slice(0, 8),
     source: 'website_form',
+    channel: 'whatsapp',
     status: 'New',
     userId: user?.uid || null,
     privacy_consent_at: F.serverTimestamp(), // feature #86: consent record
@@ -159,29 +169,54 @@ export async function submitEnquiry(v, user) {
   return { id: ref.id };
 }
 
-// Features #2/#3: a stay estimate, shown only once the hotel adds "from" rates in content.js.
-export function estimate(v) {
-  const room = ROOMS.find((r) => r.name === v.room_type);
+// Features #2/#3: a stay estimate, shown only when the admin has set a rate for the room.
+export function estimate(v, rooms = []) {
+  const room = rooms.find((r) => r.name === v.room_type);
   if (!room?.rate || !v.check_in || !v.check_out) return null;
   const n = nights(v.check_in, v.check_out);
   if (!n) return null;
   return { nights: n, perNight: room.rate, total: room.rate * n };
 }
 
-export const offerFor = (code) => OFFERS.find((o) => o.code && o.code.toUpperCase() === String(code || '').trim().toUpperCase());
+export const offerFor = (code, offers = []) => offers.find((o) => o.code && o.code.toUpperCase() === String(code || '').trim().toUpperCase());
 
-// PRD 6.3 WhatsApp message, URL-encoded. Feature #19 adds room and dates when known.
+const TYPE_TEXT = { stay: 'a room stay', event: 'a wedding or family event', meeting: 'a meeting or conference' };
+
+// The full WhatsApp message built from the enquiry form (requirement: clear, readable, every detail).
+export function enquiryMessage(v, { offer, pickups = PICKUPS, addons = ADDONS } = {}) {
+  const isStay = (v.enquiry_type || 'stay') === 'stay';
+  const kids = +v.children || 0;
+  const lines = [`Hello ${HOTEL.name}, I would like to enquire about ${TYPE_TEXT[v.enquiry_type] || TYPE_TEXT.stay}.`, ''];
+  lines.push(`Name: ${v.guest_name.trim()}`);
+  lines.push(`Phone: ${v.phone.trim()}`);
+  if (v.email?.trim()) lines.push(`Email: ${v.email.trim()}`);
+  if (isStay) {
+    lines.push(`Room: ${v.room_type || 'No preference'}`);
+    lines.push(`Guests: ${+v.adults || 1} ${+v.adults === 1 ? 'adult' : 'adults'}${kids ? `, ${kids} ${kids === 1 ? 'child' : 'children'} under 6` : ''}`);
+  } else {
+    lines.push(`Number of guests: ${v.event_guests || 'not decided yet'}`);
+  }
+  if (v.check_in && v.check_out) lines.push(`Dates: ${formatISO(v.check_in)} to ${formatISO(v.check_out)}${isStay ? ` (${nightsLabel(v.check_in, v.check_out)})` : ''}`);
+  else lines.push('Dates: not decided yet');
+  const pickup = pickups.find((p) => p.id === v.pickup && p.id !== 'none');
+  if (pickup) lines.push(`Pick-up: ${pickup.label}`);
+  const extras = (v.addons || []).map((a) => addons.find((x) => x.id === a)?.label).filter(Boolean);
+  if (extras.length) lines.push(`Extras: ${extras.join(', ')}`);
+  if (v.callback_time && v.callback_time !== CALLBACK_TIMES[0]) lines.push(`Best time to call: ${v.callback_time}`);
+  if (v.promo_code?.trim()) lines.push(`Offer: ${offer ? `${offer.title} (${offer.code})` : v.promo_code.trim().toUpperCase()}`);
+  if (v.message?.trim()) lines.push('', `Message: ${v.message.trim()}`);
+  lines.push('', 'Please let me know availability and the rate. Thank you.');
+  return lines.join('\n');
+}
+
+// Short WhatsApp message for the quick "WhatsApp us" buttons around the site.
 export function whatsappUrl(v = {}) {
-  const lines = [
-    `Hello ${HOTEL.name}, I would like to enquire about a ${v.enquiry_type && v.enquiry_type !== 'stay' ? 'booking for an event' : 'stay'}.`,
-    `Name: ${v.guest_name?.trim() || '[your name]'}`,
-    `Check-in: ${formatISO(v.check_in)}`,
-    `Check-out: ${formatISO(v.check_out)}`,
-    `Guests: ${v.adults ?? 2} adults / ${v.children ?? 0} children`,
-    `Room preference: ${v.room_type || 'Any'}`,
-    'Please share availability and rates.',
-  ];
-  return `https://wa.me/${HOTEL.whatsapp}?text=${encodeURIComponent(lines.join('\n'))}`;
+  const lines = [`Hello ${HOTEL.name}, I would like to enquire about ${TYPE_TEXT[v.enquiry_type] || TYPE_TEXT.stay}.`];
+  if (v.guest_name?.trim()) lines.push(`Name: ${v.guest_name.trim()}`);
+  if (v.room_type) lines.push(`Room: ${v.room_type}`);
+  if (v.check_in && v.check_out) lines.push(`Dates: ${formatISO(v.check_in)} to ${formatISO(v.check_out)}`);
+  lines.push('Please share availability and rates.');
+  return waLink(lines.join('\n'));
 }
 
 export const formatDate = (ts) => {
@@ -227,3 +262,6 @@ export const draft = {
     } catch {}
   },
 };
+
+// "12 Dec 2026 to 14 Dec 2026", or a clear note when the guest did not give dates.
+export const stayDates = (a, b) => (a && b ? `${formatDate(a)} to ${formatDate(b)}` : 'Dates not given');

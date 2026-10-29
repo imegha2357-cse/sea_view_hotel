@@ -37,8 +37,19 @@ export const PHOTOS = {
 // Enlarged with Real-ESRGAN x4 from the low-resolution originals (all others are the hotel's own HD files).
 export const UPSCALED = ['roomStandard', 'roomCorner', 'roomTwin', 'roomSuite', 'lobby', 'dining', 'meeting', 'vivekananda', 'thiruvalluvar', 'beach', 'gandhi', 'sunset'];
 
-export function photo(key) {
-  const p = PHOTOS[key];
-  if (!p) throw new Error(`Unknown photo: ${key}`);
-  return p;
+// A photo reference is either a built-in key above (e.g. 'roomDeluxe') or 'm:<id>' for a photo uploaded
+// in the admin panel (served by /api/media/<id>). Unknown references return null, so nothing broken shows.
+export const isMedia = (ref) => typeof ref === 'string' && ref.startsWith('m:');
+export const mediaSrc = (ref) => `/api/media/${ref.slice(2)}`;
+
+export function photo(ref) {
+  if (!ref) return null;
+  if (isMedia(ref)) return { src: mediaSrc(ref), width: 1920, height: 1280, alt: '' };
+  return PHOTOS[ref] || null;
 }
+
+// Absolute URL for structured data and social previews.
+export const photoUrl = (ref, site) => {
+  const p = photo(ref);
+  return p ? `${site}${p.src}` : null;
+};

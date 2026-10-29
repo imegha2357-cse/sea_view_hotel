@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { POLICIES, ATTRACTIONS, EXPERIENCES, FACTS, FAQS, GALLERY, HIGHLIGHT_SLIDES, HOTEL, OFFERS, OVERVIEW, ROOMS, mapsLink } from '@/data/content';
+import { POLICIES, ATTRACTIONS, EXPERIENCES, FACTS, FAQS, HIGHLIGHT_SLIDES, HOTEL, OVERVIEW, mapsLink } from '@/data/content';
 import { meta } from '@/lib/meta';
 import { JsonLd, faqLd, hotelLd } from '@/lib/ld';
 import Hero from '@/components/site/Hero';
@@ -12,7 +12,7 @@ import FeatureCards from '@/components/site/FeatureCards';
 import HighlightTabs from '@/components/site/HighlightTabs';
 import OfferCard from '@/components/site/OfferCard';
 import { EventGrid } from '@/components/site/EventTypes';
-import BookingBar from '@/components/site/BookingBar';
+import { getOffers, getRooms, getSite } from '@/lib/cms-server';
 import Facilities from '@/components/site/Facilities';
 import Faq from '@/components/site/Faq';
 import GalleryGrid from '@/components/site/GalleryGrid';
@@ -23,6 +23,7 @@ import { Chevron, LineTitle, ReadMore, Reveal } from '@/components/site/ui';
 import Photo from '@/components/Photo';
 
 export const metadata = meta('/');
+export const revalidate = 600;
 
 const TABS = [
   { id: 'overview', label: 'Overview' },
@@ -39,17 +40,13 @@ const TABS = [
   { id: 'faqs', label: 'FAQs' },
 ];
 
-export default function Home() {
+export default async function Home() {
+  const [rooms, offers, site] = await Promise.all([getRooms(), getOffers(), getSite()]);
   const dining = EXPERIENCES.filter((e) => e.id !== 'meetings');
   return (
     <>
       <JsonLd data={[hotelLd, faqLd()]} />
-      <Hero gallery={GALLERY} />
-      <section className="plan-band" aria-label="Check availability">
-        <div className="container wide">
-          <BookingBar />
-        </div>
-      </section>
+      <Hero slides={site.hero} gallery={site.gallery} />
       <SectionTabs items={TABS} />
 
       <section className="sec" id="overview" aria-labelledby="overview-h">
@@ -80,7 +77,7 @@ export default function Home() {
             <LineTitle id="rooms-h">Rooms</LineTitle>
             <p>Five room types, each with a private bathroom, television and direct-dial phone, and room service around the clock.</p>
           </div>
-          <RoomMosaic />
+          <RoomMosaic rooms={rooms} categories={site.categories} />
           <p style={{ marginTop: 28 }}>
             <Link href="/rooms" className="more-link">
               Compare all rooms <Chevron />
@@ -147,11 +144,11 @@ export default function Home() {
         </div>
       </section>
 
-      {OFFERS.length > 0 && (
+      {offers.length > 0 && (
         <section className="sec cream" id="offers" aria-labelledby="offers-h">
           <div className="container wide">
             <Rail label="offers" title={<LineTitle id="offers-h">Offers and packages</LineTitle>}>
-              {OFFERS.map((o) => (
+              {offers.map((o) => (
                 <OfferCard key={o.code} o={o} />
               ))}
             </Rail>
@@ -226,6 +223,7 @@ export default function Home() {
         </div>
       </section>
 
+      {site.gallery.length > 0 && (
       <section className="sec" id="gallery" aria-labelledby="gallery-h">
         <div className="container wide">
           <div className="sec-head-row">
@@ -234,9 +232,10 @@ export default function Home() {
               All photos <Chevron />
             </Link>
           </div>
-          <GalleryGrid items={GALLERY.slice(0, 10)} filters={false} />
+          <GalleryGrid items={site.gallery.slice(0, 10)} filters={false} />
         </div>
       </section>
+      )}
 
       <Reviews />
 

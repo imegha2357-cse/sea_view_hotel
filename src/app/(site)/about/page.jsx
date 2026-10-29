@@ -12,7 +12,7 @@ export const metadata = meta('/about');
 export default function About() {
   return (
     <>
-      <PageTop image="building" title="About the hotel" trail={[{ label: 'About', href: '/about' }]} />
+      <PageTop slot="about" title="About the hotel" trail={[{ label: 'About', href: '/about' }]} />
       <section className="sec" style={{ paddingTop: 24 }}>
         <div className="container wide overview">
           <Reveal className="overview-copy">

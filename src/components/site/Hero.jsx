@@ -23,7 +23,10 @@ export const HERO_FEATURES = [
 
 const rise = (d) => ({ hidden: { opacity: 0, y: 26 }, show: { opacity: 1, y: 0, transition: { duration: 0.9, ease: EASE, delay: d } } });
 
-export default function Hero({ slides = HERO_SLIDES, gallery }) {
+const FALLBACK = [{ image: 'building', caption: 'Hotel Sea View, Kanyakumari' }];
+
+export default function Hero({ slides: given = HERO_SLIDES, gallery }) {
+  const slides = given?.length ? given : FALLBACK;
   const [i, setI] = useState(0);
   const [playing, setPlaying] = useState(true);
   const [hover, setHover] = useState(false);
@@ -50,7 +53,7 @@ export default function Hero({ slides = HERO_SLIDES, gallery }) {
       {/* The previous, current and next photos stay mounted: the old one fades out while the next is already loaded. */}
       {slides.map((x, k) =>
         k === i || k === (i + 1) % n || k === (i - 1 + n) % n ? (
-          <motion.div key={x.image} className="hero-slide" initial={false} animate={{ opacity: k === i ? 1 : 0 }} style={{ zIndex: k === i ? 1 : 0 }} transition={{ duration: 1.4, ease: 'easeInOut' }} aria-hidden={k !== i}>
+          <motion.div key={`${x.image}-${k}`} className="hero-slide" initial={false} animate={{ opacity: k === i ? 1 : 0 }} style={{ zIndex: k === i ? 1 : 0 }} transition={{ duration: 1.4, ease: 'easeInOut' }} aria-hidden={k !== i}>
             <KenBurns duration={DELAY / 1000 + 3} active={k === i}>
               <Photo k={x.image} sizes="(orientation: portrait) 240vh, 100vw" priority={k === 0} alt={k === i ? x.caption : ''} />
             </KenBurns>
