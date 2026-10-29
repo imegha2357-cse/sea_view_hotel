@@ -7,7 +7,8 @@ import { useEffect, useRef, useState } from 'react';
 const MIN_MS = 650; // long enough to see the logo, short enough not to slow anyone down
 const MAX_MS = 6000; // never stays up if a page fails to load
 
-const isPlainClick = (e) => e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey && !e.defaultPrevented;
+// Next.js links cancel the browser's own navigation, so defaultPrevented is not checked here.
+const isPlainClick = (e) => e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey;
 
 // The Sea View logo appears whenever a link or button takes the visitor to another page of the site,
 // and fades away once the new page is ready. Links to sections of the same page, new tabs, downloads,
@@ -47,8 +48,8 @@ export default function NavLoader() {
       if (url.pathname === window.location.pathname && url.search === window.location.search) return; // same page or #section
       show();
     };
-    document.addEventListener('click', onClick);
-    return () => document.removeEventListener('click', onClick);
+    document.addEventListener('click', onClick, true);
+    return () => document.removeEventListener('click', onClick, true);
   }, []);
 
   // Finish when the new page is on screen. Navigations started by buttons (e.g. after a form)
