@@ -133,3 +133,17 @@ Other changes:
 - **Admin:** Enquiries and Reports are removed. The sidebar now reads: Website (Rooms, Photo library, Slides/banners/gallery, Offers), then Hotel (Fully booked nights, Inbox). On phones the sidebar becomes a swipeable bar. Guest enquiries arrive on WhatsApp.
 - **Highlights:** the first card now uses the HD Corner Deluxe sea-view photo. Every Highlights photo can be changed in Website → Slides, banners and gallery → Homepage highlights.
 - **Redesigned sections:** Reviews, Location and the footer were redesigned. The "Check availability" button in the closing band was invisible and is fixed.
+
+## October 2026 update 3: voice assistant, reasoning, page loader
+
+- **Voice:** tap the microphone in the chat window to ask out loud. Replies to spoken questions are read aloud, and then the assistant listens again (hands-free). The speaker button reads every reply aloud. This works in Chrome, Edge and Safari (Firefox has no speech recognition, so the microphone button is hidden there).
+- **Reasoning** (`src/lib/chat-brain.js`): the assistant
+  - reads dates, guests and rooms, and remembers them during the chat ("does it have a balcony?");
+  - recommends and compares rooms, explaining why;
+  - checks the nights marked fully booked in the admin panel;
+  - builds a pre-filled WhatsApp message and enquiry form;
+  - works out sunrise and sunset for any date;
+  - handles several questions in one message and common spelling slips.
+  It still never invents prices or availability. With `ANTHROPIC_API_KEY` set, Claude writes the replies using these findings.
+- **Loader:** the Sea View logo loader shows on every move between pages (at least 0.65 s, and never more than 6 s).
+- **Hotel information:** the homepage section now has a contact card (copy buttons, today's sunrise and sunset) and facility tiles around a photo of the lobby.
