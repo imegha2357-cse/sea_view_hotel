@@ -4,7 +4,8 @@
 // even if scripts fail. With "reduce motion" the logo does not pulse.
 const S = { w: 256, h: 171 };
 
-export const loaderScript = `(function(){try{var d=document.documentElement;if(sessionStorage.getItem('sv-boot')){d.classList.add('boot-done');return}d.classList.add('booting');var t0=Date.now();function done(){var w=Math.max(0,900-(Date.now()-t0));setTimeout(function(){d.classList.add('boot-done');d.classList.remove('booting');try{sessionStorage.setItem('sv-boot','1')}catch(e){}},w)}if(document.readyState==='complete')done();else window.addEventListener('load',done);setTimeout(done,3500)}catch(e){document.documentElement.classList.add('boot-done')}})();`;
+// Uses a data attribute (not the class list, which React manages) so hydration never resets it.
+export const loaderScript = `(function(){var d=document.documentElement;try{if(sessionStorage.getItem('sv-boot')){d.setAttribute('data-boot','done');return}d.setAttribute('data-boot','on');var t0=Date.now(),fired=0;function done(){if(fired)return;fired=1;var w=Math.max(0,900-(Date.now()-t0));setTimeout(function(){d.setAttribute('data-boot','done');try{sessionStorage.setItem('sv-boot','1')}catch(e){}},w)}if(document.readyState==='complete')done();else window.addEventListener('load',done);setTimeout(done,3500)}catch(e){d.setAttribute('data-boot','done')}})();`;
 
 export default function Loader() {
   return (

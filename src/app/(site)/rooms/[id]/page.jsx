@@ -27,7 +27,7 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }) {
   const r = await getRoom(params.id);
-  if (!r) return { title: 'Room not found | Hotel Sea View', robots: { index: false } };
+  if (!r) return { title: { absolute: 'Room not found | Hotel Sea View' }, robots: { index: false } };
   const m = meta('/rooms', { image: photo(r.images[0])?.src });
   const title = `${r.name} | Hotel Sea View, Kanyakumari`;
   const description = clip([r.summary || r.description, r.view, r.occupancy && `Sleeps ${r.occupancy}.`].filter(Boolean).join(' ')) || m.description;
