@@ -14,7 +14,7 @@ import OfferCard from '@/components/site/OfferCard';
 import { EventGrid } from '@/components/site/EventTypes';
 import { getOffers, getRooms, getSite } from '@/lib/cms-server';
 import { slugify } from '@/data/catalog';
-import Facilities from '@/components/site/Facilities';
+import HotelInfo from '@/components/site/HotelInfo';
 import Faq from '@/components/site/Faq';
 import GalleryGrid from '@/components/site/GalleryGrid';
 import LocationSection from '@/components/site/LocationSection';
@@ -176,52 +176,7 @@ export default async function Home() {
         </div>
       </section>
 
-      <section className="sec" id="facilities" aria-labelledby="info-h">
-        <div className="container wide info-grid">
-          <Reveal>
-            <LineTitle id="info-h">Hotel information</LineTitle>
-            <dl className="info-list" style={{ marginTop: 28 }}>
-              <div>
-                <dt>Address</dt>
-                <dd>{HOTEL.addressLines.join(', ')}</dd>
-              </div>
-              <div>
-                <dt>Reservations and WhatsApp</dt>
-                <dd>
-                  <a href={`tel:${HOTEL.phoneHref}`}>{HOTEL.phone}</a>
-                </dd>
-              </div>
-              <div>
-                <dt>Restaurant</dt>
-                <dd>
-                  <a href={`tel:${HOTEL.restaurantPhoneHref}`}>{HOTEL.restaurantPhone}</a>
-                </dd>
-              </div>
-              <div>
-                <dt>Email</dt>
-                <dd>
-                  <a href={`mailto:${HOTEL.email}`}>{HOTEL.email}</a>
-                </dd>
-              </div>
-              <div>
-                <dt>Check-in and check-out</dt>
-                <dd>Please ask when you enquire</dd>
-              </div>
-            </dl>
-            <p style={{ marginTop: 24 }}>
-              <Link href="/policies" className="more-link">
-                Hotel policies <Chevron />
-              </Link>
-            </p>
-          </Reveal>
-          <Reveal delay={0.1}>
-            <h3 className="info-k" style={{ marginBottom: 14 }}>
-              Facilities
-            </h3>
-            <Facilities />
-          </Reveal>
-        </div>
-      </section>
+      <HotelInfo />
 
       {site.gallery.length > 0 && (
       <section className="sec" id="gallery" aria-labelledby="gallery-h">

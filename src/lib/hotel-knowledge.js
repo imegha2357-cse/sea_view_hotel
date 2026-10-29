@@ -7,7 +7,7 @@ import { ATTRACTIONS, EXPERIENCES, FACILITIES, FAQS, HOTEL, HOW_TO_REACH, MEETIN
 import { AMENITY_CATALOG } from '../data/catalog.js';
 
 export const WA_LINK = `https://wa.me/${HOTEL.whatsapp}`;
-const amenityLabel = (id) => AMENITY_CATALOG.find((a) => a.id === id)?.label;
+export const amenityLabel = (id) => AMENITY_CATALOG.find((a) => a.id === id)?.label;
 
 export function roomFacts(r) {
   const amen = (r.amenities || []).map(amenityLabel).filter(Boolean);
@@ -82,7 +82,7 @@ ${knowledgeText(rooms)}`;
 
 // ---------- Built-in answerer (no AI) ----------
 
-const norm = (s) =>
+export const norm = (s) =>
   String(s || '')
     .toLowerCase()
     .replace(/[^a-z0-9₹\s-]/g, ' ')
@@ -90,18 +90,18 @@ const norm = (s) =>
     .trim();
 const esc = (w) => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 // Whole words (an optional plural "s"), so "ac" does not match "accommodation".
-const has = (q, words) => words.reduce((n, w) => n + (new RegExp(`(^|\\s)${esc(w)}s?(?=\\s|$)`).test(q) ? 1 : 0), 0);
+export const has = (q, words) => words.reduce((n, w) => n + (new RegExp(`(^|\\s)${esc(w)}s?(?=\\s|$)`).test(q) ? 1 : 0), 0);
 // Specific questions (price, times, pets...) win over general topics (rooms) that share a word.
-const WEIGHT = { price: 3, avail: 2, checkin: 3, pickup: 2, cancel: 2, pets: 3, children: 2, roomservice: 2, photos: 2, seaview: 2, id: 3, events: 2, offers: 2 };
+export const WEIGHT = { price: 3, avail: 2, checkin: 3, pickup: 2, cancel: 2, pets: 3, children: 2, roomservice: 2, photos: 2, seaview: 2, id: 3, events: 2, offers: 2 };
 
 const roomLine = (r) => `- [${r.name}](/rooms/${r.id}): ${[r.view, r.beds, r.occupancy && `sleeps ${r.occupancy}`].filter(Boolean).join(', ')}`;
 const notConfirmed = (what) => `I don't have confirmed ${what} yet. Our team will tell you on WhatsApp or by phone on ${HOTEL.phone}. [[WHATSAPP]]`;
 
-const PRICE_WORDS = ['price', 'rate', 'cost', 'tariff', 'how much', 'per night', 'charge', 'fare', 'rs', '₹', 'rupee', 'cheap', 'budget', 'discount', 'expensive', 'afford'];
+export const PRICE_WORDS = ['price', 'rate', 'cost', 'tariff', 'how much', 'per night', 'charge', 'fare', 'rs', '₹', 'rupee', 'cheap', 'budget', 'discount', 'expensive', 'afford'];
 // Requests that are not questions about the hotel (or try to change the assistant's rules).
-const OFF_TOPIC = /(ignore (all |your |the |previous )*(instruction|rule|prompt)|system prompt|pretend|role ?play|tell me a (joke|story)|write (a|me) (poem|story|essay|code)|jailbreak)/;
+export const OFF_TOPIC = /(ignore (all |your |the |previous )*(instruction|rule|prompt)|system prompt|pretend|role ?play|tell me a (joke|story)|write (a|me) (poem|story|essay|code)|jailbreak)/;
 
-const INTENTS = [
+export const INTENTS = [
   { id: 'greet', words: ['hi', 'hello', 'hey', 'namaste', 'vanakkam', 'good morning', 'good evening'], answer: () => `Hello! I can help with rooms, facilities, dining, directions and how to enquire at ${HOTEL.name}. What would you like to know?` },
   { id: 'price', words: PRICE_WORDS, answer: ({ rooms }) => {
     const priced = rooms.filter((r) => r.rate);
@@ -118,13 +118,15 @@ const INTENTS = [
   { id: 'location', words: ['where', 'location', 'located', 'address', 'reach', 'direction', 'directions', 'map', 'train', 'railway', 'station', 'bus', 'airport', 'flight', 'distance', 'far', 'near', 'get there', 'route'], answer: () => `We are on ${HOTEL.addressLines.slice(0, 2).join(', ')}.\n${HOW_TO_REACH.map((h) => `- ${h.mode}: ${h.text}`).join('\n')}\n[Open the map and directions](${mapsLink}).` },
   { id: 'pickup', words: ['pick up', 'pickup', 'pick-up', 'drop', 'transfer', 'taxi', 'cab'], answer: () => `Yes. Our travel desk can arrange a pick-up or drop from Kanyakumari railway station, the bus terminus or Thiruvananthapuram airport. Ask when you enquire and we will confirm the cost. [[WHATSAPP]]` },
   { id: 'facilities', words: ['facility', 'facilities', 'amenity', 'amenities', 'wifi', 'wi-fi', 'internet', 'parking', 'park', 'laundry', 'ac', 'air condition', 'lift', 'elevator', 'tv', 'service'], answer: ({ q }) => {
-    if (/wi-?fi|internet/.test(q)) return 'Yes, Wi-Fi is available at the hotel.';
-    if (/park/.test(q)) return 'Yes. Parking is free for hotel guests.';
-    if (/laundry/.test(q)) return 'Yes, a laundry service is available.';
-    if (/lift|elevator/.test(q)) return notConfirmed('information about the lift');
+    const out = [];
+    if (/wi-?fi|internet/.test(q)) out.push('Yes, Wi-Fi is available at the hotel.');
+    if (/park/.test(q)) out.push('Yes, parking is free for hotel guests.');
+    if (/laundry/.test(q)) out.push('Yes, a laundry service is available.');
+    if (/lift|elevator/.test(q)) out.push(notConfirmed('information about the lift'));
+    if (out.length) return out.join(' ');
     return `Facilities at the hotel: ${FACILITIES.map((f) => f.label).join(', ')}. Every room has a private bathroom, television and direct-dial phone.`;
   } },
-  { id: 'roomservice', words: ['room service', 'night', '24 hour', '24-hour', 'midnight'], answer: () => 'Yes. Room service runs 24 hours a day.' },
+  { id: 'roomservice', words: ['room service', 'late night', '24 hour', '24-hour', 'midnight', 'food at night'], answer: () => 'Yes. Room service runs 24 hours a day.' },
   { id: 'dining', words: ['restaurant', 'food', 'eat', 'menu', 'dinner', 'lunch', 'breakfast', 'veg', 'vegetarian', 'non-veg', 'cuisine', 'bar', 'drink', 'drinks', 'alcohol', 'beer'], answer: ({ q }) => {
     if (/breakfast/.test(q)) return 'Daily breakfast is available. Ask us whether it is included in your rate when you enquire. [[WHATSAPP]]';
     if (/bar|drink|alcohol|beer/.test(q)) return 'The Wave Bar serves wines, spirits and cocktails with a snack menu. Opening hours are not published yet, so please ask us. [[WHATSAPP]]';
@@ -136,7 +138,7 @@ const INTENTS = [
   { id: 'children', words: ['child', 'children', 'kid', 'kids', 'baby', 'infant', 'extra bed', 'extra person'], answer: () => 'Standard Rooms sleep 2 adults and 2 children under 6. For older children or an extra bed, please ask us. [[WHATSAPP]]' },
   { id: 'pets', words: ['pet', 'pets', 'dog', 'cat'], answer: () => notConfirmed('information about pets') },
   { id: 'cancel', words: ['cancel', 'cancellation', 'refund', 'payment', 'pay', 'advance', 'deposit'], answer: () => 'Cancellation and payment terms are confirmed with your booking. Please ask our team before you pay. [[WHATSAPP]]' },
-  { id: 'id', words: ['id proof', 'identity', 'aadhaar', 'aadhar', 'passport', 'documents', 'couple', 'unmarried', 'local id'], answer: () => notConfirmed('identity document rules') },
+  { id: 'id', words: ['id proof', 'identity', 'aadhaar', 'aadhar', 'passport', 'documents', 'unmarried', 'local id'], answer: () => notConfirmed('identity document rules') },
   { id: 'contact', words: ['contact', 'phone', 'call', 'number', 'email', 'mail', 'whatsapp', 'talk', 'human', 'staff', 'manager', 'reception'], answer: () => `Call or WhatsApp ${HOTEL.phone}, email ${HOTEL.email}, or call the restaurant on ${HOTEL.restaurantPhone}. You can also [send an enquiry](/enquire). [[WHATSAPP]]` },
   { id: 'rooms', words: ['room', 'rooms', 'suite', 'accommodation', 'stay', 'types', 'family', 'twin', 'deluxe', 'standard', 'executive', 'corner', 'bed', 'beds'], answer: ({ rooms }) => `We have ${rooms.length} room types:\n${rooms.map(roomLine).join('\n')}\nSee them all on the [rooms page](/rooms).`, showRooms: true },
 ];

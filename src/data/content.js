@@ -111,14 +111,14 @@ export const ROOM_TYPES = ROOMS.map((r) => r.name);
 export const RATE_NOTE = 'Rates depend on dates and availability. Send an enquiry and we will reply with prices.';
 
 export const FACILITIES = [
-  { icon: 'parking', label: 'Free parking' },
-  { icon: 'wifi', label: 'Wi-Fi' },
-  { icon: 'breakfast', label: 'Daily breakfast' },
-  { icon: 'bell', label: '24-hour room service' },
-  { icon: 'laundry', label: 'Laundry service' },
-  { icon: 'ac', label: 'Air-conditioned restaurant' },
-  { icon: 'map', label: 'Travel desk and tours' },
-  { icon: 'sun', label: 'Sunrise views' },
+  { icon: 'parking', label: 'Free parking', text: 'For hotel guests' },
+  { icon: 'wifi', label: 'Wi-Fi', text: 'Available at the hotel' },
+  { icon: 'breakfast', label: 'Daily breakfast', text: 'Ask if it is in your rate' },
+  { icon: 'bell', label: '24-hour room service', text: 'Day and night' },
+  { icon: 'laundry', label: 'Laundry service', text: 'Ask at reception' },
+  { icon: 'ac', label: 'Air-conditioned restaurant', text: 'Indian, Chinese, Continental' },
+  { icon: 'map', label: 'Travel desk and tours', text: 'Sightseeing arranged' },
+  { icon: 'sun', label: 'Sunrise views', text: 'From sea-facing rooms' },
 ];
 
 export const EXPERIENCES = [
