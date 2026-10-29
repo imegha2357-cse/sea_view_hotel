@@ -8,8 +8,9 @@ import { FAQS, HOTEL, ROOMS } from '../src/data/content.js';
 
 const SITE = (process.env.VITE_SITE_URL || 'https://seaviewhotel-8x42.vercel.app').replace(/\/$/, '');
 const DIST = 'dist';
-const UP = 'https://hotelseaview.in/wp-content/uploads';
-const OG = `${UP}/2025/06/Hotel-Sea-View-Deluxe-Seaview-Rooms.jpg`;
+// HD copies served from this site (public/images).
+const UP = `${SITE}/images`;
+const OG = `${UP}/Hotel-Sea-View-Deluxe-Seaview-Rooms.jpg`;
 const ROOM_IMG = {
   roomStandard: '2025/06/Hotel-Sea-View-Standard-Rooms.jpg',
   roomDeluxe: '2025/06/Hotel-Sea-View-Deluxe-Seaview-Rooms.jpg',
@@ -29,7 +30,7 @@ const hotel = {
   url: `${SITE}/`,
   telephone: '+91-9489474968',
   email: HOTEL.email,
-  image: [OG, `${UP}/2025/07/Hotel-Sea-View-scaled.jpg`],
+  image: [OG, `${UP}/Hotel-Sea-View.jpg`],
   address: {
     '@type': 'PostalAddress',
     streetAddress: 'East Car Street',
@@ -76,7 +77,7 @@ function ldFor(page) {
       name: r.name,
       description: r.summary,
       url: url(page.path),
-      image: `${UP}/${ROOM_IMG[r.image]}`,
+      image: `${UP}/${ROOM_IMG[r.image].split('/').pop()}`,
       bed: r.beds,
       containedInPlace: { '@id': `${SITE}/#hotel` },
     });
@@ -96,7 +97,7 @@ function render(page) {
     `<meta property="og:url" content="${url(page.path)}" />`,
     `<meta property="og:title" content="${esc(page.title.split(' | ')[0])}" />`,
     `<meta property="og:description" content="${esc(page.description)}" />`,
-    `<meta property="og:image" content="${page.room ? `${UP}/${ROOM_IMG[ROOMS.find((x) => x.id === page.room).image]}` : OG}" />`,
+    `<meta property="og:image" content="${page.room ? `${UP}/${ROOM_IMG[ROOMS.find((x) => x.id === page.room).image].split('/').pop()}` : OG}" />`,
     `<meta property="og:locale" content="en_IN" />`,
     `<meta name="twitter:card" content="summary_large_image" />`,
     ...ldFor(page).map((d) => `<script type="application/ld+json">${JSON.stringify(d).replace(/</g, '\\u003c')}</script>`),

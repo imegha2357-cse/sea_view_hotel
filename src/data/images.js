@@ -1,8 +1,10 @@
 // Every photo used on the site comes from the hotel's current website (hotelseaview.in).
 // The client must confirm these photos are authorised for reuse (PRD section 11).
 //
-// VITE_IMAGE_SOURCE=remote  -> load straight from hotelseaview.in (works immediately)
-// VITE_IMAGE_SOURCE=local   -> load from /public/images after `npm run fetch-images` (faster, recommended for production)
+// HD only: the site serves its own copies in /public/images, each at least 1920px wide (2560px for most).
+// Photos the hotel only published at low resolution were enlarged with an AI upscaler (Real-ESRGAN x4)
+// from the originals; see scripts/photo-list.txt and UPSCALED below. Ask the hotel for camera originals
+// to replace them. VITE_IMAGE_SOURCE=remote loads the low-resolution originals from hotelseaview.in instead.
 
 const BASE = 'https://hotelseaview.in/wp-content/uploads';
 
@@ -11,7 +13,7 @@ export const IMAGE_MANIFEST = {
   logoFooter: { path: '2025/06/seaviewl.png', alt: 'Hotel Sea View logo' },
   favicon: { path: '2025/07/cropped-web-app-manifest-192x192-1-270x270.png', alt: '' },
 
-  building: { path: '2025/07/Hotel-Sea-View-scaled.jpg', alt: 'Hotel Sea View building on East Car Street, Kanyakumari' },
+  building: { path: '2025/07/Hotel-Sea-View.jpg', alt: 'Hotel Sea View building on East Car Street, Kanyakumari' },
   entrance: { path: '2025/07/hotel-sea-view-door.jpg', alt: 'Hotel entrance porch at night' },
   lobby: { path: '2025/07/sea-view-front.jpg', alt: 'Hotel lobby with leather sofas' },
   dining: { path: '2025/07/sea-view-frount.jpg', alt: 'Dining area with lattice screens' },
@@ -35,7 +37,10 @@ export const IMAGE_MANIFEST = {
   sunset: { path: '2025/07/Sun-Set-Point.jpg', alt: 'Sunset Point, Kanyakumari' },
 };
 
-const SOURCE = import.meta.env.VITE_IMAGE_SOURCE === 'local' ? 'local' : 'remote';
+// Enlarged with Real-ESRGAN x4 from the low-resolution originals (all others are the hotel's own HD files).
+export const UPSCALED = ['roomStandard', 'roomCorner', 'roomTwin', 'roomSuite', 'lobby', 'dining', 'meeting', 'vivekananda', 'thiruvalluvar', 'beach', 'gandhi', 'sunset'];
+
+const SOURCE = import.meta.env.VITE_IMAGE_SOURCE === 'remote' ? 'remote' : 'local';
 
 export const localName = (path) => path.split('/').pop();
 export const remoteUrl = (path) => `${BASE}/${path}`;
@@ -43,15 +48,15 @@ export const remoteUrl = (path) => `${BASE}/${path}`;
 // FR-09 / PRD 10.2: serve resized, compressed copies (AVIF/WebP) through Vercel Image Optimization.
 // The widths must match "images.sizes" in vercel.json. Set VITE_IMAGE_CDN=off to disable
 // (for example when hosting on Firebase Hosting instead of Vercel).
-export const IMAGE_WIDTHS = [480, 828, 1200, 1920];
+export const IMAGE_WIDTHS = [1200, 1920, 2560];
 const CDN = import.meta.env.PROD && import.meta.env.VITE_IMAGE_CDN !== 'off';
 
-const cdnUrl = (url, w) => `/_vercel/image?url=${encodeURIComponent(url)}&w=${w}&q=75`;
+const cdnUrl = (url, w) => `/_vercel/image?url=${encodeURIComponent(url)}&w=${w}&q=85`;
 
 export function img(key, { width = 1200 } = {}) {
   const item = IMAGE_MANIFEST[key];
   if (!item) throw new Error(`Unknown image key: ${key}`);
-  const original = SOURCE === 'local' ? `/images/${localName(item.path)}` : remoteUrl(item.path);
+  const original = SOURCE === 'local' && !item.path.endsWith('.png') ? `/images/${localName(item.path)}` : remoteUrl(item.path);
   const isPng = item.path.endsWith('.png');
   const useCdn = CDN && !isPng;
   const w = IMAGE_WIDTHS.find((x) => x >= width) || IMAGE_WIDTHS[IMAGE_WIDTHS.length - 1];
@@ -66,5 +71,5 @@ export function img(key, { width = 1200 } = {}) {
 // Files in /public/media (the hero photo) go through the same optimizer.
 export function mediaImg(path) {
   if (!CDN) return { src: path, srcSet: undefined };
-  return { src: cdnUrl(path, 1920), srcSet: IMAGE_WIDTHS.map((x) => `${cdnUrl(path, x)} ${x}w`).join(', ') };
+  return { src: cdnUrl(path, 2560), srcSet: IMAGE_WIDTHS.map((x) => `${cdnUrl(path, x)} ${x}w`).join(', ') };
 }
