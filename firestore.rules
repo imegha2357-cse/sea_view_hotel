@@ -264,12 +264,13 @@ service cloud.firestore {
     match /site/content {
       allow read: if true;
       allow write: if canEdit()
-        && request.resource.data.keys().hasOnly(['seeded', 'categories', 'hero', 'gallery', 'banners', 'updated_at', 'updated_by'])
+        && request.resource.data.keys().hasOnly(['seeded', 'categories', 'hero', 'gallery', 'banners', 'highlights', 'updated_at', 'updated_by'])
         && optBool(request.resource.data, 'seeded')
         && optList(request.resource.data, 'categories', 12)
         && optList(request.resource.data, 'hero', 12)
         && optList(request.resource.data, 'gallery', 120)
         && (!('banners' in request.resource.data) || request.resource.data.banners is map)
+        && (!('highlights' in request.resource.data) || request.resource.data.highlights is map)
         && optString(request.resource.data, 'updated_by', 120);
     }
 

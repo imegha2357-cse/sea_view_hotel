@@ -409,7 +409,7 @@ export const ITINERARIES = [
 // Home page "Highlights" carousel (image card on a blurred backdrop, in the style of the Taj reference).
 // Every line is a published fact about the hotel; nothing here is a ranking or award.
 export const HIGHLIGHT_SLIDES = [
-  { title: 'Sunrise from your room', image: 'seaView', text: 'Sea-facing rooms look out towards the Vivekananda Rock Memorial and the Thiruvalluvar Statue, so the sunrise comes to you.', href: '/rooms', cta: 'Sea-view rooms' },
+  { title: 'Sunrise from your room', image: 'roomCorner', text: 'Sea-facing rooms look out towards the Vivekananda Rock Memorial and the Thiruvalluvar Statue, so the sunrise comes to you.', href: '/rooms', cta: 'Sea-view rooms' },
   { title: 'Deluxe Seaview Room', image: 'roomDeluxe', text: 'Watch the sun come up over the sea from your bed, with a private bathroom, television and work area.', href: '/rooms/deluxe-seaview', cta: 'View the room' },
   { title: 'Sea View Restaurant', image: 'restaurant1', text: 'A fully air-conditioned, multi-cuisine restaurant serving Indian, Chinese and Continental dishes, vegetarian and non-vegetarian.', href: '/dining#restaurant', cta: 'Dining' },
   { title: 'Wave Bar', image: 'bar1', text: 'A drink before dinner or a nightcap after a day of sightseeing, with a snack menu alongside.', href: '/dining#bar', cta: 'Wave Bar' },

@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { POLICIES, ATTRACTIONS, EXPERIENCES, FACTS, FAQS, HIGHLIGHT_SLIDES, HOTEL, OVERVIEW, mapsLink } from '@/data/content';
+import { POLICIES, ATTRACTIONS, EXPERIENCES, FACTS, FAQS, HIGHLIGHT_SLIDES, HOTEL, OVERVIEW } from '@/data/content';
 import { meta } from '@/lib/meta';
 import { JsonLd, faqLd, hotelLd } from '@/lib/ld';
 import Hero from '@/components/site/Hero';
@@ -13,11 +13,11 @@ import HighlightTabs from '@/components/site/HighlightTabs';
 import OfferCard from '@/components/site/OfferCard';
 import { EventGrid } from '@/components/site/EventTypes';
 import { getOffers, getRooms, getSite } from '@/lib/cms-server';
+import { slugify } from '@/data/catalog';
 import Facilities from '@/components/site/Facilities';
 import Faq from '@/components/site/Faq';
 import GalleryGrid from '@/components/site/GalleryGrid';
-import MapEmbed from '@/components/site/MapEmbed';
-import ReachTabs from '@/components/site/ReachTabs';
+import LocationSection from '@/components/site/LocationSection';
 import { PlaceCard } from '@/components/site/Cards';
 import { Chevron, LineTitle, ReadMore, Reveal } from '@/components/site/ui';
 import Photo from '@/components/Photo';
@@ -86,7 +86,7 @@ export default async function Home() {
         </div>
       </section>
 
-      <Highlights slides={HIGHLIGHT_SLIDES} />
+      <Highlights slides={HIGHLIGHT_SLIDES.map((h) => ({ ...h, image: site.highlights[slugify(h.title)] || h.image }))} />
 
       <section className="sec" id="dining" aria-labelledby="dining-h">
         <div className="container wide">
@@ -239,27 +239,7 @@ export default async function Home() {
 
       <Reviews />
 
-      <section className="sec" id="location" aria-labelledby="loc-h">
-        <div className="container wide loc-grid">
-          <Reveal style={{ display: 'grid', gap: 20, alignContent: 'start' }}>
-            <LineTitle id="loc-h">Location</LineTitle>
-            <address className="lead" style={{ fontStyle: 'normal' }}>
-              {HOTEL.addressLines.map((l) => (
-                <span key={l} style={{ display: 'block' }}>
-                  {l}
-                </span>
-              ))}
-            </address>
-            <ReachTabs />
-            <a href={mapsLink} className="more-link" target="_blank" rel="noreferrer">
-              Get directions <Chevron />
-            </a>
-          </Reveal>
-          <Reveal delay={0.1}>
-            <MapEmbed />
-          </Reveal>
-        </div>
-      </section>
+      <LocationSection />
 
       <section className="sec grey" id="faqs" aria-labelledby="faq-h">
         <div className="container" style={{ maxWidth: 920 }}>
@@ -277,7 +257,7 @@ export default async function Home() {
           <h2>Wake up to the sunrise</h2>
           <p>Send us your dates and our team will confirm availability and the best rate by phone or WhatsApp.</p>
           <div className="row">
-            <Link href="/enquire" className="btn ghost-light">
+            <Link href="/enquire" className="btn solid ghost-light">
               Check availability
             </Link>
             <a href={`https://wa.me/${HOTEL.whatsapp}`} className="btn outline light" target="_blank" rel="noreferrer">

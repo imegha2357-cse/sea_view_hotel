@@ -15,10 +15,11 @@ const SECTIONS = [
 ];
 
 // "Website" tab of the admin panel: everything guests see on the site, editable without code.
-export default function ContentManager({ canEdit, me }) {
+export default function ContentManager({ canEdit, me, section }) {
   const [content, setContent] = useState(null);
   const [err, setErr] = useState('');
-  const [sec, setSec] = useState('rooms');
+  const [own, setSec] = useState('rooms');
+  const sec = section || own;
   const [importing, setImporting] = useState(false);
 
   const reload = useCallback(async () => {
@@ -87,6 +88,7 @@ export default function ContentManager({ canEdit, me }) {
   const props = { content, me, canEdit, reload };
   return (
     <div className="cm">
+      {!section && (
       <nav className="cm-subtabs" aria-label="Website content">
         {SECTIONS.map(([id, label]) => (
           <button key={id} type="button" aria-current={sec === id ? 'page' : undefined} className={sec === id ? 'on' : ''} onClick={() => setSec(id)}>
@@ -94,6 +96,7 @@ export default function ContentManager({ canEdit, me }) {
           </button>
         ))}
       </nav>
+      )}
       {!canEdit && <p className="info-box">Your account is view-only, so you can look but not change anything.</p>}
       {err && (
         <p className="form-alert" role="alert">

@@ -57,6 +57,7 @@ export async function getSite() {
     hero: (s.hero || []).filter((h) => h?.image),
     gallery: (s.gallery || []).filter((g) => g?.image),
     banners: s.banners || {},
+    highlights: s.highlights || {},
   };
 }
 

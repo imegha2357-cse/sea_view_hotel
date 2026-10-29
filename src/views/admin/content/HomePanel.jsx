@@ -2,7 +2,10 @@
 
 import { AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
-import { BANNER_SLOTS, GALLERY_CATEGORIES } from '@/data/catalog';
+import { BANNER_SLOTS, GALLERY_CATEGORIES, slugify } from '@/data/catalog';
+import { HIGHLIGHT_SLIDES } from '@/data/content';
+
+const HIGHLIGHT_SLOTS = HIGHLIGHT_SLIDES.map((h) => ({ id: slugify(h.title), label: h.title, fallback: h.image }));
 import { friendlyError, saveSite } from '@/lib/cms-admin';
 import { PhotoPicker, Thumb } from './PhotoTools';
 
@@ -121,11 +124,11 @@ function PhotoList({ id, title, help, items, max, field, fieldLabel, catField, c
   );
 }
 
-function Banners({ content, me, canEdit, reload }) {
+function SlotPhotos({ content, me, canEdit, reload, field = 'banners', slots = BANNER_SLOTS, title = 'Page banners', help = 'The large photo at the top of each page.' }) {
   const [picker, setPicker] = useState(null);
   const [busy, setBusy] = useState('');
   const [msg, setMsg] = useState(null);
-  const banners = content.site.banners || {};
+  const banners = content.site[field] || {};
   const set = async (slot, ref) => {
     setBusy(slot);
     setMsg(null);
@@ -133,9 +136,9 @@ function Banners({ content, me, canEdit, reload }) {
       const next = { ...banners };
       if (ref) next[slot] = ref;
       else delete next[slot];
-      await saveSite({ banners: next }, me);
+      await saveSite({ [field]: next }, me);
       await reload();
-      setMsg({ ok: true, text: 'Banner saved. The page is updated.' });
+      setMsg({ ok: true, text: 'Photo saved. The website is updated.' });
     } catch (e) {
       setMsg({ ok: false, text: friendlyError(e) });
     } finally {
@@ -143,16 +146,16 @@ function Banners({ content, me, canEdit, reload }) {
     }
   };
   return (
-    <section className="panel" aria-labelledby="ban-h">
-      <h2 id="ban-h">Page banners</h2>
-      <p className="meta">The large photo at the top of each page.</p>
+    <section className="panel" aria-labelledby={`${field}-h`}>
+      <h2 id={`${field}-h`}>{title}</h2>
+      <p className="meta">{help}</p>
       {msg && (
         <p className={msg.ok ? 'cm-ok' : 'form-alert'} role={msg.ok ? 'status' : 'alert'}>
           {msg.text}
         </p>
       )}
       <ul className="cm-banners">
-        {BANNER_SLOTS.map((b) => (
+        {slots.map((b) => (
           <li key={b.id}>
             <Thumb refKey={banners[b.id] || b.fallback} size="wide" />
             <b>{b.label}</b>
@@ -178,7 +181,7 @@ function Banners({ content, me, canEdit, reload }) {
             media={content.media}
             me={me}
             onUploaded={reload}
-            title={`Banner: ${BANNER_SLOTS.find((b) => b.id === picker)?.label}`}
+            title={`${title}: ${slots.find((b) => b.id === picker)?.label}`}
             onClose={() => setPicker(null)}
             onPick={(ref) => {
               const slot = picker;
@@ -207,7 +210,8 @@ export default function HomePanel(props) {
         fieldLabel="Description (read out to screen readers)"
         {...props}
       />
-      <Banners {...props} />
+      <SlotPhotos {...props} />
+      <SlotPhotos {...props} field="highlights" slots={HIGHLIGHT_SLOTS} title="Homepage highlights" help="The photo shown with each card in the homepage Highlights carousel." />
       <PhotoList
         key={`gal-${JSON.stringify(content.site.gallery)}`}
         id="gallery"

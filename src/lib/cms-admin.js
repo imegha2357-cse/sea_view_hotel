@@ -18,7 +18,7 @@ export async function loadContent() {
   const byOrder = (a, b) => (a.order ?? 99) - (b.order ?? 99);
   return {
     seeded: Boolean(s?.seeded),
-    site: { categories: s?.categories || [], hero: s?.hero || [], gallery: s?.gallery || [], banners: s?.banners || {} },
+    site: { categories: s?.categories || [], hero: s?.hero || [], gallery: s?.gallery || [], banners: s?.banners || {}, highlights: s?.highlights || {} },
     rooms: rooms.docs.map((d) => ({ id: d.id, ...d.data() })).sort(byOrder),
     offers: offers.docs.map((d) => ({ ...d.data(), code: d.id })).sort(byOrder),
     media: media.docs
@@ -203,6 +203,7 @@ export function photoUsage(ref, content) {
   for (const o of content.offers) if (o.image === ref) where.push(`Offer: ${o.title}`);
   content.site.hero.forEach((h, i) => h.image === ref && where.push(`Homepage slide ${i + 1}`));
   for (const [slot, v] of Object.entries(content.site.banners || {})) if (v === ref) where.push(`Banner: ${slot}`);
+  for (const [slot, v] of Object.entries(content.site.highlights || {})) if (v === ref) where.push(`Highlight: ${slot}`);
   if (content.site.gallery.some((g) => g.image === ref)) where.push('Gallery');
   return where;
 }
@@ -226,9 +227,11 @@ export async function swapPhotoEverywhere(from, to, content, me) {
   const s = content.site;
   const hero = s.hero.map((h) => (h.image === from ? { ...h, image: to } : h)).filter((h) => h.image);
   const gallery = s.gallery.map((g) => (g.image === from ? { ...g, image: to } : g)).filter((g) => g.image);
-  const banners = Object.fromEntries(Object.entries(s.banners || {}).map(([k, v]) => [k, v === from ? to : v]).filter(([, v]) => v));
-  if (JSON.stringify([hero, gallery, banners]) !== JSON.stringify([s.hero, s.gallery, s.banners || {}])) {
-    batch.set(F.doc(db, 'site', 'content'), { hero, gallery, banners, seeded: true, ...stamp(me) }, { merge: true });
+  const swapMap = (o) => Object.fromEntries(Object.entries(o || {}).map(([k, v]) => [k, v === from ? to : v]).filter(([, v]) => v));
+  const banners = swapMap(s.banners);
+  const highlights = swapMap(s.highlights);
+  if (JSON.stringify([hero, gallery, banners, highlights]) !== JSON.stringify([s.hero, s.gallery, s.banners || {}, s.highlights || {}])) {
+    batch.set(F.doc(db, 'site', 'content'), { hero, gallery, banners, highlights, seeded: true, ...stamp(me) }, { merge: true });
     n++;
   }
   if (n) await batch.commit();
