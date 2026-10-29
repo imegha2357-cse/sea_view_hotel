@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import Photo from '@/components/Photo';
 import { EASE } from '@/components/Motion';
 import { BUILT_IN, MAX_UPLOAD, friendlyError, preparePhoto, savePhoto } from '@/lib/cms-admin';
@@ -173,11 +174,12 @@ export function PhotoPicker({ media, me, onPick, onClose, onUploaded, title = 'C
     return () => window.removeEventListener('keydown', k);
   }, [onClose]);
   const list = tab === 'uploaded' ? media.map((m) => ({ ref: `m:${m.id}`, alt: m.alt || m.name })) : BUILT_IN;
-  return (
+  // Rendered at the end of the page (not inside the room or offer form), so nothing here submits that form.
+  return createPortal(
     <div className="drawer-wrap" role="dialog" aria-modal="true" aria-label={title}>
       <motion.div className="drawer-bg" onClick={onClose} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} />
       <motion.aside className="drawer cm-picker" data-lenis-prevent initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }} transition={{ duration: 0.4, ease: EASE }}>
-        <button ref={closeRef} className="x" onClick={onClose} aria-label="Close">
+        <button ref={closeRef} type="button" className="x" onClick={onClose} aria-label="Close">
           ×
         </button>
         <h2>{title}</h2>
@@ -187,7 +189,7 @@ export function PhotoPicker({ media, me, onPick, onClose, onUploaded, title = 'C
             ['website', `Website photos (${BUILT_IN.length})`],
             ['upload', 'Upload new'],
           ].map(([id, label]) => (
-            <button key={id} role="tab" aria-selected={tab === id} className={tab === id ? 'on' : ''} onClick={() => setTab(id)}>
+            <button key={id} type="button" role="tab" aria-selected={tab === id} className={tab === id ? 'on' : ''} onClick={() => setTab(id)}>
               {label}
             </button>
           ))}
@@ -214,6 +216,7 @@ export function PhotoPicker({ media, me, onPick, onClose, onUploaded, title = 'C
           <p className="meta">No uploaded photos yet. Use “Upload new”.</p>
         )}
       </motion.aside>
-    </div>
+    </div>,
+    document.body
   );
 }
