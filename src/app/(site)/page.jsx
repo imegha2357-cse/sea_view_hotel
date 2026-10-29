@@ -6,12 +6,15 @@ import Hero from '@/components/site/Hero';
 import SectionTabs from '@/components/site/SectionTabs';
 import Highlights from '@/components/site/Highlights';
 import Rail from '@/components/site/Rail';
+import RoomMosaic from '@/components/site/RoomMosaic';
+import Reviews from '@/components/site/Reviews';
+import BookingBar from '@/components/site/BookingBar';
 import Facilities from '@/components/site/Facilities';
 import Faq from '@/components/site/Faq';
 import GalleryGrid from '@/components/site/GalleryGrid';
 import MapEmbed from '@/components/site/MapEmbed';
 import ReachTabs from '@/components/site/ReachTabs';
-import { PlaceCard, RoomCard } from '@/components/site/Cards';
+import { PlaceCard } from '@/components/site/Cards';
 import { Chevron, LineTitle, ReadMore, Reveal } from '@/components/site/ui';
 import Photo from '@/components/Photo';
 
@@ -25,6 +28,7 @@ const TABS = [
   { id: 'experiences', label: 'Experiences' },
   { id: 'facilities', label: 'Hotel information' },
   { id: 'gallery', label: 'Gallery' },
+  { id: 'reviews', label: 'Reviews' },
   { id: 'location', label: 'Location' },
   { id: 'faqs', label: 'FAQs' },
 ];
@@ -35,6 +39,11 @@ export default function Home() {
     <>
       <JsonLd data={[hotelLd, faqLd()]} />
       <Hero gallery={GALLERY} />
+      <section className="plan-band" aria-label="Check availability">
+        <div className="container wide">
+          <BookingBar />
+        </div>
+      </section>
       <SectionTabs items={TABS} />
 
       <section className="sec" id="overview" aria-labelledby="overview-h">
@@ -57,13 +66,13 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="sec cream" id="rooms" aria-labelledby="rooms-h">
+      <section className="sec" id="rooms" aria-labelledby="rooms-h">
         <div className="container wide">
-          <Rail label="rooms" title={<LineTitle id="rooms-h">Rooms and suites</LineTitle>}>
-            {ROOMS.map((r) => (
-              <RoomCard key={r.id} r={r} />
-            ))}
-          </Rail>
+          <div className="sec-head">
+            <LineTitle id="rooms-h">Rooms</LineTitle>
+            <p>Five room types, each with a private bathroom, television and direct-dial phone, and room service around the clock.</p>
+          </div>
+          <RoomMosaic />
           <p style={{ marginTop: 28 }}>
             <Link href="/rooms" className="more-link">
               Compare all rooms <Chevron />
@@ -188,7 +197,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="sec cream" id="gallery" aria-labelledby="gallery-h">
+      <section className="sec" id="gallery" aria-labelledby="gallery-h">
         <div className="container wide">
           <div className="sec-head-row">
             <LineTitle id="gallery-h">Gallery</LineTitle>
@@ -199,6 +208,8 @@ export default function Home() {
           <GalleryGrid items={GALLERY.slice(0, 10)} filters={false} />
         </div>
       </section>
+
+      <Reviews />
 
       <section className="sec" id="location" aria-labelledby="loc-h">
         <div className="container wide loc-grid">
@@ -239,7 +250,7 @@ export default function Home() {
           <p>Send us your dates and our team will confirm availability and the best rate by phone or WhatsApp.</p>
           <div className="row">
             <Link href="/enquire" className="btn ghost-light">
-              Book a stay
+              Check availability
             </Link>
             <a href={`https://wa.me/${HOTEL.whatsapp}`} className="btn outline light" target="_blank" rel="noreferrer">
               WhatsApp us

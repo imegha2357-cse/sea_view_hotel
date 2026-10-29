@@ -22,7 +22,7 @@ export default function NotFound() {
                 Rooms
               </Link>
               <Link href="/enquire" className="btn outline dark">
-                Book a stay
+                Check availability
               </Link>
             </div>
           </div>

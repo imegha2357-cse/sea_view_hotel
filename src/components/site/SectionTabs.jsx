@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from 'react';
 import { EASE } from './ui';
 
 // Taj's sticky in-page menu: highlights the section on screen and scrolls the strip to keep it visible.
-export default function SectionTabs({ items, cta = { href: '/enquire', label: 'Book a stay' } }) {
+export default function SectionTabs({ items, cta = { href: '/enquire', label: 'Check availability' } }) {
   const [active, setActive] = useState(items[0]?.id);
   const strip = useRef(null);
 
@@ -24,8 +24,10 @@ export default function SectionTabs({ items, cta = { href: '/enquire', label: 'B
   }, [items]);
 
   useEffect(() => {
-    const el = strip.current?.querySelector(`[data-id="${active}"]`);
-    el?.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
+    // Scroll only the tab strip (scrollIntoView would also move the keyboard focus starting point).
+    const box = strip.current;
+    const el = box?.querySelector(`[data-id="${active}"]`);
+    if (box && el) box.scrollTo({ left: el.offsetLeft - box.clientWidth / 2 + el.offsetWidth / 2, behavior: 'smooth' });
   }, [active]);
 
   return (

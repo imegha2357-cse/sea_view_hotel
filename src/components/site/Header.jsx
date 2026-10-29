@@ -123,7 +123,7 @@ function MobileDrawer({ onClose, account }) {
       </nav>
       <div className="drawer-foot">
         <Link href="/enquire" className="btn solid" onClick={onClose}>
-          Book a stay
+          Check availability
         </Link>
         <Link href={account.href} className="btn outline dark" onClick={onClose}>
           {account.label}
@@ -245,7 +245,7 @@ export default function Header() {
               <span>{account.label}</span>
             </Link>
             <Link href="/enquire" className="btn solid">
-              Book a stay
+              Check availability
             </Link>
             <button className="burger" aria-label="Open menu" aria-expanded={drawer} onClick={() => setDrawer(true)}>
               <i />

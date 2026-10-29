@@ -3,7 +3,7 @@ import { RATE_NOTE, ROOMS } from '@/data/content';
 import { meta } from '@/lib/meta';
 import { rupees } from '@/lib/enquiry';
 import PageTop from '@/components/site/PageTop';
-import RoomsGrid from '@/components/site/RoomsGrid';
+import RoomMosaic from '@/components/site/RoomMosaic';
 import { LineTitle, Reveal } from '@/components/site/ui';
 
 export const metadata = meta('/rooms');
@@ -20,14 +20,14 @@ const ROWS = [
 export default function RoomsPage() {
   return (
     <>
-      <PageTop image="roomDeluxe" title="Rooms and suites" text="Five ways to stay, from city-view rooms to sea-facing suites." trail={[{ label: 'Rooms', href: '/rooms' }]} />
+      <PageTop image="roomDeluxe" title="Rooms and suites" trail={[{ label: 'Rooms', href: '/rooms' }]} />
       <section className="sec" style={{ paddingTop: 24 }}>
         <div className="container wide">
-          <h2 className="sr-only">All rooms</h2>
-          <p className="lead" style={{ maxWidth: '70ch', marginBottom: 32 }}>
-            Every room has a private bathroom, television and direct-dial phone, with room service around the clock. {RATE_NOTE}
-          </p>
-          <RoomsGrid />
+          <div className="sec-head">
+            <LineTitle as="h2">Rooms</LineTitle>
+            <p>Every room has a private bathroom, television and direct-dial phone, with room service around the clock. {RATE_NOTE}</p>
+          </div>
+          <RoomMosaic />
         </div>
       </section>
       <section className="sec cream" aria-labelledby="compare-h">

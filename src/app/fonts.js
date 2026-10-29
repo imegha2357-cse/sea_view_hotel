@@ -2,8 +2,12 @@ import localFont from 'next/font/local';
 
 // Fonts are bundled with the site (no request to Google), preloaded and swapped in without layout jumps.
 export const display = localFont({
-  src: './../fonts/marcellus-latin-400-normal.woff2',
-  weight: '400',
+  src: [
+    { path: './../fonts/playfair-display-latin-400-normal.woff2', weight: '400', style: 'normal' },
+    { path: './../fonts/playfair-display-latin-400-italic.woff2', weight: '400', style: 'italic' },
+    { path: './../fonts/playfair-display-latin-500-normal.woff2', weight: '500', style: 'normal' },
+    { path: './../fonts/playfair-display-latin-500-italic.woff2', weight: '500', style: 'italic' },
+  ],
   variable: '--font-display',
   display: 'swap',
   fallback: ['Georgia', 'Times New Roman', 'serif'],

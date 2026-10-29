@@ -21,7 +21,7 @@ export default function RoomActions({ room }) {
   return (
     <div className="card-actions">
       <a href="#book" className="btn solid">
-        Book this room
+        Enquire about this room
       </a>
       <a href={whatsappUrl({ room_type: room.name })} className="btn outline dark" target="_blank" rel="noreferrer">
         WhatsApp

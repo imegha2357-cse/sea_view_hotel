@@ -10,11 +10,11 @@ export const metadata = meta('/enquire');
 export default function Enquire() {
   return (
     <div className="plain-top">
-      <Crumbs trail={[{ label: 'Book a stay', href: '/enquire' }]} title="Book a stay at Hotel Sea View" />
+      <Crumbs trail={[{ label: 'Check availability', href: '/enquire' }]} title="Check availability at Hotel Sea View" />
       <section className="sec" style={{ paddingTop: 16 }}>
         <div className="container" style={{ maxWidth: 980 }}>
           <div className="sec-head">
-            <LineTitle as="h1">Book a stay</LineTitle>
+            <LineTitle as="h1">Check availability</LineTitle>
             <p>
               Tell us your dates and we will confirm availability and price by phone or WhatsApp, usually the same day. You can also call {HOTEL.phone}.
             </p>

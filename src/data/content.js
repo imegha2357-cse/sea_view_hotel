@@ -57,11 +57,11 @@ export const ROOMS = [
     image: 'roomDeluxe',
     view: 'Sea view',
     tags: ['sea'],
-    summary: 'Faces the sea, the Vivekananda Rock Memorial and the Thiruvalluvar Statue. Watch the sunrise from your bed.',
+    summary: 'Our classic sea-facing room. Look straight out to the Vivekananda Rock Memorial and the Thiruvalluvar Statue, and watch the sunrise without leaving your bed.',
     beds: 'King or twin',
     occupancy: '2 adults + 2 children under 6',
     size: null, // CONFIRM room size
-    features: ['Sunrise from the bed', 'Private bathroom', 'Television', 'Work area'],
+    features: ['Faces the island memorials', 'Sunrise from the bed', 'Private bathroom', 'Television', 'Work area'],
     rate: null, // CONFIRM 'from' price per night
   },
   {
@@ -70,11 +70,11 @@ export const ROOMS = [
     image: 'roomCorner',
     view: 'Sea view',
     tags: ['sea'],
-    summary: 'A corner room with sea views on the sunrise side of the hotel.',
+    summary: 'Set on a corner of the building on the sunrise side, looking out over the sea.',
     beds: 'King or twin',
     occupancy: '2 adults + 2 children under 6',
     size: null, // CONFIRM room size and a distinct description
-    features: ['Sunrise from the bed', 'Private bathroom', 'Television'],
+    features: ['Corner position', 'Sea view on the sunrise side', 'Private bathroom', 'Television'],
     rate: null, // CONFIRM 'from' price per night
   },
   {
@@ -96,11 +96,11 @@ export const ROOMS = [
     image: 'roomSuite',
     view: 'Sea view',
     tags: ['sea'],
-    summary: 'Sea views over to the island memorials, with the sunrise visible from the bed.',
+    summary: 'The hotel’s suite category: sea views across to the two island memorials, the sunrise from the bed, and a work area for longer stays.',
     beds: 'King or twin',
     occupancy: '2 adults + 2 children under 6',
     size: null, // CONFIRM room size
-    features: ['Sunrise from the bed', 'Sea views', 'Work area'],
+    features: ['Suite', 'Sea views to the island memorials', 'Sunrise from the bed', 'Work area'],
     rate: null, // CONFIRM 'from' price per night
   },
 ];
@@ -217,6 +217,23 @@ export const FAQS = [
 // { quote: 'Exact approved words of the guest.', name: 'Guest name or initials', from: 'City', date: 'Month Year', source: 'Google review' }
 export const TESTIMONIALS = [];
 
+// Room mosaic (rooms page and home): text tiles introduce each group, photo tiles show each room.
+export const ROOM_GROUPS = [
+  {
+    title: 'Sea-view rooms',
+    text: 'Rooms on the sea side of the hotel, facing the Vivekananda Rock Memorial and the Thiruvalluvar Statue. The sunrise comes to you.',
+    rooms: ['deluxe-seaview', 'corner-deluxe', 'executive-suite'],
+    textFirst: true,
+  },
+  {
+    title: 'City and family rooms',
+    text: 'Standard Rooms look over the town, and the interconnected Twin Rooms keep families together, with one balcony facing the sea.',
+    rooms: ['standard', 'twin'],
+    textFirst: false,
+    extra: { title: 'Room tour', meta: 'Watch the 73-second video', href: '/room-tour', image: 'tourPoster' },
+  },
+];
+
 export const ENQUIRY_STATUSES = ['New', 'Contacted', 'Availability Checked', 'Awaiting Guest', 'Confirmed', 'Cancelled', 'Closed'];
 
 export const VIDEO = {
@@ -296,11 +313,10 @@ export const HIGHLIGHT_SLIDES = [
 ];
 
 export const HERO_SLIDES = [
+  { image: 'vivekananda', caption: 'Vivekananda Rock Memorial, a short ferry ride away' },
   { image: 'building', caption: 'Hotel Sea View, East Car Street' },
-  { image: 'seaView', caption: 'The view from a sea-facing room' },
   { image: 'roomDeluxe', caption: 'Deluxe Seaview Room' },
   { image: 'restaurant1', caption: 'Sea View Restaurant' },
-  { image: 'vivekananda', caption: 'Vivekananda Rock Memorial' },
 ];
 
 export const OVERVIEW = {

@@ -1,81 +1,119 @@
 'use client';
 
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
-import { useCallback, useEffect, useState } from 'react';
-import { HERO_SLIDES } from '@/data/content';
+import Link from 'next/link';
+import { AnimatePresence, motion, useReducedMotion, useScroll, useTransform } from 'framer-motion';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { HERO_SLIDES, HOTEL } from '@/data/content';
 import Photo from '../Photo';
-import BookingBar from './BookingBar';
 import Lightbox from './Lightbox';
-import { Chevron, EASE, KenBurns } from './ui';
+import { EASE, KenBurns } from './ui';
+import { HeroIcon } from './HeroIcons';
 
-const DELAY = 6500;
+const DELAY = 7000;
 
-// Taj hero: full-screen photos that crossfade with a slow zoom, round arrows, title with a drawn rule,
-// a "Gallery" chip and the booking bar along the bottom.
-export default function Hero({ title = 'Hotel Sea View, Kanyakumari', slides = HERO_SLIDES, gallery }) {
+// Facts along the bottom of the hero, all published by the hotel.
+export const HERO_FEATURES = [
+  { icon: 'waves', title: 'Sea-facing rooms', text: 'Views to the island memorials' },
+  { icon: 'sunrise', title: 'Sunrise from your room', text: 'Over the sea at the tip of India' },
+  { icon: 'dish', title: 'Multi-cuisine restaurant', text: 'Indian, Chinese and Continental' },
+  { icon: 'bell', title: '24-hour room service', text: 'Day and night' },
+  { icon: 'parking', title: 'Free parking', text: 'For hotel guests' },
+  { icon: 'compass', title: 'Travel desk', text: 'Sightseeing and tours' },
+];
+
+const rise = (d) => ({ hidden: { opacity: 0, y: 26 }, show: { opacity: 1, y: 0, transition: { duration: 0.9, ease: EASE, delay: d } } });
+
+export default function Hero({ slides = HERO_SLIDES, gallery }) {
   const [i, setI] = useState(0);
-  const [paused, setPaused] = useState(false);
+  const [playing, setPlaying] = useState(true);
+  const [hover, setHover] = useState(false);
   const [lb, setLb] = useState(null);
   const reduce = useReducedMotion();
+  const ref = useRef(null);
   const n = slides.length;
   const go = useCallback((d) => setI((x) => (x + d + n) % n), [n]);
 
+  // Gentle parallax: the text drifts up and fades as the hero scrolls away.
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] });
+  const textY = useTransform(scrollYProgress, [0, 1], [0, -90]);
+  const textO = useTransform(scrollYProgress, [0, 0.7], [1, 0]);
+
   useEffect(() => {
-    if (paused || reduce || n < 2) return undefined;
+    if (!playing || hover || reduce || n < 2) return undefined;
     const t = setTimeout(() => go(1), DELAY);
     return () => clearTimeout(t);
-  }, [i, paused, reduce, go, n]);
+  }, [i, playing, hover, reduce, go, n]);
 
   const s = slides[i];
   return (
-    <section className="hero" data-hero aria-roledescription="carousel" aria-label="Photos of the hotel" onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)} onFocus={() => setPaused(true)} onBlur={() => setPaused(false)}>
-      <AnimatePresence initial={false}>
-        <motion.div key={s.image} className="hero-slide" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 1.2, ease: 'easeInOut' }} role="group" aria-roledescription="slide" aria-label={`${i + 1} of ${n}: ${s.caption}`}>
-          <KenBurns duration={DELAY / 1000 + 2}>
-            <Photo k={s.image} sizes="(orientation: portrait) 240vh, 100vw" priority={i === 0} />
-          </KenBurns>
-        </motion.div>
-      </AnimatePresence>
-
-      {n > 1 && (
-        <div className="hero-arrows">
-          <button className="round-btn" onClick={() => go(-1)} aria-label="Previous photo">
-            <Chevron dir="left" />
-          </button>
-          <button className="round-btn" onClick={() => go(1)} aria-label="Next photo">
-            <Chevron />
-          </button>
-        </div>
+    <section ref={ref} className="hero coast" data-hero aria-label="Welcome to Hotel Sea View" onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}>
+      {/* The previous, current and next photos stay mounted: the old one fades out while the next is already loaded. */}
+      {slides.map((x, k) =>
+        k === i || k === (i + 1) % n || k === (i - 1 + n) % n ? (
+          <motion.div key={x.image} className="hero-slide" initial={false} animate={{ opacity: k === i ? 1 : 0 }} style={{ zIndex: k === i ? 1 : 0 }} transition={{ duration: 1.4, ease: 'easeInOut' }} aria-hidden={k !== i}>
+            <KenBurns duration={DELAY / 1000 + 3} active={k === i}>
+              <Photo k={x.image} sizes="(orientation: portrait) 240vh, 100vw" priority={k === 0} alt={k === i ? x.caption : ''} />
+            </KenBurns>
+          </motion.div>
+        ) : null
       )}
 
-      <div className="hero-bottom">
-        <div className="container wide">
-          <AnimatePresence mode="wait">
-            <motion.p key={s.caption} className="hero-caption" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.5 }} aria-live="polite">
-              {s.caption}
-            </motion.p>
-          </AnimatePresence>
-          <div className="hero-title-row">
-            <motion.h1 className="hero-title" initial="hide" animate="show">
-              <motion.span className="line" aria-hidden="true" variants={{ hide: { scaleX: 0 }, show: { scaleX: 1, transition: { duration: 1, ease: EASE, delay: 0.3 } } }} />
-              <motion.span variants={{ hide: { opacity: 0, y: 30 }, show: { opacity: 1, y: 0, transition: { duration: 1, ease: EASE, delay: 0.45 } } }}>{title}</motion.span>
-            </motion.h1>
-            {gallery?.length > 0 && (
-              <motion.button className="gallery-chip" onClick={() => setLb(0)} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.8, duration: 0.6, ease: EASE }} aria-label={`Open the gallery, ${gallery.length} photos`}>
-                <span className="thumbs" aria-hidden="true">
-                  {gallery.slice(0, 4).map((g) => (
-                    <span key={g.image}>
-                      <Photo k={g.image} sizes="30px" alt="" />
-                    </span>
-                  ))}
-                </span>
-                Gallery
-              </motion.button>
-            )}
+      <motion.div className="container hero-copy" style={reduce ? undefined : { y: textY, opacity: textO }} initial="hidden" animate="show">
+        <motion.p className="hero-chip" variants={rise(0.15)}>
+          <i aria-hidden="true" /> East Car Street · Kanyakumari
+        </motion.p>
+        <motion.h1 className="hero-h1" variants={rise(0.3)}>
+          Wake up to the <em>sunrise</em>
+          <br /> at the tip of India.
+        </motion.h1>
+        <motion.p className="hero-sub" variants={rise(0.45)}>
+          Sea-facing rooms looking out to the Vivekananda Rock Memorial and the Thiruvalluvar Statue, a short walk from Kanyakumari beach.
+        </motion.p>
+        <motion.div className="hero-ctas" variants={rise(0.6)}>
+          <Link href="/enquire" className="cta-pill accent">
+            Check availability <span aria-hidden="true">→</span>
+          </Link>
+          <Link href="/rooms" className="cta-pill glass">
+            Explore rooms
+          </Link>
+          <a href={`https://wa.me/${HOTEL.whatsapp}`} className="cta-pill wa" target="_blank" rel="noreferrer">
+            <HeroIcon name="chat" /> WhatsApp us
+          </a>
+        </motion.div>
+        <motion.p className="hero-note" variants={rise(0.7)}>
+          We confirm availability and price personally, by phone or WhatsApp.
+        </motion.p>
+      </motion.div>
+
+      <div className="hero-foot container">
+        <motion.ul className="hero-strip" initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.9, ease: EASE, delay: 0.85 }} aria-label="At a glance">
+          {HERO_FEATURES.map((f) => (
+            <li key={f.title}>
+              <HeroIcon name={f.icon} />
+              <b>{f.title}</b>
+              <span>{f.text}</span>
+            </li>
+          ))}
+        </motion.ul>
+        <div className="hero-controls">
+          <span className="hero-cap" aria-live="polite">
+            {s.caption}
+          </span>
+          <div className="hero-dots" role="group" aria-label="Choose photo">
+            {slides.map((x, k) => (
+              <button key={x.image} aria-label={`Photo ${k + 1}: ${x.caption}`} aria-current={k === i ? 'true' : undefined} onClick={() => setI(k)} />
+            ))}
           </div>
-          <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7, duration: 0.8, ease: EASE }}>
-            <BookingBar />
-          </motion.div>
+          {n > 1 && (
+            <button className="hero-pause" onClick={() => setPlaying((p) => !p)} aria-label={playing ? 'Pause the slideshow' : 'Play the slideshow'}>
+              {playing ? '❚❚' : '▶'}
+            </button>
+          )}
+          {gallery?.length > 0 && (
+            <button className="hero-gallery" onClick={() => setLb(0)}>
+              View gallery
+            </button>
+          )}
         </div>
       </div>
       <AnimatePresence>{lb !== null && <Lightbox items={gallery} start={lb} onClose={() => setLb(null)} />}</AnimatePresence>

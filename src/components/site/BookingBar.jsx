@@ -33,7 +33,7 @@ function Step({ label, hint, value, set, min, max }) {
   );
 }
 
-// Taj booking bar: dates, guests and rooms, room type, Book now. It opens the enquiry form already filled in.
+// Booking bar: dates, guests and rooms, room type, Check availability. It opens the enquiry form already filled in.
 export default function BookingBar({ compact = false }) {
   const router = useRouter();
   const [inD, setIn] = useState('');
@@ -133,7 +133,7 @@ export default function BookingBar({ compact = false }) {
         </select>
       </div>
       <button className="btn solid" type="submit">
-        Book now
+        Check availability
       </button>
     </form>
   );

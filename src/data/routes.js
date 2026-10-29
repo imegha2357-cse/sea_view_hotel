@@ -64,7 +64,7 @@ export const PAGES = [
   },
   {
     path: '/enquire',
-    title: 'Book a stay | Hotel Sea View, Kanyakumari',
+    title: 'Check availability | Hotel Sea View, Kanyakumari',
     description: 'Send a booking enquiry to Hotel Sea View, Kanyakumari. Our team confirms availability and price by phone or WhatsApp.',
     priority: '0.7',
   },

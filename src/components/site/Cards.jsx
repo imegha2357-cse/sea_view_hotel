@@ -22,7 +22,7 @@ export function RoomCard({ r }) {
         </div>
         <div className="card-actions">
           <Link href={`/enquire?room_type=${encodeURIComponent(r.name)}`} className="btn solid sm">
-            Book now
+            Enquire
           </Link>
           <Link href={`/rooms/${r.id}`} className="more-link">
             Details <Chevron />

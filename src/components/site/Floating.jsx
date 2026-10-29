@@ -10,7 +10,7 @@ export default function Floating() {
   const [show, setShow] = useState(false);
   const [chat, setChat] = useState(false);
   useEffect(() => {
-    // The chat button waits until the visitor scrolls, so it never covers the hero's Book now button.
+    // The chat button waits until the visitor scrolls, so it never covers the hero's buttons.
     const on = () => {
       setShow(window.scrollY > 900);
       setChat(window.scrollY > 420);

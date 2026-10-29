@@ -4,7 +4,7 @@ import { useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 import EnquiryForm from '../EnquiryForm';
 
-// The booking bar and "Book now" buttons pass dates, guests and room in the address; the form starts filled in.
+// The booking bar and "Enquire" buttons pass dates, guests and room in the address; the form starts filled in.
 export default function EnquireForm() {
   const q = useSearchParams();
   const prefill = useMemo(() => {

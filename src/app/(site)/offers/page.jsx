@@ -24,7 +24,7 @@ export default function Offers() {
                     {o.code && <p className="card-meta">Code: {o.code}</p>}
                     <div className="card-actions">
                       <Link href={`/enquire?promo_code=${encodeURIComponent(o.code || '')}`} className="btn solid sm">
-                        Book now
+                        Enquire
                       </Link>
                     </div>
                   </div>

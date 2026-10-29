@@ -1,5 +1,6 @@
 import '@/styles/app.css';
 import '@/styles/site.css';
+import '@/styles/coast.css';
 import { SITE_URL } from '@/data/site';
 import { AuthProvider } from '@/lib/auth';
 import CookieConsent from '@/components/CookieConsent';
@@ -15,7 +16,7 @@ export const metadata = {
 };
 
 export const viewport = {
-  themeColor: '#1d2827',
+  themeColor: '#173B3A',
   width: 'device-width',
   initialScale: 1,
   viewportFit: 'cover',

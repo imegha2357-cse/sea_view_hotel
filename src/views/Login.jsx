@@ -61,7 +61,7 @@ export default function Login() {
       <div className="auth-media">
         <SmartImg name="roomDeluxe" eager />
         <motion.div className="quote" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, ease: EASE, delay: 0.2 }}>
-          <span className="eyebrow" style={{ color: '#f1d9b3' }}>
+          <span className="eyebrow" style={{ color: 'var(--ivory)' }}>
             Guest account
           </span>
           <h2>Track your enquiries and plan your stay by the sea.</h2>
