@@ -75,3 +75,26 @@ Staff can click **Add 15 demo enquiries** in `/admin`. Demo records are tagged "
 ## Commands
 
 `npm run dev` (local), `npm run build`, `npm test` (unit tests), GitHub Actions runs tests and a build on every push.
+
+## Features from the 100-feature plan that are live (61)
+
+Numbers refer to Part 5 of the planning doc. Features that need the hotel's accounts or data (email keys, room rates, menus, translations and so on) are not counted until they are switched on.
+
+| Area | Live features | Where |
+| --- | --- | --- |
+| Booking and enquiries | 1 availability calendar · 5 offers and codes · 6 event and meeting enquiries · 7 pick-up request · 8 add-ons · 9 callback time · 10 unsent-form recovery · 19 WhatsApp message with room and dates · 20 offers sign-up | `/enquire`, footer, `/offers` |
+| Guest communication | 15 pre-arrival message · 17 staff reply templates | `/admin` enquiry drawer |
+| Rooms and content | 21 page per room · 22 comparison table · 25 in-room amenity icons · 28 conference hall page · 29 policies page | `/rooms`, `/rooms/[room]`, `/meetings`, `/policies` |
+| Guest account | 32 book again · 34 saved preferences · 35 messages with the hotel · 37 online check-in · 38 saved rooms · 40 download or delete my data | `/account` |
+| Staff dashboard | 41 roles · 42 assign · 43 follow-ups and overdue · 45 reports · 46 phone and walk-in entries · 47 duplicate warning · 48 change history · 50 installable app | `/admin` |
+| Marketing and SEO | 52 pre-built pages · 54 travel guides · 55 offers page · 56 share images · 57 rich results · 60 enquiry source tracking | every page, `/guides`, `/offers` |
+| Local experience | 61 sunrise calendar · 63 weather · 64 day plans · 68 tour packages · 69 how to reach | `/plan-your-visit`, `/experiences`, `/offers` |
+| Speed and reliability | 71 login code loads only when needed · 72 photos hosted here · 73 sized hero image · 74 self-hosted fonts · 75 works offline · 77 error reporting · 78 automatic tests · 79 preview links before publishing (Vercel) | throughout |
+| Security and privacy | 82 enquiry rate limit · 84 auto sign-out · 86 consent record · 87 strict security headers · 90 blocked-spam log | form, `/admin` Inbox |
+| Accessibility and convenience | 93 dark mode · 94 WCAG AA audit · 96 FAQ question search · 97 add to calendar · 98 printable directions · 99 feedback button · 100 larger text | footer, FAQs, `/plan-your-visit` |
+
+Ready but waiting for the hotel: 2/3 prices and estimate (room rates), 11/13/18 email alerts, auto-reply and digest (email keys), 16 review request (Google review link), 31 Google sign-in (switch on in Firebase), 81 bot protection (reCAPTCHA key).
+
+## Offers
+
+`OFFERS` in `src/data/content.js` holds five packages built only from services the hotel already publishes (sea-view rooms, interconnected rooms, travel desk, conference hall). None states a price or a discount. Confirm each with the hotel before launch; add a rate or "valid until" when they approve.

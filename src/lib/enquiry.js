@@ -1,6 +1,16 @@
 import { firebaseReady, loadFirebase, NOT_CONFIGURED } from './firebase';
 import { HOTEL, ROOMS, ROOM_TYPES, OFFERS } from '../data/content';
 import { getSource } from './attribution';
+import { reportError } from './errors';
+
+const SENT = 'seaview-sent';
+const sentTimes = () => {
+  try {
+    return JSON.parse(localStorage.getItem(SENT) || '[]');
+  } catch {
+    return [];
+  }
+};
 
 export const MESSAGE_MAX = 1000;
 
@@ -93,7 +103,15 @@ export const formatISO = (iso) =>
 
 export async function submitEnquiry(v, user) {
   if (!firebaseReady) throw new Error(NOT_CONFIGURED);
-  if (v.company) return { id: 'ignored' }; // silently drop bots
+  if (v.company) {
+    // Feature #90: the hidden field was filled, so this is a bot. Drop it, and log it for staff (Inbox → Website errors).
+    reportError('Blocked spam enquiry (hidden anti-spam field was filled)');
+    return { id: 'ignored' };
+  }
+  // Feature #82: one enquiry a minute and at most five a day from the same browser.
+  const recent = sentTimes().filter((t) => Date.now() - t < 86400000);
+  if (recent.length && Date.now() - recent[recent.length - 1] < 60000) throw new Error('You sent an enquiry a moment ago. Please wait a minute before sending another, or WhatsApp us.');
+  if (recent.length >= 5) throw new Error('You have sent several enquiries today. Our team will reply to them; for anything urgent, please call or WhatsApp us.');
   const { db, F } = await loadFirebase();
   const toDate = (iso) => F.Timestamp.fromDate(new Date(`${iso}T12:00:00`));
   const src = getSource();
@@ -128,6 +146,9 @@ export async function submitEnquiry(v, user) {
   };
   // Resolves only after Firestore confirms the write, so success is never shown early (PRD 6.1 step 4).
   const ref = await F.addDoc(F.collection(db, 'booking_enquiries'), data);
+  try {
+    localStorage.setItem(SENT, JSON.stringify([...recent, Date.now()].slice(-5)));
+  } catch {}
 
   // Feature #20: offers newsletter, only with an explicit tick.
   if (v.newsletter && v.email.trim()) {

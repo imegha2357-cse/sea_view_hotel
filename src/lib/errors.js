@@ -10,6 +10,7 @@ export function reportError(message) {
   if (!firebaseReady || sent >= 3 || seen.has(msg) || process.env.NODE_ENV === 'development') return;
   // Ignore noise from browser extensions and cancelled media loads.
   if (/extension:|ResizeObserver loop|AbortError|Load failed|NetworkError/i.test(msg)) return;
+  if (/^Blocked spam/.test(msg)) sent = Math.max(0, sent - 1); // spam logs do not use up the error allowance
   seen.add(msg);
   sent++;
   loadFirebase()

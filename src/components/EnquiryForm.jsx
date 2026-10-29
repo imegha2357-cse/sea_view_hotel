@@ -343,7 +343,7 @@ export default function EnquiryForm({ prefill, compact = false, onSubmitted, def
                     {OFFERS.length > 0 && (
                       <Field id="promo_code" label="Offer code" error={errors.promo_code}>
                         <input id="promo_code" name="promo_code" placeholder=" " value={v.promo_code} onChange={set('promo_code')} maxLength={30} />
-                        {v.promo_code && <div className={`hint ${offer ? 'ok' : ''}`}>{offer ? `${offer.title} applied` : 'We will check this code'}</div>}
+                        {v.promo_code && <div className={`hint ${offer ? 'ok' : ''}`}>{offer ? `${offer.title}: noted for our team` : 'We will check this code'}</div>}
                       </Field>
                     )}
                   </div>

@@ -9,6 +9,7 @@ import PageTop from '@/components/site/PageTop';
 import Rail from '@/components/site/Rail';
 import { RoomCard } from '@/components/site/Cards';
 import RoomActions from '@/components/site/RoomActions';
+import RoomAmenities from '@/components/site/RoomAmenities';
 import EnquiryForm from '@/components/EnquiryForm';
 import { Chevron, LineTitle, Reveal } from '@/components/site/ui';
 import Photo from '@/components/Photo';
@@ -57,6 +58,7 @@ export default function RoomPage({ params }) {
                 <dd>{r.rate ? `From ${rupees(r.rate)} a night` : 'On enquiry'}</dd>
               </div>
             </dl>
+            <RoomAmenities room={r} />
             <ul>
               {[...r.features, ...BASICS.filter((b) => !r.features.includes(b))].map((f) => (
                 <li key={f}>{f}</li>

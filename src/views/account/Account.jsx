@@ -212,11 +212,12 @@ export default function Account() {
   useEffect(() => {
     if (!user) return undefined;
     const { db, F } = fb();
-    const q = F.query(F.collection(db, 'booking_enquiries'), F.where('userId', '==', user.uid), F.orderBy('created_at', 'desc'));
+    // Filter only on userId (no composite index needed) and sort newest first here.
+    const q = F.query(F.collection(db, 'booking_enquiries'), F.where('userId', '==', user.uid));
     return F.onSnapshot(
       q,
-      (snap) => setItems(snap.docs.map((d) => ({ id: d.id, ...d.data() }))),
-      (err) => setError(err.code === 'failed-precondition' ? 'The enquiries index is still building. Try again in a few minutes.' : 'We could not load your enquiries. Refresh to try again.')
+      (snap) => setItems(snap.docs.map((d) => ({ id: d.id, ...d.data() })).sort((a, b) => (b.created_at?.toMillis?.() || 0) - (a.created_at?.toMillis?.() || 0))),
+      () => setError('We could not load your enquiries. Refresh the page to try again, or call us.')
     );
   }, [user]);
 
@@ -294,7 +295,7 @@ export default function Account() {
       <main id="main" className="container dash-body">
         <div className="dash-head">
           <div>
-            <h1>Hello{p.name ? `, ${p.name.split(' ')[0]}` : ''}</h1>
+            <h1>{p.name ? `Hello, ${p.name.split(' ')[0]}` : 'Welcome back'}</h1>
             <p>Your enquiries and their status. Our team updates these as they follow up with you.</p>
           </div>
           <button className="btn solid" onClick={() => { setPrefill(null); setShowForm((s) => !s); }}>

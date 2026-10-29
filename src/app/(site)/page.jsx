@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ATTRACTIONS, EXPERIENCES, FACTS, FAQS, GALLERY, HIGHLIGHT_SLIDES, HOTEL, OFFERS, OVERVIEW, ROOMS, mapsLink } from '@/data/content';
+import { POLICIES, ATTRACTIONS, EXPERIENCES, FACTS, FAQS, GALLERY, HIGHLIGHT_SLIDES, HOTEL, OFFERS, OVERVIEW, ROOMS, mapsLink } from '@/data/content';
 import { meta } from '@/lib/meta';
 import { JsonLd, faqLd, hotelLd } from '@/lib/ld';
 import Hero from '@/components/site/Hero';
@@ -8,6 +8,10 @@ import Highlights from '@/components/site/Highlights';
 import Rail from '@/components/site/Rail';
 import RoomMosaic from '@/components/site/RoomMosaic';
 import Reviews from '@/components/site/Reviews';
+import FeatureCards from '@/components/site/FeatureCards';
+import HighlightTabs from '@/components/site/HighlightTabs';
+import OfferCard from '@/components/site/OfferCard';
+import { EventGrid } from '@/components/site/EventTypes';
 import BookingBar from '@/components/site/BookingBar';
 import Facilities from '@/components/site/Facilities';
 import Faq from '@/components/site/Faq';
@@ -26,6 +30,8 @@ const TABS = [
   { id: 'highlights', label: 'Highlights' },
   { id: 'dining', label: 'Dining' },
   { id: 'experiences', label: 'Experiences' },
+  { id: 'offers', label: 'Offers' },
+  { id: 'events', label: 'Events' },
   { id: 'facilities', label: 'Hotel information' },
   { id: 'gallery', label: 'Gallery' },
   { id: 'reviews', label: 'Reviews' },
@@ -65,6 +71,8 @@ export default function Home() {
           </Reveal>
         </div>
       </section>
+
+      <FeatureCards />
 
       <section className="sec" id="rooms" aria-labelledby="rooms-h">
         <div className="container wide">
@@ -122,7 +130,9 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="sec grey" id="experiences" aria-labelledby="exp-h">
+      <HighlightTabs />
+
+      <section className="sec" id="experiences" aria-labelledby="exp-h">
         <div className="container wide">
           <Rail label="places" title={<LineTitle id="exp-h">Around Kanyakumari</LineTitle>}>
             {ATTRACTIONS.map((a) => (
@@ -138,17 +148,36 @@ export default function Home() {
       </section>
 
       {OFFERS.length > 0 && (
-        <section className="sec" id="offers" aria-labelledby="offers-h">
+        <section className="sec cream" id="offers" aria-labelledby="offers-h">
           <div className="container wide">
-            <div className="sec-head-row">
-              <LineTitle id="offers-h">Offers</LineTitle>
+            <Rail label="offers" title={<LineTitle id="offers-h">Offers and packages</LineTitle>}>
+              {OFFERS.map((o) => (
+                <OfferCard key={o.code} o={o} />
+              ))}
+            </Rail>
+            <p style={{ marginTop: 28 }}>
               <Link href="/offers" className="more-link">
                 All offers <Chevron />
               </Link>
-            </div>
+            </p>
           </div>
         </section>
       )}
+
+      <section className="sec" id="events" aria-labelledby="events-h">
+        <div className="container wide">
+          <div className="sec-head-row">
+            <div className="sec-head" style={{ marginBottom: 0 }}>
+              <LineTitle id="events-h">Weddings, meetings and events</LineTitle>
+              <p>A conference hall, our restaurant and rooms for your guests, all in one place.</p>
+            </div>
+            <Link href="/meetings" className="more-link">
+              All events <Chevron />
+            </Link>
+          </div>
+          <EventGrid limit={4} />
+        </div>
+      </section>
 
       <section className="sec" id="facilities" aria-labelledby="info-h">
         <div className="container wide info-grid">
@@ -240,7 +269,7 @@ export default function Home() {
               Frequently asked questions
             </LineTitle>
           </div>
-          <Faq items={FAQS} />
+          <Faq items={FAQS} search extra={POLICIES.filter((p) => p.confirmed).map((p) => ({ q: p.title, a: p.text }))} />
         </div>
       </section>
 

@@ -413,7 +413,7 @@ html[data-theme='dark'] .cal-day.start, html[data-theme='dark'] .cal-day.end, ht
 
 /* ---------- Print: directions and enquiry summary only ---------- */
 @media print {
-  .site-header, .site-footer, .wa-fab, .to-top, .mobile-bar, .consent, .no-print, .skip-link, .crumbs { display: none !important; }
+  .hdr, .ftr, .tabs-bar, .fab-top, .fab-chat, .consent, .no-print, .skip-link, .crumb-row, .banner, .mega-scrim { display: none !important; }
   body { background: #fff; color: #000; }
   .page { padding-top: 0; }
   .panel-soft, .policy, .itin { break-inside: avoid; border-color: #bbb; }

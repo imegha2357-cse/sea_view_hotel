@@ -33,7 +33,7 @@ export default function Policies() {
               Frequently asked questions
             </LineTitle>
           </div>
-          <Faq items={FAQS} />
+          <Faq items={FAQS} search extra={POLICIES.filter((p) => p.confirmed).map((p) => ({ q: p.title, a: p.text }))} />
         </div>
       </section>
     </>

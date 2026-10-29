@@ -1,5 +1,5 @@
 // Header and footer structure, modelled on the Taj layout but pointing only at things Hotel Sea View has.
-import { ATTRACTIONS, HOTEL, ROOMS } from './content.js';
+import { ATTRACTIONS, HOTEL, OFFERS, ROOMS } from './content.js';
 
 export const MAIN_NAV = [
   {
@@ -31,8 +31,32 @@ export const MAIN_NAV = [
     href: '/experiences',
     tiles: ATTRACTIONS.slice(0, 5).map((a) => ({ label: a.name, href: `/experiences#${slug(a.name)}`, image: a.image })),
   },
-  { id: 'offers', label: 'Offers', href: '/offers' },
-  { id: 'events', label: 'Events', href: '/meetings' },
+  {
+    id: 'offers',
+    label: 'Offers',
+    href: '/offers',
+    tiles: OFFERS.map((o) => ({ label: o.title, href: `/offers#${o.code.toLowerCase()}`, image: o.image })),
+  },
+  {
+    id: 'events',
+    label: 'Events',
+    href: '/meetings',
+    columns: [
+      [
+        { label: 'Weddings and receptions', href: '/meetings#weddings' },
+        { label: 'Engagements', href: '/meetings#engagements' },
+        { label: 'Birthdays and anniversaries', href: '/meetings#birthdays' },
+        { label: 'Family get-togethers', href: '/meetings#reunions' },
+      ],
+      [
+        { label: 'Business meetings', href: '/meetings#meetings' },
+        { label: 'Training and seminars', href: '/meetings#training' },
+        { label: 'Tour and pilgrimage groups', href: '/meetings#groups' },
+        { label: 'Plan your event', href: '/meetings#plan', arrow: true },
+      ],
+    ],
+    tiles: [{ label: 'Conference hall', href: '/meetings', image: 'meeting' }],
+  },
   {
     id: 'more',
     label: 'More',
@@ -43,6 +67,7 @@ export const MAIN_NAV = [
         { label: 'Plan your visit', href: '/plan-your-visit' },
         { label: 'Gallery', href: '/gallery' },
         { label: 'Room tour video', href: '/room-tour' },
+        { label: 'Kanyakumari guides', href: '/guides' },
       ],
       [
         { label: 'About the hotel', href: '/about' },
@@ -71,6 +96,7 @@ export const FOOTER_LINKS = [
     { label: 'Meetings and events', href: '/meetings' },
     { label: 'Gallery', href: '/gallery' },
     { label: 'Room tour video', href: '/room-tour' },
+    { label: 'Kanyakumari guides', href: '/guides' },
   ],
   [
     { label: 'About the hotel', href: '/about' },

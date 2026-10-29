@@ -26,6 +26,13 @@ function MegaPanel({ item, onNavigate }) {
           </Link>
         </div>
         <motion.div className="mega-body" variants={list} initial="hide" animate="show">
+          {item.href && (
+            <motion.p variants={el} className="mega-all">
+              <Link href={item.href} onClick={onNavigate} className="more-link">
+                {item.id === 'stay' ? 'All rooms and suites' : item.id === 'events' ? 'Meetings and events' : `All ${item.label.toLowerCase()}`} <Chevron />
+              </Link>
+            </motion.p>
+          )}
           {item.columns && (
             <div className="mega-cols">
               {item.columns.map((col, ci) => (

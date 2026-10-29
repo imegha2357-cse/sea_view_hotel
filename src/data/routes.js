@@ -1,6 +1,6 @@
 // One list of public pages with their title and description (PRD 10.1: unique per page).
 // Used by the pages themselves and by scripts/prerender.mjs, which writes per-page HTML and sitemap.xml.
-import { ROOMS } from './content.js';
+import { GUIDES, ROOMS } from './content.js';
 
 // Keep descriptions under about 160 characters, cut at a word.
 const clip = (s, n = 160) => (s.length <= n ? s : `${s.slice(0, s.lastIndexOf(' ', n - 1))}…`);
@@ -68,6 +68,18 @@ export const PAGES = [
     description: 'Send a booking enquiry to Hotel Sea View, Kanyakumari. Our team confirms availability and price by phone or WhatsApp.',
     priority: '0.7',
   },
+  {
+    path: '/guides',
+    title: 'Kanyakumari travel guides | Hotel Sea View',
+    description: 'Short guides to Kanyakumari from Hotel Sea View: watching the sunrise, and the best time of year to visit.',
+    priority: '0.5',
+  },
+  ...GUIDES.map((g) => ({
+    path: `/guides/${g.slug}`,
+    title: `${g.title} | Hotel Sea View`,
+    description: g.summary,
+    priority: '0.5',
+  })),
   {
     path: '/accessibility',
     title: 'Accessibility | Hotel Sea View',

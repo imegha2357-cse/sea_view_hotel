@@ -4,6 +4,7 @@ import PageTop from '@/components/site/PageTop';
 import Split from '@/components/site/Split';
 import EnquiryForm from '@/components/EnquiryForm';
 import { LineTitle } from '@/components/site/ui';
+import { EventGrid, EventSteps } from '@/components/site/EventTypes';
 
 export const metadata = meta('/meetings');
 
@@ -15,7 +16,7 @@ export default function Meetings() {
         <div className="container wide">
           <Split images={[MEETINGS.image]} tag="Conference hall" title={MEETINGS.title} text={MEETINGS.text} list={MEETINGS.facts} />
           <Split
-            id="weddings"
+            id="weddings-hall"
             images={['restaurant2']}
             tag="Celebrations"
             title="Weddings and family events"
@@ -23,6 +24,23 @@ export default function Meetings() {
             list={['Catering from our restaurant', 'Rooms for out-of-town guests', 'Capacity and menus: please ask']}
             flip
           />
+        </div>
+      </section>
+      <section className="sec cream" id="occasions" aria-labelledby="occ-h">
+        <div className="container wide">
+          <div className="sec-head">
+            <LineTitle id="occ-h">Events we host</LineTitle>
+            <p>From a family lunch to a training day. Tell us the date and numbers and we will plan it with you.</p>
+          </div>
+          <EventGrid />
+        </div>
+      </section>
+      <section className="sec" aria-labelledby="steps-h">
+        <div className="container wide">
+          <div className="sec-head">
+            <LineTitle id="steps-h">How planning works</LineTitle>
+          </div>
+          <EventSteps />
         </div>
       </section>
       <section className="sec cream" id="plan" aria-labelledby="plan-h">

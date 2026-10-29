@@ -109,6 +109,12 @@ export default function Hero({ slides = HERO_SLIDES, gallery }) {
               {playing ? '❚❚' : '▶'}
             </button>
           )}
+          <Link href="/room-tour" className="hero-gallery hero-tour">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M8 5.5v13l11-6.5z" />
+            </svg>
+            Watch room tour
+          </Link>
           {gallery?.length > 0 && (
             <button className="hero-gallery" onClick={() => setLb(0)}>
               View gallery
