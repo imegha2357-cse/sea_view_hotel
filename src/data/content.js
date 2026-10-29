@@ -217,7 +217,6 @@ export const ENQUIRY_STATUSES = ['New', 'Contacted', 'Availability Checked', 'Aw
 export const VIDEO = {
   tour: '/media/room-tour.mp4',
   tourPoster: '/media/room-tour-poster.jpg',
-  loop: '/media/sea-loop.mp4',
-  loopPoster: '/media/sea-loop-poster.jpg',
+  heroImage: '/media/sea-loop-poster.jpg',
   duration: '1:13',
 };

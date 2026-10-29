@@ -103,11 +103,7 @@ export default function Hero({ onPrefill }) {
     <section className="hero" ref={ref} aria-label="Welcome to Hotel Sea View">
       <motion.div className="hero-media" style={reduce ? undefined : { y: mediaY, scale: mediaScale }}>
         <motion.div className="hero-media-in" initial={{ scale: 1.18 }} animate={{ scale: ready ? 1 : 1.18 }} transition={{ duration: 2.4, ease: EASE }}>
-          {reduce ? (
-            <img src={VIDEO.loopPoster} alt="View from a sea-facing room towards Vivekananda Rock Memorial" />
-          ) : (
-            <video src={VIDEO.loop} poster={VIDEO.loopPoster} autoPlay muted loop playsInline preload="auto" aria-hidden="true" />
-          )}
+          <img src={VIDEO.heroImage} alt="View from a sea-facing room over Kanyakumari towards Vivekananda Rock Memorial" fetchpriority="high" />
         </motion.div>
       </motion.div>
       <div className="hero-shade" />

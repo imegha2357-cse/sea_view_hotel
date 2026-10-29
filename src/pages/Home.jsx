@@ -15,7 +15,6 @@ import Attractions from '../sections/Attractions';
 import Location from '../sections/Location';
 import Faq from '../sections/Faq';
 import Enquire from '../sections/Enquire';
-import VideoModal from '../components/VideoModal';
 import { usePageMeta } from '../lib/seo';
 import { scrollToId } from '../lib/scroll';
 
@@ -50,7 +49,6 @@ export default function Home() {
       <Location />
       <Faq />
       <Enquire prefill={prefill} />
-      <VideoModal />
     </main>
   );
 }

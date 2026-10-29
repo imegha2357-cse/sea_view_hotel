@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import { AMENITIES, VIDEO } from '../data/content';
 import { FacilityIcon } from '../components/Icons';
 import { EASE, Eyebrow, Reveal, SplitWords } from '../components/Motion';
-import { playTour } from '../components/VideoModal';
+import { Link } from 'react-router-dom';
 
 // "Hotel amenities and features" from the original site: four cards and the hotel video.
 export default function Amenities() {
@@ -16,7 +16,7 @@ export default function Amenities() {
             Friendly service and practical comforts, steps from the sea.
           </Reveal>
           <Reveal delay={0.3}>
-            <button className="play-cta" onClick={playTour}>
+            <Link to="/room-tour" className="play-cta">
               <span className="play-ring">
                 <span className="play-core">
                   <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -28,7 +28,7 @@ export default function Amenities() {
                 <b>Watch hotel video</b>
                 <small>Room tour · {VIDEO.duration}</small>
               </span>
-            </button>
+            </Link>
           </Reveal>
         </div>
         <div className="amen-cards">

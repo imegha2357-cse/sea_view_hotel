@@ -7,6 +7,7 @@ import FloatingActions from './components/FloatingActions';
 import { RequireAdmin, RequireGuest } from './components/Guards';
 import Home from './pages/Home';
 import Privacy from './pages/Privacy';
+import RoomTour from './pages/RoomTour';
 import NotFound from './pages/NotFound';
 import Login from './pages/Login';
 import AdminLogin from './pages/admin/AdminLogin';
@@ -56,6 +57,7 @@ export default function App() {
         <Suspense fallback={null}>
           <Routes location={location} key={location.pathname}>
             <Route path="/" element={<Page><Site><Home /></Site></Page>} />
+            <Route path="/room-tour" element={<Page><Site><RoomTour /></Site></Page>} />
             <Route path="/privacy" element={<Page><Site><Privacy /></Site></Page>} />
             <Route path="/login" element={<Page><Login /></Page>} />
             <Route path="/account" element={<Page><RequireGuest><Account /></RequireGuest></Page>} />
