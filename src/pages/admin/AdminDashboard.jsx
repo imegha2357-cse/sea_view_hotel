@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { collection, doc, limit, onSnapshot, orderBy, query, serverTimestamp, updateDoc } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 import { useAuth } from '../../lib/auth';
-import { formatDate, nights } from '../../lib/enquiry';
+import { formatDate, nights, nightsLabel } from '../../lib/enquiry';
 import { ENQUIRY_STATUSES, HOTEL } from '../../data/content';
 import { Brand } from '../../components/Header';
 import { EASE } from '../../components/Motion';
@@ -177,7 +177,7 @@ export default function AdminDashboard() {
                     </td>
                     <td className="num">
                       {formatDate(r.check_in)} → {formatDate(r.check_out)}
-                      <span className="sub">{nights(r.check_in, r.check_out)} nights</span>
+                      <span className="sub">{nightsLabel(r.check_in, r.check_out)}</span>
                     </td>
                     <td className="num">
                       {r.adults}A{r.children ? ` · ${r.children}C` : ''}
@@ -267,7 +267,7 @@ function Drawer({ r, onClose }) {
           <dd>{formatDate(r.check_in)}</dd>
           <dt>Check-out</dt>
           <dd>
-            {formatDate(r.check_out)} ({nights(r.check_in, r.check_out)} nights)
+            {formatDate(r.check_out)} ({nightsLabel(r.check_in, r.check_out)})
           </dd>
           <dt>Guests</dt>
           <dd>

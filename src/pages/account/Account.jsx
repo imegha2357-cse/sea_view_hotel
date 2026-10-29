@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { collection, onSnapshot, orderBy, query, where } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 import { useAuth } from '../../lib/auth';
-import { formatDate, nights, whatsappUrl } from '../../lib/enquiry';
+import { formatDate, nightsLabel, whatsappUrl } from '../../lib/enquiry';
 import { ENQUIRY_STATUSES, HOTEL } from '../../data/content';
 import EnquiryForm from '../../components/EnquiryForm';
 import { Brand } from '../../components/Header';
@@ -123,7 +123,7 @@ export default function Account() {
                   <div>
                     <h3>{it.room_type || 'Any room'}</h3>
                     <p className="meta">
-                      {formatDate(it.check_in)} to {formatDate(it.check_out)} · {nights(it.check_in, it.check_out)} nights · {it.adults} adults
+                      {formatDate(it.check_in)} to {formatDate(it.check_out)} · {nightsLabel(it.check_in, it.check_out)} · {it.adults} adults
                       {it.children ? `, ${it.children} children` : ''}
                     </p>
                     <p className="meta">Sent {formatDate(it.created_at)}</p>

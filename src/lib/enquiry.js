@@ -109,3 +109,8 @@ export const nights = (a, b) => {
   const dbb = b.toDate ? b.toDate() : new Date(`${b}T12:00:00`);
   return Math.max(0, Math.round((dbb - da) / 86400000));
 };
+
+export const nightsLabel = (a, b) => {
+  const n = nights(a, b);
+  return `${n} ${n === 1 ? 'night' : 'nights'}`;
+};

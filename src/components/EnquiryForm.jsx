@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { ROOM_TYPES } from '../data/content';
-import { emptyEnquiry, MESSAGE_MAX, submitEnquiry, todayISO, validateEnquiry, whatsappUrl, nights } from '../lib/enquiry';
+import { emptyEnquiry, MESSAGE_MAX, submitEnquiry, todayISO, validateEnquiry, whatsappUrl, nights, nightsLabel } from '../lib/enquiry';
 import { useAuth } from '../lib/auth';
 import { CheckCircle, ChatIcon } from './Icons';
 import { EASE } from './Motion';
@@ -128,7 +128,7 @@ export default function EnquiryForm({ prefill, compact = false, onSubmitted }) {
               <dd>{doneData.guest_name}</dd>
               <dt>Dates</dt>
               <dd>
-                {doneData.check_in} to {doneData.check_out} ({nights(doneData.check_in, doneData.check_out)} nights)
+                {doneData.check_in} to {doneData.check_out} ({nightsLabel(doneData.check_in, doneData.check_out)})
               </dd>
               <dt>Guests</dt>
               <dd>
