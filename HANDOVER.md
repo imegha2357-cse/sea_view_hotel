@@ -98,3 +98,29 @@ Ready but waiting for the hotel: 2/3 prices and estimate (room rates), 11/13/18 
 ## Offers
 
 `OFFERS` in `src/data/content.js` holds five packages built only from services the hotel already publishes (sea-view rooms, interconnected rooms, travel desk, conference hall). None states a price or a discount. Confirm each with the hotel before launch; add a rate or "valid until" when they approve.
+
+## Content management update (October 2026)
+
+Everything guests see can now be changed in **Admin → Website**, without code:
+
+| Section | What staff can do |
+|---|---|
+| Rooms | Add, edit, hide, reorder and delete room types: name, group, view, beds, guests, size, price (or "on enquiry"), short line, full description, highlights, amenities (16 ticks), up to 20 photos (reorder, replace, remove). Edit room groups (title + introduction). |
+| Photo library | Upload JPG/PNG/WebP up to 15 MB with a preview. Large photos are resized to 2400 px and compressed to under 700 KB. Staff must describe each photo. Photos narrower than 1200 px get a warning. "Replace everywhere" and "Delete" show where a photo is used, so nothing is left broken. |
+| Slides, banners and gallery | Homepage slides, the banner photo of every page, and gallery photos with categories. |
+| Offers | Add, edit, hide and delete offers. No prices are shown. |
+
+- **Where the data lives:** Firestore `rooms`, `offers`, `site/content`, `media` and `media_meta`. Photos are stored in Firestore because Firebase Storage needs the paid Blaze plan; they are served by `/api/media/<id>`.
+- **Who can change it:** only staff with the owner or desk role (`firestore.rules`). Viewers can only look.
+- **When changes appear:** each save refreshes the website straight away (`/api/revalidate`, checked against the staff sign-in). Deleted rooms show "not found" and drop out of menus, the sitemap and the enquiry form.
+- **Already done:**
+  - The built-in content was imported on 29 Oct 2026.
+  - The 15 demo enquiries were removed, and the demo generator is gone.
+- **Tested live:** a test room was created, given an uploaded photo, edited, and then deleted together with its photo. It worked end to end and nothing was left behind.
+
+Other changes:
+- **Rooms page:** laid out like Taj Lands End. Each group has a title between rules and a centred carousel. Each card has a Gallery chip, size, guest and bed icons, a "More" window (highlights, services and amenities) and "Book now".
+- **Homepage:** the check-in/check-out bar was removed.
+- **Enquiry form:** dates are optional. Submitting opens WhatsApp (+91 94894 74968; change it with `NEXT_PUBLIC_WHATSAPP_NUMBER`) with a formatted message. The page says the guest still has to press Send there. A copy of the enquiry is also saved to the dashboard.
+- **Logo:** the official logo from hotelseaview.in (gold "S" and the SEA VIEW wordmark) is in the header, footer and dashboards. A light version is used on dark backgrounds.
+- **Loader:** a logo loader shows once per visit. It lasts at least 0.9 s, is hidden after 4 s at the latest, and does not pulse when "reduce motion" is on.
