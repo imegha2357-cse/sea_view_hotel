@@ -13,7 +13,7 @@ export default function Amenities() {
           <Eyebrow>Our benefits</Eyebrow>
           <SplitWords text="Hotel amenities and features" className="amen-title" />
           <Reveal as="p" delay={0.2}>
-            Friendly service and practical comforts, steps from the sea.
+            Friendly service and practical comforts, near the sea.
           </Reveal>
           <Reveal delay={0.3}>
             <Link to="/room-tour" className="play-cta">

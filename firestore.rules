@@ -4,18 +4,55 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    // ---------- Who is asking ----------
     function signedIn() { return request.auth != null; }
-    function isAdmin() { return signedIn() && exists(/databases/$(database)/documents/admins/$(request.auth.uid)); }
+    function staffPath() { return /databases/$(database)/documents/admins/$(request.auth.uid); }
+    // Any staff member (admins/{uid} exists). Roles: owner | desk | viewer. A missing role means owner.
+    function isAdmin() { return signedIn() && exists(staffPath()); }
+    function staffRole() { return get(staffPath()).data.get('role', 'owner'); }
+    function canEdit() { return isAdmin() && staffRole() != 'viewer'; }
 
+    // ---------- Field helpers ----------
     function validStatus(s) {
       return s in ['New', 'Contacted', 'Availability Checked', 'Awaiting Guest', 'Confirmed', 'Cancelled', 'Closed'];
     }
     function optString(d, k, max) {
       return !(k in d) || d[k] == null || (d[k] is string && d[k].size() <= max);
     }
+    function optIn(d, k, values) {
+      return !(k in d) || d[k] == null || d[k] in values;
+    }
+    function optInt(d, k, lo, hi) {
+      return !(k in d) || d[k] == null || (d[k] is int && d[k] >= lo && d[k] <= hi);
+    }
+    function optAddons(d) {
+      return !('addons' in d) || d.addons == null || (d.addons is list && d.addons.size() <= 5
+        && d.addons.hasOnly(['breakfast', 'extra_bed', 'sightseeing', 'decoration', 'late_checkout']));
+    }
+
+    // Every optional field a guest may send with an enquiry.
+    function enquiryKeys() {
+      return ['guest_name', 'phone', 'email', 'check_in', 'check_out', 'adults', 'children',
+              'room_type', 'message', 'source', 'status', 'userId', 'created_at', 'updated_at',
+              'enquiry_type', 'event_guests', 'pickup', 'addons', 'callback_time', 'promo_code',
+              'referrer', 'utm_source', 'utm_medium', 'utm_campaign', 'privacy_consent_at', 'lang'];
+    }
+    function validExtras(d) {
+      return optIn(d, 'enquiry_type', ['stay', 'event', 'meeting'])
+        && optInt(d, 'event_guests', 1, 1000)
+        && optIn(d, 'pickup', ['none', 'station', 'bus', 'airport'])
+        && optAddons(d)
+        && optString(d, 'callback_time', 40)
+        && optString(d, 'promo_code', 30)
+        && optString(d, 'referrer', 200)
+        && optString(d, 'utm_source', 100)
+        && optString(d, 'utm_medium', 100)
+        && optString(d, 'utm_campaign', 100)
+        && optString(d, 'lang', 8);
+    }
+
     function validNewEnquiry(d) {
-      return d.keys().hasOnly(['guest_name', 'phone', 'email', 'check_in', 'check_out', 'adults', 'children',
-                               'room_type', 'message', 'source', 'status', 'userId', 'created_at', 'updated_at'])
+      return d.keys().hasOnly(enquiryKeys())
         && d.guest_name is string && d.guest_name.size() > 0 && d.guest_name.size() <= 80
         && d.phone is string && d.phone.matches('^\\+?[0-9][0-9 \\-]{8,16}$')
         && (d.email == null || (d.email is string && d.email.matches('^[^\\s@]+@[^\\s@]+\\.[^\\s@]{2,}$') && d.email.size() <= 120))
@@ -30,16 +67,16 @@ service cloud.firestore {
         && d.source == 'website_form'
         && d.status == 'New'
         && d.created_at == request.time && d.updated_at == request.time
+        && d.privacy_consent_at == request.time
+        && validExtras(d)
         && (d.userId == null || (signedIn() && d.userId == request.auth.uid));
     }
 
-    // Demo data for trying the dashboard: only staff may add it, it must be marked source == 'demo',
-    // and only demo records can ever be deleted.
-    function validDemo(d) {
-      return isAdmin()
-        && d.keys().hasOnly(['guest_name', 'phone', 'email', 'check_in', 'check_out', 'adults', 'children',
-                             'room_type', 'message', 'source', 'status', 'userId', 'created_at', 'updated_at', 'staff_notes'])
-        && d.source == 'demo'
+    // Staff-entered records: demo data, phone calls, walk-ins and emails received.
+    function validStaffEntry(d) {
+      return canEdit()
+        && d.keys().hasOnly(enquiryKeys().concat(['staff_notes', 'assigned_to', 'follow_up_at']))
+        && d.source in ['demo', 'phone', 'walk_in', 'email']
         && validStatus(d.status)
         && d.guest_name is string && d.guest_name.size() > 0 && d.guest_name.size() <= 80
         && d.phone is string && d.phone.size() <= 20
@@ -47,41 +84,116 @@ service cloud.firestore {
         && d.adults is int && d.children is int
         && d.created_at is timestamp && d.updated_at is timestamp
         && d.userId == null
-        && optString(d, 'staff_notes', 2000);
+        && optString(d, 'staff_notes', 2000)
+        && validExtras(d);
     }
 
+    function isOwnerOf(data) { return signedIn() && data.userId == request.auth.uid; }
+
     match /booking_enquiries/{id} {
-      // Anyone may submit a valid enquiry; nobody but staff can list or read them,
-      // except a signed-in guest reading their own.
-      allow create: if validNewEnquiry(request.resource.data) || validDemo(request.resource.data);
-      allow read: if isAdmin() || (signedIn() && resource.data.userId == request.auth.uid);
-      // Staff may change only status, notes and the update time.
-      allow update: if isAdmin()
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'staff_notes', 'updated_at'])
-        && validStatus(request.resource.data.status)
-        && optString(request.resource.data, 'staff_notes', 2000)
+      allow create: if validNewEnquiry(request.resource.data) || validStaffEntry(request.resource.data);
+      allow read: if isAdmin() || isOwnerOf(resource.data);
+
+      // Staff: status, notes, assignee and follow-up date only.
+      // Guest: their own online check-in details only.
+      allow update: if (canEdit()
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'staff_notes', 'updated_at', 'assigned_to', 'follow_up_at'])
+          && validStatus(request.resource.data.status)
+          && optString(request.resource.data, 'staff_notes', 2000)
+          && optString(request.resource.data, 'assigned_to', 120)
+          && (!('follow_up_at' in request.resource.data) || request.resource.data.follow_up_at == null || request.resource.data.follow_up_at is timestamp)
+          && request.resource.data.updated_at == request.time)
+        || (isOwnerOf(resource.data)
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['checkin', 'updated_at'])
+          && request.resource.data.checkin is map
+          && request.resource.data.checkin.keys().hasOnly(['arrival_time', 'guest_names', 'vehicle', 'notes', 'submitted_at'])
+          && request.resource.data.updated_at == request.time);
+
+      // Staff may delete demo records; guests may delete their own enquiries (download/delete my data).
+      allow delete: if (canEdit() && resource.data.source == 'demo') || isOwnerOf(resource.data);
+
+      // Messages between the guest and the hotel about this enquiry.
+      match /messages/{m} {
+        function parent() { return get(/databases/$(database)/documents/booking_enquiries/$(id)).data; }
+        allow read: if isAdmin() || isOwnerOf(parent());
+        allow create: if request.resource.data.keys().hasOnly(['text', 'from', 'author', 'created_at'])
+          && request.resource.data.text is string && request.resource.data.text.size() > 0 && request.resource.data.text.size() <= 1000
+          && request.resource.data.created_at == request.time
+          && optString(request.resource.data, 'author', 80)
+          && ((request.resource.data.from == 'staff' && canEdit()) || (request.resource.data.from == 'guest' && isOwnerOf(parent())));
+        allow delete: if canEdit() && parent().source == 'demo';
+      }
+
+      // Who changed what and when (staff only, never edited).
+      match /history/{h} {
+        allow read: if isAdmin();
+        allow create: if canEdit()
+          && request.resource.data.keys().hasOnly(['change', 'by', 'at'])
+          && request.resource.data.change is string && request.resource.data.change.size() <= 300
+          && request.resource.data.by is string && request.resource.data.by.size() <= 120
+          && request.resource.data.at == request.time;
+        allow delete: if canEdit() && get(/databases/$(database)/documents/booking_enquiries/$(id)).data.source == 'demo';
+      }
+    }
+
+    // Dates the hotel is fully booked (shown on the enquiry form).
+    match /settings/availability {
+      allow read: if true;
+      allow write: if canEdit()
+        && request.resource.data.keys().hasOnly(['blocked', 'updated_at', 'updated_by'])
+        && request.resource.data.blocked is list && request.resource.data.blocked.size() <= 400
         && request.resource.data.updated_at == request.time;
-      allow delete: if isAdmin() && resource.data.source == 'demo'; // real enquiries: agreed retention procedure (PRD 7.2)
     }
 
     match /users/{uid} {
       allow read: if (signedIn() && request.auth.uid == uid) || isAdmin();
       allow create: if signedIn() && request.auth.uid == uid
-        && request.resource.data.keys().hasOnly(['name', 'phone', 'email', 'role', 'createdAt'])
+        && request.resource.data.keys().hasOnly(['name', 'phone', 'email', 'role', 'createdAt', 'preferences', 'saved_rooms'])
         && request.resource.data.role == 'guest'
         && request.resource.data.name is string && request.resource.data.name.size() <= 80
         && request.resource.data.phone is string && request.resource.data.phone.size() <= 20;
       allow update: if signedIn() && request.auth.uid == uid
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['name', 'phone'])
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['name', 'phone', 'preferences', 'saved_rooms'])
         && request.resource.data.name is string && request.resource.data.name.size() <= 80
-        && request.resource.data.phone is string && request.resource.data.phone.size() <= 20;
-      allow delete: if false;
+        && request.resource.data.phone is string && request.resource.data.phone.size() <= 20
+        && (!('preferences' in request.resource.data) || request.resource.data.preferences is map)
+        && (!('saved_rooms' in request.resource.data) || (request.resource.data.saved_rooms is list && request.resource.data.saved_rooms.size() <= 10));
+      allow delete: if signedIn() && request.auth.uid == uid;
     }
 
-    // Admin membership is managed only with the Admin SDK (npm run create-users) or the Firebase console.
+    // Staff list (for assigning enquiries). Membership and roles are set only in the Firebase console.
     match /admins/{uid} {
-      allow read: if signedIn() && request.auth.uid == uid;
+      allow read: if signedIn() && (request.auth.uid == uid || isAdmin());
       allow write: if false;
+    }
+
+    match /newsletter/{id} {
+      allow create: if request.resource.data.keys().hasOnly(['email', 'consent', 'created_at', 'lang'])
+        && request.resource.data.email is string && request.resource.data.email.matches('^[^\\s@]+@[^\\s@]+\\.[^\\s@]{2,}$') && request.resource.data.email.size() <= 120
+        && request.resource.data.consent == true
+        && request.resource.data.created_at == request.time
+        && optString(request.resource.data, 'lang', 8);
+      allow read, delete: if isAdmin();
+    }
+
+    match /feedback/{id} {
+      allow create: if request.resource.data.keys().hasOnly(['message', 'page', 'created_at'])
+        && request.resource.data.message is string && request.resource.data.message.size() > 0 && request.resource.data.message.size() <= 1000
+        && request.resource.data.page is string && request.resource.data.page.size() <= 200
+        && request.resource.data.created_at == request.time;
+      allow read: if isAdmin();
+      allow delete: if canEdit();
+    }
+
+    // Front-end errors, so broken pages are noticed (no personal data is sent).
+    match /client_errors/{id} {
+      allow create: if request.resource.data.keys().hasOnly(['message', 'page', 'ua', 'at'])
+        && request.resource.data.message is string && request.resource.data.message.size() <= 500
+        && request.resource.data.page is string && request.resource.data.page.size() <= 200
+        && request.resource.data.ua is string && request.resource.data.ua.size() <= 200
+        && request.resource.data.at == request.time;
+      allow read: if isAdmin();
+      allow delete: if canEdit();
     }
 
     match /{document=**} {

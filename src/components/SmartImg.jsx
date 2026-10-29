@@ -3,12 +3,12 @@ import { img } from '../data/images';
 
 // Lazy, responsive image (#40 fade-in on load). Serves resized copies via srcset,
 // and falls back to the original photo on hotelseaview.in if a resized copy fails.
-export default function SmartImg({ name, alt, className = '', eager = false, sizes = '(max-width: 600px) 100vw, 50vw', width, style, imgStyle }) {
+export default function SmartImg({ name, alt, className = '', eager = false, sizes = '(max-width: 600px) 100vw, 50vw', width, style, imgStyle, as: Tag = 'div' }) {
   const meta = img(name, { width });
   const [failed, setFailed] = useState(false);
   const [loaded, setLoaded] = useState(false);
   return (
-    <div className={`smart-img ${className}`} style={style}>
+    <Tag className={`smart-img ${className}`} style={style}>
       <img
         src={failed ? meta.fallback : meta.src}
         srcSet={failed ? undefined : meta.srcSet}
@@ -27,6 +27,6 @@ export default function SmartImg({ name, alt, className = '', eager = false, siz
           if (el && el.complete && el.naturalWidth && !loaded) setLoaded(true);
         }}
       />
-    </div>
+    </Tag>
   );
 }

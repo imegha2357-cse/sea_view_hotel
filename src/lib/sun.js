@@ -37,3 +37,9 @@ export function sunNow({ lat, lon, tzHours }, now = new Date()) {
     localTime: fmtMinutes(nowMin),
   };
 }
+
+// Sunrise and sunset for any calendar date at the hotel (used by the Plan your visit page).
+export function sunOn({ lat, lon, tzHours }, date) {
+  const t = times(date.getFullYear(), date.getMonth(), date.getDate(), lat, lon, tzHours);
+  return { sunrise: fmtMinutes(t.rise), sunset: fmtMinutes(t.set) };
+}

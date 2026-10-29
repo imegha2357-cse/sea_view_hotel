@@ -10,7 +10,7 @@ export default function Enquire({ prefill }) {
           <Eyebrow>Plan your stay</Eyebrow>
           <MaskLines lines={['Send us', 'an enquiry']} />
           <Reveal as="p" delay={0.2}>
-            Tell us your dates and we will reply with availability and the best rate for your stay, usually the same day.
+            Tell us your dates and our team will reply with availability and rates by phone, WhatsApp or email.
           </Reveal>
           <Reveal className="contact-lines" delay={0.3}>
             <a href={`tel:${HOTEL.phoneHref}`}>Call {HOTEL.phone}</a>

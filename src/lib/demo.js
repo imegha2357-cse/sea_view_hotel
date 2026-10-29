@@ -1,5 +1,4 @@
-import { collection, deleteDoc, doc, getDocs, query, setDoc, Timestamp, where } from 'firebase/firestore';
-import { db } from './firebase';
+import { loadFirebase } from './firebase';
 
 // 15 fictional enquiries for trying the staff dashboard. Every one is marked source: 'demo',
 // uses example.com emails and obviously fake 90000 phone numbers, and can be removed in one click.
@@ -22,13 +21,17 @@ const PEOPLE = [
 ];
 
 const day = 86400000;
-const atNoon = (ms) => {
-  const d = new Date(ms);
-  d.setHours(12, 0, 0, 0);
-  return Timestamp.fromDate(d);
-};
+const TYPES = ['stay', 'stay', 'stay', 'stay', 'stay', 'stay', 'stay', 'stay', 'stay', 'event', 'stay', 'stay', 'stay', 'meeting', 'stay'];
+const PICK = ['none', 'none', 'station', 'none', 'none', 'bus', 'none', 'none', 'station', 'none', 'none', 'none', 'none', 'none', 'airport'];
 
 export async function addDemoEnquiries() {
+  const { db, F } = await loadFirebase();
+  const { collection, doc, setDoc, Timestamp } = F;
+  const atNoon = (ms) => {
+    const d = new Date(ms);
+    d.setHours(12, 0, 0, 0);
+    return Timestamp.fromDate(d);
+  };
   const now = Date.now();
   const writes = PEOPLE.map(([name, room, adults, children, status, message, note], i) => {
     const created = now - (i * 1.3 + 0.2) * day - (i % 5) * 3600e3;
@@ -43,8 +46,13 @@ export async function addDemoEnquiries() {
       check_out: atNoon(inMs + nights * day),
       adults,
       children,
-      room_type: room,
+      room_type: TYPES[i] === 'stay' ? room : null,
+      enquiry_type: TYPES[i],
+      event_guests: TYPES[i] === 'stay' ? null : 40 + i * 5,
+      pickup: PICK[i],
+      addons: i % 4 === 0 ? ['breakfast'] : [],
       message: message || null,
+      follow_up_at: ['New', 'Contacted', 'Awaiting Guest'].includes(status) ? Timestamp.fromMillis(now + ((i % 5) - 2) * day) : null,
       source: 'demo',
       status,
       userId: null,
@@ -58,7 +66,15 @@ export async function addDemoEnquiries() {
 }
 
 export async function removeDemoEnquiries() {
+  const { db, F } = await loadFirebase();
+  const { collection, deleteDoc, getDocs, query, where } = F;
   const snap = await getDocs(query(collection(db, 'booking_enquiries'), where('source', '==', 'demo')));
-  await Promise.all(snap.docs.map((d) => deleteDoc(d.ref)));
+  await Promise.all(
+    snap.docs.map(async (d) => {
+      const [m, h] = await Promise.all([getDocs(collection(d.ref, 'messages')), getDocs(collection(d.ref, 'history'))]);
+      await Promise.all([...m.docs, ...h.docs].map((x) => deleteDoc(x.ref)));
+      await deleteDoc(d.ref);
+    })
+  );
   return snap.size;
 }

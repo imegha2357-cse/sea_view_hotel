@@ -4,6 +4,7 @@ import { EASE, Magnetic } from '../components/Motion';
 import { useIntroDone } from '../components/Intro';
 import { ChatIcon } from '../components/Icons';
 import { GEO, VIDEO } from '../data/content';
+import { mediaImg } from '../data/images';
 import { sunNow } from '../lib/sun';
 import { todayISO, whatsappUrl } from '../lib/enquiry';
 import { scrollToId } from '../lib/scroll';
@@ -103,7 +104,7 @@ export default function Hero({ onPrefill }) {
     <section className="hero" ref={ref} aria-label="Welcome to Hotel Sea View">
       <motion.div className="hero-media" style={reduce ? undefined : { y: mediaY, scale: mediaScale }}>
         <motion.div className="hero-media-in" initial={{ scale: 1.18 }} animate={{ scale: ready ? 1 : 1.18 }} transition={{ duration: 2.4, ease: EASE }}>
-          <img src={VIDEO.heroImage} alt="View from a sea-facing room over Kanyakumari towards Vivekananda Rock Memorial" fetchpriority="high" />
+          <img {...mediaImg(VIDEO.heroImage)} sizes="100vw" alt="View from a sea-facing room over Kanyakumari towards Vivekananda Rock Memorial" fetchpriority="high" />
         </motion.div>
       </motion.div>
       <div className="hero-shade" />
@@ -115,7 +116,7 @@ export default function Hero({ onPrefill }) {
           <span>8.08° N · 77.54° E</span>
         </motion.p>
 
-        <motion.h1 className="hero-title" style={reduce ? undefined : { y: titleY }} initial="hide" animate={show} aria-label="Hotel Sea View">
+        <motion.h1 className="hero-title" style={reduce ? undefined : { y: titleY }} initial="hide" animate={show} aria-label="Hotel Sea View, Kanyakumari">
           {title.map((w, wi) => (
             <span className="hero-word" key={w} aria-hidden="true">
               {w.split('').map((c, ci) => (

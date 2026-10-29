@@ -2,9 +2,11 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { EASE } from './Motion';
 import { HOTEL, mapsLink } from '../data/content';
-import { Brand, NAV } from './Header';
+import { Brand, MORE, NAV } from './Header';
 import { analyticsEnabled } from '../lib/analytics';
 import { openCookieSettings } from './CookieConsent';
+import Feedback from './Feedback';
+import { Preferences } from './Preferences';
 
 export default function Footer() {
   return (
@@ -15,7 +17,7 @@ export default function Footer() {
           <p style={{ maxWidth: '36ch' }}>Sea-view rooms facing the sunrise, close to the beach in Kanyakumari.</p>
         </div>
         <div>
-          <h4>Visit</h4>
+          <h2 className="foot-h">Visit</h2>
           <address style={{ fontStyle: 'normal' }}>
             {HOTEL.addressLines.map((l) => (
               <div key={l}>{l}</div>
@@ -28,7 +30,7 @@ export default function Footer() {
           </p>
         </div>
         <div>
-          <h4>Contact</h4>
+          <h2 className="foot-h">Contact</h2>
           <ul>
             <li>
               <a href={`tel:${HOTEL.phoneHref}`}>Phone {HOTEL.phone}</a>
@@ -47,13 +49,13 @@ export default function Footer() {
           </ul>
         </div>
         <div>
-          <h4>Explore</h4>
+          <h2 className="foot-h">Explore</h2>
           <ul>
-            {NAV.filter((n) => n.id !== 'contact').map((n) => (
-              <li key={n.id}>
-                <a href={`/#${n.id}`}>{n.label}</a>
-              </li>
-            ))}
+            {[...NAV, ...MORE]
+              .filter((n) => n.id !== 'contact')
+              .map((n) => (
+                <li key={n.id}>{n.to ? <Link to={n.to}>{n.label}</Link> : <a href={`/#${n.id}`}>{n.label}</a>}</li>
+              ))}
             <li>
               <a href={HOTEL.facebook} target="_blank" rel="noreferrer">
                 Facebook
@@ -78,6 +80,8 @@ export default function Footer() {
               Cookie settings
             </button>
           )}
+          <Feedback />
+          <Preferences />
           <Link to="/login">Guest sign in</Link>
           <Link to="/admin/login">Staff sign in</Link>
         </span>

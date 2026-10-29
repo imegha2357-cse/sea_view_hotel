@@ -14,19 +14,17 @@ const PARTS = [
   'over',
   'three',
   'seas,',
-  'a',
-  'short',
-  'walk',
-  'from',
-  { img: 'beach' },
-  'the',
-  'shore',
-  'and',
-  'the',
-  'ferry',
+  'close',
   'to',
-  'Vivekananda',
-  'Rock.',
+  'the',
+  { img: 'beach' },
+  'beach',
+  'at',
+  'the',
+  'southern',
+  'tip',
+  'of',
+  'India.',
 ];
 
 function Word({ children, progress, range }) {
@@ -38,7 +36,7 @@ function Pill({ name, progress, range }) {
   const width = useTransform(progress, range, ['0em', '2.6em']);
   return (
     <motion.span className="pill-img" style={{ width }} aria-hidden="true">
-      <SmartImg name={name} width={480} sizes="160px" />
+      <SmartImg as="span" name={name} width={480} sizes="160px" alt="" />
     </motion.span>
   );
 }

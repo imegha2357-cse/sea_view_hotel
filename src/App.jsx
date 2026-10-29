@@ -8,6 +8,11 @@ import { RequireAdmin, RequireGuest } from './components/Guards';
 import Home from './pages/Home';
 import Privacy from './pages/Privacy';
 import RoomTour from './pages/RoomTour';
+import RoomsPage from './pages/RoomsPage';
+import RoomDetail from './pages/RoomDetail';
+import Meetings from './pages/Meetings';
+import Policies from './pages/Policies';
+import PlanVisit from './pages/PlanVisit';
 import NotFound from './pages/NotFound';
 import Login from './pages/Login';
 import AdminLogin from './pages/admin/AdminLogin';
@@ -57,6 +62,11 @@ export default function App() {
         <Suspense fallback={null}>
           <Routes location={location} key={location.pathname}>
             <Route path="/" element={<Page><Site><Home /></Site></Page>} />
+            <Route path="/rooms" element={<Page><Site><RoomsPage /></Site></Page>} />
+            <Route path="/rooms/:id" element={<Page><Site><RoomDetail /></Site></Page>} />
+            <Route path="/meetings" element={<Page><Site><Meetings /></Site></Page>} />
+            <Route path="/policies" element={<Page><Site><Policies /></Site></Page>} />
+            <Route path="/plan-your-visit" element={<Page><Site><PlanVisit /></Site></Page>} />
             <Route path="/room-tour" element={<Page><Site><RoomTour /></Site></Page>} />
             <Route path="/privacy" element={<Page><Site><Privacy /></Site></Page>} />
             <Route path="/login" element={<Page><Login /></Page>} />

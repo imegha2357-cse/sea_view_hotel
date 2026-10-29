@@ -16,16 +16,15 @@ import Location from '../sections/Location';
 import Faq from '../sections/Faq';
 import Enquire from '../sections/Enquire';
 import { usePageMeta } from '../lib/seo';
+import { pageMeta } from '../data/routes';
 import { scrollToId } from '../lib/scroll';
 
 export default function Home() {
   const [prefill, setPrefill] = useState(null);
   const merge = (p) => setPrefill((s) => ({ ...(s || {}), ...p }));
 
-  usePageMeta(
-    'Hotel Sea View, Kanyakumari | Sea-View Rooms by the Beach',
-    'Hotel Sea View on East Car Street, Kanyakumari: sea-view rooms facing the sunrise, Vivekananda Rock and Thiruvalluvar Statue, a multi-cuisine restaurant and 24-hour room service. Enquire on WhatsApp or online.'
-  );
+  const meta = pageMeta('/');
+  usePageMeta(meta.title, meta.description);
 
   useEffect(() => {
     if (window.location.hash) setTimeout(() => scrollToId(window.location.hash.slice(1)), 120);

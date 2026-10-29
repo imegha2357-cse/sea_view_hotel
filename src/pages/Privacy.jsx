@@ -1,9 +1,11 @@
 import { HOTEL } from '../data/content';
 import { usePageMeta } from '../lib/seo';
+import { pageMeta } from '../data/routes';
 
 // DRAFT. PRD 10.4 requires a client-approved privacy notice before launch.
 export default function Privacy() {
-  usePageMeta('Privacy notice | Hotel Sea View', 'How Hotel Sea View, Kanyakumari collects and uses the details you send in a booking enquiry.');
+  const meta = pageMeta('/privacy');
+  usePageMeta(meta.title, meta.description);
   return (
     <main id="main" className="page">
       <div className="container prose">

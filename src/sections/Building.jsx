@@ -30,7 +30,7 @@ export default function Building() {
 
       <div className="container building-copy">
         <div>
-          <SplitWords text="A family-run hotel by the sea, close to everything you came to see." className="building-title" />
+          <SplitWords text="A hotel by the sea, near the beach and a few minutes from the bus terminus." className="building-title" />
         </div>
         <div className="building-text">
           {ABOUT.body.map((p, i) => (

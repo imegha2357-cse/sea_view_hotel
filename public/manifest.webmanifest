@@ -1,0 +1,13 @@
+{
+  "name": "Hotel Sea View, Kanyakumari",
+  "short_name": "Sea View",
+  "description": "Sea-view rooms in Kanyakumari. Enquire, track your stay, and staff front desk.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f4f0e7",
+  "theme_color": "#173b3a",
+  "icons": [
+    { "src": "https://hotelseaview.in/wp-content/uploads/2025/07/cropped-web-app-manifest-192x192-1-270x270.png", "sizes": "270x270", "type": "image/png", "purpose": "any" }
+  ]
+}

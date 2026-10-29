@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { VIDEO, HOTEL } from '../data/content';
 import { EASE, Eyebrow, SplitWords } from '../components/Motion';
 import { usePageMeta } from '../lib/seo';
+import { pageMeta } from '../data/routes';
 import { whatsappUrl } from '../lib/enquiry';
 
 // The room tour lives on its own page, so the home page never loads the video.
@@ -20,7 +21,8 @@ const CHAPTERS = [
 const fmt = (s) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
 
 export default function RoomTour() {
-  usePageMeta('Room tour video | Hotel Sea View, Kanyakumari', 'Watch a 73-second tour of Hotel Sea View: the corridor, a deluxe room, the balcony view of the sea and the Vivekananda Rock Memorial by day and night.');
+  const meta = pageMeta('/room-tour');
+  usePageMeta(meta.title, meta.description);
   const ref = useRef(null);
   const [time, setTime] = useState(0);
 

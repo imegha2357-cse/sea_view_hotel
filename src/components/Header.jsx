@@ -8,13 +8,21 @@ import { UserIcon } from './Icons';
 import { EASE } from './Motion';
 import { lockScroll, unlockScroll } from '../lib/scroll';
 
+// Items with "to" are separate pages; the rest are sections of the home page.
 export const NAV = [
   { id: 'rooms', label: 'Rooms' },
   { id: 'dining', label: 'Dining' },
   { id: 'gallery', label: 'Gallery' },
   { id: 'location', label: 'Location' },
-  { id: 'faq', label: 'FAQs' },
+  { id: 'visit', label: 'Plan your visit', to: '/plan-your-visit' },
+  { id: 'events', label: 'Events', to: '/meetings' },
   { id: 'contact', label: 'Contact' },
+];
+export const MORE = [
+  { id: 'all-rooms', label: 'All rooms', to: '/rooms' },
+  { id: 'faq', label: 'FAQs' },
+  { id: 'policies', label: 'Policies', to: '/policies' },
+  { id: 'tour', label: 'Room tour video', to: '/room-tour' },
 ];
 
 export function Brand() {
@@ -30,7 +38,7 @@ export default function Header() {
   const { pathname } = useLocation();
   const onHome = pathname === '/';
   const { solid, hidden } = useHeaderScroll(80);
-  const active = useActiveSection(NAV.map((n) => n.id));
+  const active = useActiveSection(NAV.filter((n) => !n.to).map((n) => n.id));
   const [open, setOpen] = useState(false);
   const { user, isAdmin } = useAuth();
   const { scrollYProgress } = useScroll();
@@ -59,11 +67,17 @@ export default function Header() {
             <Brand />
           </Link>
           <nav className="nav" aria-label="Main">
-            {NAV.map((n) => (
-              <a key={n.id} href={href(n.id)} className={onHome && active === n.id ? 'active' : ''}>
-                {n.label}
-              </a>
-            ))}
+            {NAV.map((n) =>
+              n.to ? (
+                <Link key={n.id} to={n.to} className={pathname === n.to ? 'active' : ''} aria-current={pathname === n.to ? 'page' : undefined}>
+                  {n.label}
+                </Link>
+              ) : (
+                <a key={n.id} href={href(n.id)} className={onHome && active === n.id ? 'active' : ''}>
+                  {n.label}
+                </a>
+              )
+            )}
           </nav>
           <div className="header-actions">
             <Link to={accountLink} className="account">
@@ -101,17 +115,18 @@ export default function Header() {
               ×
             </button>
             <nav>
-              {[...NAV, { id: 'enquire', label: 'Enquire' }].map((n, i) => (
-                <motion.a
-                  key={n.id}
-                  href={href(n.id)}
-                  onClick={() => setOpen(false)}
-                  initial={{ opacity: 0, y: 14 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.45, ease: EASE, delay: 0.18 + i * 0.06 }}
-                >
-                  {n.label}
-                </motion.a>
+              {[...NAV, ...MORE, { id: 'enquire', label: 'Enquire' }].map((n, i) => (
+                <motion.span key={n.id} initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, ease: EASE, delay: 0.18 + i * 0.04 }}>
+                  {n.to ? (
+                    <Link to={n.to} onClick={() => setOpen(false)}>
+                      {n.label}
+                    </Link>
+                  ) : (
+                    <a href={href(n.id)} onClick={() => setOpen(false)}>
+                      {n.label}
+                    </a>
+                  )}
+                </motion.span>
               ))}
             </nav>
             <motion.div className="mm-foot" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }}>

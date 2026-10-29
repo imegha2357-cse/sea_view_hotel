@@ -62,3 +62,9 @@ export function img(key, { width = 1200 } = {}) {
     alt: item.alt,
   };
 }
+
+// Files in /public/media (the hero photo) go through the same optimizer.
+export function mediaImg(path) {
+  if (!CDN) return { src: path, srcSet: undefined };
+  return { src: cdnUrl(path, 1920), srcSet: IMAGE_WIDTHS.map((x) => `${cdnUrl(path, x)} ${x}w`).join(', ') };
+}

@@ -1,11 +1,12 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
-import { collection, onSnapshot, orderBy, query, where } from 'firebase/firestore';
-import { db } from '../../lib/firebase';
-import { useAuth } from '../../lib/auth';
+import { fb } from '../../lib/firebase';
+import { useAuth, useIdleSignOut } from '../../lib/auth';
 import { formatDate, nightsLabel, whatsappUrl } from '../../lib/enquiry';
-import { ENQUIRY_STATUSES, HOTEL } from '../../data/content';
+import { downloadText, stayIcs, toISODate } from '../../lib/ics';
+import { GOOGLE_REVIEW_URL, HOTEL, ROOMS } from '../../data/content';
+import { usePageMeta } from '../../lib/seo';
 import EnquiryForm from '../../components/EnquiryForm';
 import { Brand } from '../../components/Header';
 import { EASE } from '../../components/Motion';
@@ -17,6 +18,7 @@ const STEP_LABEL = {
   'Availability Checked': 'Availability checked',
   Confirmed: 'Stay confirmed',
 };
+const TYPE_LABEL = { stay: 'Room stay', event: 'Event', meeting: 'Meeting' };
 
 function Timeline({ status }) {
   if (status === 'Cancelled' || status === 'Closed') return <p className="meta">This enquiry is {status.toLowerCase()}.</p>;
@@ -33,39 +35,238 @@ function Timeline({ status }) {
   );
 }
 
+// Feature #36: messages between the guest and the hotel on one enquiry.
+function Messages({ enquiryId, author }) {
+  const [list, setList] = useState([]);
+  const [text, setText] = useState('');
+  const [err, setErr] = useState('');
+  useEffect(() => {
+    const { db, F } = fb();
+    const q = F.query(F.collection(db, 'booking_enquiries', enquiryId, 'messages'), F.orderBy('created_at', 'asc'));
+    return F.onSnapshot(q, (s) => setList(s.docs.map((d) => ({ id: d.id, ...d.data() }))), () => setErr('Messages could not be loaded.'));
+  }, [enquiryId]);
+  const send = async (e) => {
+    e.preventDefault();
+    const t = text.trim();
+    if (!t) return;
+    setErr('');
+    try {
+      const { db, F } = fb();
+      await F.addDoc(F.collection(db, 'booking_enquiries', enquiryId, 'messages'), { text: t.slice(0, 1000), from: 'guest', author: (author || '').slice(0, 80), created_at: F.serverTimestamp() });
+      setText('');
+    } catch {
+      setErr('Not sent. Try again, or WhatsApp us.');
+    }
+  };
+  return (
+    <div className="thread">
+      {list.length === 0 && <p className="meta">No messages yet. Ask a question here and our team will reply.</p>}
+      {list.map((m) => (
+        <div key={m.id} className={`bubble ${m.from}`}>
+          <span>{m.text}</span>
+          <small>
+            {m.from === 'staff' ? 'Hotel Sea View' : 'You'} · {formatDate(m.created_at)}
+          </small>
+        </div>
+      ))}
+      <form onSubmit={send} className="thread-form">
+        <label className="sr-only" htmlFor={`msg-${enquiryId}`}>
+          Message to the hotel
+        </label>
+        <input id={`msg-${enquiryId}`} value={text} onChange={(e) => setText(e.target.value)} maxLength={1000} placeholder="Write a message" />
+        <button className="btn outline" type="submit" disabled={!text.trim()}>
+          Send
+        </button>
+      </form>
+      {err && <p className="form-alert">{err}</p>}
+    </div>
+  );
+}
+
+// Feature #37: online check-in, so arrival is faster.
+function CheckIn({ it }) {
+  const [v, setV] = useState({ arrival_time: '', guest_names: '', vehicle: '', notes: '', ...(it.checkin || {}) });
+  const [msg, setMsg] = useState('');
+  const save = async (e) => {
+    e.preventDefault();
+    setMsg('');
+    try {
+      const { db, F } = fb();
+      const checkin = {
+        arrival_time: String(v.arrival_time).slice(0, 20),
+        guest_names: String(v.guest_names).slice(0, 300),
+        vehicle: String(v.vehicle).slice(0, 40),
+        notes: String(v.notes).slice(0, 500),
+        submitted_at: F.Timestamp.now(),
+      };
+      await F.updateDoc(F.doc(db, 'booking_enquiries', it.id), { checkin, updated_at: F.serverTimestamp() });
+      setMsg('Saved. The front desk will have this ready.');
+    } catch {
+      setMsg('Not saved. Try again.');
+    }
+  };
+  const f = (k) => (e) => setV((s) => ({ ...s, [k]: e.target.value }));
+  return (
+    <form className="checkin-form" onSubmit={save}>
+      <div className="field static">
+        <input id={`at-${it.id}`} type="time" value={v.arrival_time} onChange={f('arrival_time')} />
+        <label htmlFor={`at-${it.id}`}>Expected arrival time</label>
+      </div>
+      <div className="field">
+        <input id={`gn-${it.id}`} placeholder=" " value={v.guest_names} onChange={f('guest_names')} maxLength={300} />
+        <label htmlFor={`gn-${it.id}`}>Names of all adult guests</label>
+      </div>
+      <div className="field">
+        <input id={`vh-${it.id}`} placeholder=" " value={v.vehicle} onChange={f('vehicle')} maxLength={40} />
+        <label htmlFor={`vh-${it.id}`}>Vehicle number (for parking, optional)</label>
+      </div>
+      <div className="field">
+        <input id={`nt-${it.id}`} placeholder=" " value={v.notes} onChange={f('notes')} maxLength={500} />
+        <label htmlFor={`nt-${it.id}`}>Anything else for the front desk</label>
+      </div>
+      <p className="form-note">Please bring a government photo ID for each adult. We do not collect ID numbers online.</p>
+      <div className="form-actions">
+        <button className="btn solid" type="submit">
+          Save check-in details
+        </button>
+        {msg && <span className="saved">{msg}</span>}
+      </div>
+    </form>
+  );
+}
+
+function EnquiryCard({ it, i, author, onRebook }) {
+  const [tab, setTab] = useState(null);
+  const confirmed = it.status === 'Confirmed';
+  const past = it.check_out?.toDate && it.check_out.toDate() < new Date();
+  const stay = { check_in: toISODate(it.check_in), check_out: toISODate(it.check_out), room_type: it.room_type, guest_name: it.guest_name };
+  return (
+    <motion.article className="enq" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, ease: EASE, delay: i * 0.05 }}>
+      <div>
+        <h3>{it.room_type || TYPE_LABEL[it.enquiry_type] || 'Any room'}</h3>
+        <p className="meta">
+          {formatDate(it.check_in)} to {formatDate(it.check_out)} · {nightsLabel(it.check_in, it.check_out)} ·{' '}
+          {it.enquiry_type && it.enquiry_type !== 'stay' ? `${it.event_guests || '?'} guests` : `${it.adults} adults${it.children ? `, ${it.children} children` : ''}`}
+        </p>
+        <p className="meta">Sent {formatDate(it.created_at)}</p>
+      </div>
+      <span className={`pill st-${it.status.replace(/ /g, '-')}`}>{it.status}</span>
+      <div className="tl">
+        <Timeline status={it.status} />
+      </div>
+      <div className="enq-actions">
+        <button className="text-btn" onClick={() => setTab(tab === 'msg' ? null : 'msg')} aria-expanded={tab === 'msg'}>
+          Messages
+        </button>
+        {confirmed && !past && (
+          <button className="text-btn" onClick={() => setTab(tab === 'checkin' ? null : 'checkin')} aria-expanded={tab === 'checkin'}>
+            {it.checkin ? 'Edit online check-in' : 'Online check-in'}
+          </button>
+        )}
+        {!past && it.status !== 'Cancelled' && (
+          <button className="text-btn" onClick={() => downloadText('hotel-sea-view-stay.ics', stayIcs(stay))}>
+            Add to calendar
+          </button>
+        )}
+        <button className="text-btn" onClick={() => onRebook(it)}>
+          Book again
+        </button>
+        {past && confirmed && GOOGLE_REVIEW_URL && (
+          <a className="text-btn" href={GOOGLE_REVIEW_URL} target="_blank" rel="noreferrer">
+            Review your stay
+          </a>
+        )}
+      </div>
+      <AnimatePresence initial={false}>
+        {tab && (
+          <motion.div className="enq-panel" initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.3, ease: EASE }}>
+            {tab === 'msg' ? <Messages enquiryId={it.id} author={author} /> : <CheckIn it={it} />}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.article>
+  );
+}
+
 export default function Account() {
   const { user, profile, logout, saveProfile } = useAuth();
+  const idleWarn = useIdleSignOut(30);
   const [items, setItems] = useState(null);
   const [error, setError] = useState('');
   const [showForm, setShowForm] = useState(false);
+  const [prefill, setPrefill] = useState(null);
   const [p, setP] = useState({ name: '', phone: '' });
+  const [prefs, setPrefs] = useState({ floor: '', bed: '', diet: '', notes: '' });
+  const [savedRooms, setSavedRooms] = useState([]);
   const [saved, setSaved] = useState('');
+  const [privacyMsg, setPrivacyMsg] = useState('');
+
+  usePageMeta('My account | Hotel Sea View', 'Your Hotel Sea View enquiries.', { noindex: true });
 
   useEffect(() => {
-    document.title = 'My account | Hotel Sea View';
-  }, []);
-  useEffect(() => {
     setP({ name: profile?.name || user?.displayName || '', phone: profile?.phone || '' });
+    setPrefs({ floor: '', bed: '', diet: '', notes: '', ...(profile?.preferences || {}) });
+    setSavedRooms(profile?.saved_rooms || []);
   }, [profile, user]);
 
   useEffect(() => {
     if (!user) return undefined;
-    const q = query(collection(db, 'booking_enquiries'), where('userId', '==', user.uid), orderBy('created_at', 'desc'));
-    return onSnapshot(
+    const { db, F } = fb();
+    const q = F.query(F.collection(db, 'booking_enquiries'), F.where('userId', '==', user.uid), F.orderBy('created_at', 'desc'));
+    return F.onSnapshot(
       q,
       (snap) => setItems(snap.docs.map((d) => ({ id: d.id, ...d.data() }))),
       (err) => setError(err.code === 'failed-precondition' ? 'The enquiries index is still building. Try again in a few minutes.' : 'We could not load your enquiries. Refresh to try again.')
     );
   }, [user]);
 
+  const upcoming = useMemo(() => (items || []).find((it) => it.status === 'Confirmed' && it.check_in?.toDate && it.check_in.toDate() > new Date()), [items]);
+
   const onSave = async (e) => {
     e.preventDefault();
     setSaved('');
     try {
-      await saveProfile(p);
+      await saveProfile({ ...p, preferences: prefs, saved_rooms: savedRooms });
       setSaved('Saved');
     } catch {
       setSaved('Could not save. Try again.');
+    }
+  };
+
+  const toggleRoom = (id) => setSavedRooms((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id].slice(0, 10)));
+
+  const rebook = (it) => {
+    setPrefill({
+      enquiry_type: it.enquiry_type || 'stay',
+      room_type: it.room_type || '',
+      adults: it.adults || 2,
+      children: it.children || 0,
+      check_in: '',
+      check_out: '',
+      message: prefs.notes ? `Preferences: ${prefs.notes}` : '',
+    });
+    setShowForm(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Feature #39: download my data, and delete my data (PRD privacy).
+  const downloadData = () => {
+    const strip = (o) => JSON.parse(JSON.stringify(o, (k, val) => (val && typeof val === 'object' && 'seconds' in val && 'nanoseconds' in val ? new Date(val.seconds * 1000).toISOString() : val)));
+    const data = { exported_at: new Date().toISOString(), account: { email: user.email, ...strip(profile || {}) }, enquiries: strip(items || []) };
+    downloadText('hotel-sea-view-my-data.json', JSON.stringify(data, null, 2), 'application/json');
+  };
+  const deleteData = async () => {
+    // eslint-disable-next-line no-alert
+    if (!window.confirm('Delete your account and all your enquiries? This cannot be undone.')) return;
+    setPrivacyMsg('Deleting…');
+    try {
+      const { db, F, A, auth } = fb();
+      for (const it of items || []) await F.deleteDoc(F.doc(db, 'booking_enquiries', it.id));
+      await F.deleteDoc(F.doc(db, 'users', user.uid));
+      await A.deleteUser(auth.currentUser);
+      setPrivacyMsg('Your data has been deleted.');
+    } catch (err) {
+      setPrivacyMsg(err?.code === 'auth/requires-recent-login' ? 'Your enquiries were deleted. To remove the login too, sign out, sign in again and repeat.' : 'Something went wrong. Please try again or email us.');
     }
   };
 
@@ -73,10 +274,10 @@ export default function Account() {
     <div className="dash">
       <header className="dash-top">
         <div className="container">
-          <Link to="/" style={{ textDecoration: 'none' }}>
+          <Link to="/" style={{ textDecoration: 'none' }} aria-label="Hotel Sea View home">
             <Brand />
           </Link>
-          <nav>
+          <nav aria-label="Account">
             <span className="who">{user?.email}</span>
             <Link to="/">Website</Link>
             <button className="text-btn" onClick={logout}>
@@ -85,21 +286,33 @@ export default function Account() {
           </nav>
         </div>
       </header>
+      {idleWarn && (
+        <div className="idle-bar" role="alert">
+          You will be signed out in one minute because of inactivity. Move the mouse or press a key to stay signed in.
+        </div>
+      )}
       <main id="main" className="container dash-body">
         <div className="dash-head">
           <div>
             <h1>Hello{p.name ? `, ${p.name.split(' ')[0]}` : ''}</h1>
             <p>Your enquiries and their status. Our team updates these as they follow up with you.</p>
           </div>
-          <button className="btn solid" onClick={() => setShowForm((s) => !s)}>
+          <button className="btn solid" onClick={() => { setPrefill(null); setShowForm((s) => !s); }}>
             {showForm ? 'Close form' : 'New enquiry'}
           </button>
         </div>
 
+        {upcoming && (
+          <div className="info-box upcoming">
+            <b>Your next stay:</b> {formatDate(upcoming.check_in)} to {formatDate(upcoming.check_out)}
+            {upcoming.room_type ? `, ${upcoming.room_type}` : ''}. {upcoming.checkin ? 'Online check-in done.' : 'Complete online check-in below to save time at the desk.'}
+          </div>
+        )}
+
         <AnimatePresence initial={false}>
           {showForm && (
             <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.4, ease: EASE }} style={{ overflow: 'hidden' }}>
-              <EnquiryForm compact={false} />
+              <EnquiryForm prefill={prefill} />
             </motion.div>
           )}
         </AnimatePresence>
@@ -119,36 +332,64 @@ export default function Account() {
             )}
             <div className="enq-list">
               {items?.map((it, i) => (
-                <motion.article key={it.id} className="enq" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, ease: EASE, delay: i * 0.05 }}>
-                  <div>
-                    <h3>{it.room_type || 'Any room'}</h3>
-                    <p className="meta">
-                      {formatDate(it.check_in)} to {formatDate(it.check_out)} · {nightsLabel(it.check_in, it.check_out)} · {it.adults} adults
-                      {it.children ? `, ${it.children} children` : ''}
-                    </p>
-                    <p className="meta">Sent {formatDate(it.created_at)}</p>
-                  </div>
-                  <span className={`pill st-${it.status.replace(/ /g, '-')}`}>{it.status}</span>
-                  <div className="tl">
-                    <Timeline status={it.status} />
-                  </div>
-                </motion.article>
+                <EnquiryCard key={it.id} it={it} i={i} author={p.name} onRebook={rebook} />
               ))}
             </div>
           </section>
 
           <aside style={{ display: 'grid', gap: 24 }}>
-            <section className="panel">
-              <h2>My details</h2>
+            <section className="panel" aria-labelledby="my-details">
+              <h2 id="my-details">My details and preferences</h2>
               <form className="profile-form" onSubmit={onSave}>
                 <div className="field">
-                  <input id="p-name" placeholder=" " value={p.name} onChange={(e) => setP((s) => ({ ...s, name: e.target.value }))} />
+                  <input id="p-name" placeholder=" " autoComplete="name" value={p.name} onChange={(e) => setP((s) => ({ ...s, name: e.target.value }))} maxLength={80} />
                   <label htmlFor="p-name">Full name</label>
                 </div>
                 <div className="field">
-                  <input id="p-phone" type="tel" placeholder=" " value={p.phone} onChange={(e) => setP((s) => ({ ...s, phone: e.target.value }))} />
+                  <input id="p-phone" type="tel" autoComplete="tel" placeholder=" " value={p.phone} onChange={(e) => setP((s) => ({ ...s, phone: e.target.value }))} maxLength={20} />
                   <label htmlFor="p-phone">Phone / WhatsApp</label>
                 </div>
+                <div className="field static">
+                  <select id="p-floor" value={prefs.floor} onChange={(e) => setPrefs((s) => ({ ...s, floor: e.target.value }))}>
+                    <option value="">No preference</option>
+                    <option>Lower floor</option>
+                    <option>Higher floor</option>
+                    <option>Near the lift</option>
+                  </select>
+                  <label htmlFor="p-floor">Floor</label>
+                </div>
+                <div className="field static">
+                  <select id="p-bed" value={prefs.bed} onChange={(e) => setPrefs((s) => ({ ...s, bed: e.target.value }))}>
+                    <option value="">No preference</option>
+                    <option>King bed</option>
+                    <option>Twin beds</option>
+                  </select>
+                  <label htmlFor="p-bed">Bed</label>
+                </div>
+                <div className="field static">
+                  <select id="p-diet" value={prefs.diet} onChange={(e) => setPrefs((s) => ({ ...s, diet: e.target.value }))}>
+                    <option value="">No preference</option>
+                    <option>Vegetarian</option>
+                    <option>Jain</option>
+                    <option>Non-vegetarian</option>
+                  </select>
+                  <label htmlFor="p-diet">Food</label>
+                </div>
+                <div className="field">
+                  <input id="p-notes" placeholder=" " value={prefs.notes} onChange={(e) => setPrefs((s) => ({ ...s, notes: e.target.value.slice(0, 300) }))} />
+                  <label htmlFor="p-notes">Other requests we should remember</label>
+                </div>
+                <fieldset className="addons">
+                  <legend>Saved rooms</legend>
+                  {ROOMS.map((r) => (
+                    <label key={r.id} className="check">
+                      <input type="checkbox" checked={savedRooms.includes(r.id)} onChange={() => toggleRoom(r.id)} />
+                      <span>
+                        <Link to={`/rooms/${r.id}`}>{r.name}</Link>
+                      </span>
+                    </label>
+                  ))}
+                </fieldset>
                 <div className="form-actions">
                   <button className="btn outline" type="submit">
                     Save details
@@ -157,8 +398,8 @@ export default function Account() {
                 </div>
               </form>
             </section>
-            <section className="panel">
-              <h2>Need help?</h2>
+            <section className="panel" aria-labelledby="help">
+              <h2 id="help">Need help?</h2>
               <p className="meta" style={{ marginBottom: 12 }}>
                 Call {HOTEL.phone} or message us on WhatsApp.
               </p>
@@ -166,11 +407,24 @@ export default function Account() {
                 WhatsApp the hotel
               </a>
             </section>
+            <section className="panel" aria-labelledby="my-data">
+              <h2 id="my-data">Your data</h2>
+              <p className="meta" style={{ marginBottom: 12 }}>
+                Download a copy of everything we hold about you, or delete it. See the <Link to="/privacy">privacy notice</Link>.
+              </p>
+              <div className="form-actions">
+                <button className="btn outline" onClick={downloadData} disabled={!items}>
+                  Download my data
+                </button>
+                <button className="text-btn danger" onClick={deleteData} disabled={!items}>
+                  Delete my account
+                </button>
+              </div>
+              {privacyMsg && <p className="meta" role="status">{privacyMsg}</p>}
+            </section>
           </aside>
         </div>
       </main>
     </div>
   );
 }
-
-export { ENQUIRY_STATUSES };

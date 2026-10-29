@@ -49,6 +49,7 @@ export const ROOMS = [
     occupancy: '2 adults + 2 children under 6',
     size: '300 sq ft',
     features: ['Private bathroom', 'Television', 'Direct-dial phone', 'Work area'],
+    rate: null, // CONFIRM: 'from' price per night in rupees, e.g. 2500
   },
   {
     id: 'deluxe-seaview',
@@ -61,6 +62,7 @@ export const ROOMS = [
     occupancy: '2 adults + 2 children under 6',
     size: null, // CONFIRM room size
     features: ['Sunrise from the bed', 'Private bathroom', 'Television', 'Work area'],
+    rate: null, // CONFIRM 'from' price per night
   },
   {
     id: 'corner-deluxe',
@@ -73,6 +75,7 @@ export const ROOMS = [
     occupancy: '2 adults + 2 children under 6',
     size: null, // CONFIRM room size and a distinct description
     features: ['Sunrise from the bed', 'Private bathroom', 'Television'],
+    rate: null, // CONFIRM 'from' price per night
   },
   {
     id: 'twin',
@@ -85,6 +88,7 @@ export const ROOMS = [
     occupancy: '4 adults + 4 children under 6',
     size: null, // CONFIRM room size
     features: ['Two balconies', 'Interconnecting door', 'Sea and city views'],
+    rate: null, // CONFIRM 'from' price per night
   },
   {
     id: 'executive-suite',
@@ -92,11 +96,12 @@ export const ROOMS = [
     image: 'roomSuite',
     view: 'Sea view',
     tags: ['sea'],
-    summary: 'Our most spacious stay, with views over the sea to the island memorials and sunrise from the bed.',
+    summary: 'Sea views over to the island memorials, with the sunrise visible from the bed.',
     beds: 'King or twin',
     occupancy: '2 adults + 2 children under 6',
     size: null, // CONFIRM room size
     features: ['Sunrise from the bed', 'Sea views', 'Work area'],
+    rate: null, // CONFIRM 'from' price per night
   },
 ];
 
@@ -146,7 +151,7 @@ export const EXPERIENCES = [
 export const ATTRACTIONS = [
   { name: 'Vivekananda Rock Memorial', image: 'vivekananda', text: 'The island memorial and its glass bridge, reached by ferry from the shore.' },
   { name: 'Thiruvalluvar Statue', image: 'thiruvalluvar', text: 'The tall stone statue of the Tamil poet beside the rock memorial.' },
-  { name: 'Kanyakumari Beach', image: 'beach', text: 'Where three seas meet, a short walk from the hotel.' },
+  { name: 'Kanyakumari Beach', image: 'beach', text: 'Where three seas meet, near the hotel.' },
   { name: 'Gandhi Memorial Mandapam', image: 'gandhi', text: 'Memorial hall on the seafront.' },
   { name: 'Sunset Point', image: 'sunset', text: 'A favourite spot to watch the evening sky.' },
 ];
@@ -176,14 +181,14 @@ export const GALLERY = [
 // "Our benefits" from the original site, rewritten. Templated claims (e.g. "historical luxury") removed.
 export const AMENITIES = [
   { icon: 'rings', title: 'Weddings and events', text: 'Our conference hall and restaurant host family functions, meetings and celebrations.', link: '#dining' },
-  { icon: 'umbrella', title: 'Beach location', text: 'Stay a short walk from the shore where three seas meet.', link: '#location' },
+  { icon: 'umbrella', title: 'Beach location', text: 'Stay near the shore where three seas meet.', link: '#location' },
   { icon: 'dish', title: 'Restaurant', text: 'Indian, Chinese and Continental dishes, vegetarian and non-vegetarian.', link: '#dining' },
   { icon: 'glass', title: 'Wave Bar', text: 'A drink before dinner or a nightcap after a day of sightseeing.', link: '#dining' },
 ];
 
 export const HIGHLIGHTS = [
   { title: 'Comfortable rooms', image: 'roomDeluxe', text: 'Five room types, from city-view Standard Rooms to the Executive Suite, each with a private bathroom and TV.' },
-  { title: 'Prime location', image: 'building', text: 'On East Car Street, close to the beach, the ferry to Vivekananda Rock and the bus terminus.' },
+  { title: 'Prime location', image: 'building', text: 'On East Car Street, close to the beach and a few minutes from the Kanyakumari bus terminus.' },
   { title: 'Safe pick and drop', image: 'entrance', text: 'Ask our travel desk to arrange your transfer from the station, bus stand or airport.' },
   { title: 'Quality room service', image: 'dining', text: 'Meals and help at any hour, around the clock.' },
 ];
@@ -220,3 +225,60 @@ export const VIDEO = {
   heroImage: '/media/sea-loop-poster.jpg',
   duration: '1:13',
 };
+
+
+// Features #5/#55: offers and promo codes. The offers block and code field appear only when this list has entries.
+// Shape: { code: 'HONEYMOON', title: 'Honeymoon stay', text: 'Room decoration and a sea-view room', valid: 'Until 31 Mar 2027' }
+export const OFFERS = [];
+
+// Feature #16: link guests to the hotel's Google reviews after their stay. CONFIRM and paste the review link.
+export const GOOGLE_REVIEW_URL = null;
+
+// Feature #29: only facts the hotel has published are stated; the rest say "please ask".
+export const POLICIES = [
+  { title: 'Check-in and check-out', text: 'Times to be confirmed by the hotel. Please ask when you enquire.', confirmed: false },
+  { title: 'Parking', text: 'Free parking for hotel guests.', confirmed: true },
+  { title: 'Room service', text: 'Available 24 hours a day.', confirmed: true },
+  { title: 'Children', text: 'Standard rooms sleep 2 adults and 2 children under 6. Ask us about older children.', confirmed: true },
+  { title: 'Cancellation', text: 'Cancellation terms are confirmed with your booking. Please ask before you pay.', confirmed: false },
+  { title: 'Identity documents', text: 'Please carry a government photo ID for every adult guest.', confirmed: false },
+  { title: 'Pets', text: 'Please ask the hotel before travelling with a pet.', confirmed: false },
+];
+
+// Feature #28: the conference hall. CONFIRM capacity, layouts and equipment.
+export const MEETINGS = {
+  title: 'Conference hall',
+  image: 'meeting',
+  text: 'A meeting room for business gatherings, training sessions and family functions, with catering from Sea View Restaurant.',
+  facts: ['Meetings, training and small functions', 'Catering from our multi-cuisine restaurant', 'Rooms for out-of-town attendees', 'Capacity and equipment: please ask'],
+};
+
+// Feature #69: getting here. Distances are not stated until verified.
+export const HOW_TO_REACH = [
+  { mode: 'By train', text: 'Kanyakumari railway station serves the town. Our travel desk can arrange a pick-up.' },
+  { mode: 'By bus', text: 'The hotel is a few minutes from the Kanyakumari bus terminus.' },
+  { mode: 'By air', text: 'The nearest airport is Thiruvananthapuram International Airport. Ask us to arrange a transfer.' },
+  { mode: 'By road', text: 'We are on East Car Street. Free parking is available for guests.' },
+];
+
+// Feature #64: suggested plans built from the landmarks near the hotel. Ask the travel desk for timings.
+export const ITINERARIES = [
+  {
+    title: 'One day at the tip of India',
+    steps: [
+      { time: 'Sunrise', text: 'Watch the sun come up over the sea from a sea-facing room or the shore.' },
+      { time: 'Morning', text: 'Take the ferry to the Vivekananda Rock Memorial and the Thiruvalluvar Statue.' },
+      { time: 'Midday', text: 'Lunch at Sea View Restaurant: Indian, Chinese or Continental.' },
+      { time: 'Afternoon', text: 'Visit the Gandhi Memorial Mandapam and walk along Kanyakumari Beach.' },
+      { time: 'Evening', text: 'Watch the sunset from Sunset Point, then dinner back at the hotel.' },
+    ],
+  },
+  {
+    title: 'Two relaxed days',
+    steps: [
+      { time: 'Day 1', text: 'Arrive, settle in, sunset at Sunset Point and the beach in the evening.' },
+      { time: 'Day 2 morning', text: 'Sunrise from your room, then the ferry to the island memorials.' },
+      { time: 'Day 2 afternoon', text: 'Gandhi Memorial Mandapam, local shopping, and a sightseeing tour from our travel desk.' },
+    ],
+  },
+];
