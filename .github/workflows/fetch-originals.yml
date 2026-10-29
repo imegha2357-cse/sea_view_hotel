@@ -1,0 +1,35 @@
+# Downloads the hotel's original photos from hotelseaview.in onto the "image-originals" branch,
+# so they can be upscaled and served from this site. Run it from the Actions tab when photos change.
+name: Fetch original photos
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: [scripts/photo-list.txt]
+permissions:
+  contents: write
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download
+        run: |
+          mkdir -p originals
+          while read -r path; do
+            [ -z "$path" ] && continue
+            curl -fsSL --retry 3 -o "originals/$(basename "$path")" "https://hotelseaview.in/wp-content/uploads/$path"
+          done < scripts/photo-list.txt
+          ls -la originals
+      - name: Commit to image-originals branch
+        run: |
+          cp -r originals /tmp/originals
+          git config user.name "github-actions"
+          git config user.email "github-actions@users.noreply.github.com"
+          git checkout --orphan image-originals
+          git rm -rq --cached .
+          git clean -fdq -e originals
+          rm -rf originals && cp -r /tmp/originals originals
+          git add originals
+          git commit -qm "Original photos from hotelseaview.in"
+          git push -f origin image-originals
