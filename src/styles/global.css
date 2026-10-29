@@ -496,7 +496,7 @@ em { font-family: var(--accent-serif); font-style: italic; font-weight: 400; }
 .rooms-title { font-size: clamp(32px, 4.4vw, 60px); max-width: 14ch; }
 .rooms-note { max-width: 34ch; font-size: 14px; color: var(--muted); }
 .rooms-pin { position: relative; }
-.rooms-sticky { position: sticky; top: 0; height: 100vh; overflow: hidden; display: grid; grid-template-rows: auto 1fr auto; gap: 28px; padding-top: calc(var(--header-h) + 24px); padding-bottom: 28px; }
+.rooms-sticky { position: sticky; top: 0; height: 100vh; overflow: hidden; display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto 1fr auto; gap: 28px; padding-top: calc(var(--header-h) + 24px); padding-bottom: 28px; }
 .rooms-track { display: flex; gap: 28px; padding-left: max(var(--gutter), calc((100vw - var(--max)) / 2 + var(--gutter))); padding-right: 48px; align-items: stretch; width: max-content; will-change: transform; cursor: none; }
 .rooms-track .room-tile { cursor: none; }
 .room-tile { width: clamp(300px, 30vw, 440px); flex: none; display: grid; grid-template-rows: 1fr auto; text-align: left; border: 0; padding: 0; background: none; color: inherit; cursor: pointer; }
