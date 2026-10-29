@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { AnimatePresence, motion, useReducedMotion, useScroll, useTransform } from 'framer-motion';
+import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion';
 import { EASE, Magnetic } from '../components/Motion';
 import { useIntroDone } from '../components/Intro';
 import { ChatIcon } from '../components/Icons';
@@ -134,12 +134,14 @@ export default function Hero({ onPrefill }) {
         <motion.div className="hero-sub" initial={{ opacity: 0, y: 18 }} animate={{ opacity: ready ? 1 : 0, y: ready ? 0 : 18 }} transition={{ duration: 0.9, ease: EASE, delay: 0.8 }}>
           <p>
             Wake to the sunrise where the{' '}
-            <span className="sea-rotator" aria-live="off">
-              <AnimatePresence mode="wait" initial={false}>
-                <motion.em key={SEAS[sea]} initial={{ y: '100%', opacity: 0 }} animate={{ y: '0%', opacity: 1 }} exit={{ y: '-100%', opacity: 0 }} transition={{ duration: 0.5, ease: EASE }}>
-                  {SEAS[sea]}
-                </motion.em>
-              </AnimatePresence>
+            <span className="sea-rotator" aria-label={SEAS.join(', ')}>
+              <motion.span className="sea-col" animate={{ y: `${(-sea * 100) / SEAS.length}%` }} transition={{ duration: 0.7, ease: EASE }} aria-hidden="true">
+                {SEAS.map((s, k) => (
+                  <motion.em key={s} animate={{ opacity: k === sea ? 1 : 0.25 }} transition={{ duration: 0.5 }}>
+                    {s}
+                  </motion.em>
+                ))}
+              </motion.span>
             </span>
             <br />
             meets the tip of India.
