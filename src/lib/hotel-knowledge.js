@@ -97,9 +97,13 @@ const WEIGHT = { price: 3, avail: 2, checkin: 3, pickup: 2, cancel: 2, pets: 3, 
 const roomLine = (r) => `- [${r.name}](/rooms/${r.id}): ${[r.view, r.beds, r.occupancy && `sleeps ${r.occupancy}`].filter(Boolean).join(', ')}`;
 const notConfirmed = (what) => `I don't have confirmed ${what} yet. Our team will tell you on WhatsApp or by phone on ${HOTEL.phone}. [[WHATSAPP]]`;
 
+const PRICE_WORDS = ['price', 'rate', 'cost', 'tariff', 'how much', 'per night', 'charge', 'fare', 'rs', '₹', 'rupee', 'cheap', 'budget', 'discount', 'expensive', 'afford'];
+// Requests that are not questions about the hotel (or try to change the assistant's rules).
+const OFF_TOPIC = /(ignore (all |your |the |previous )*(instruction|rule|prompt)|system prompt|pretend|role ?play|tell me a (joke|story)|write (a|me) (poem|story|essay|code)|jailbreak)/;
+
 const INTENTS = [
   { id: 'greet', words: ['hi', 'hello', 'hey', 'namaste', 'vanakkam', 'good morning', 'good evening'], answer: () => `Hello! I can help with rooms, facilities, dining, directions and how to enquire at ${HOTEL.name}. What would you like to know?` },
-  { id: 'price', words: ['price', 'rate', 'cost', 'tariff', 'how much', 'charge', 'fare', 'rs', '₹', 'rupee', 'cheap', 'budget', 'discount'], answer: ({ rooms }) => {
+  { id: 'price', words: PRICE_WORDS, answer: ({ rooms }) => {
     const priced = rooms.filter((r) => r.rate);
     const list = priced.length ? `\n${priced.map((r) => `- ${r.name}: from ₹${r.rate} a night`).join('\n')}\nFinal rates depend on your dates.` : '';
     return `${RATE_NOTE}${list} You can [send an enquiry](/enquire) or ask on WhatsApp. [[WHATSAPP]]`;
@@ -107,7 +111,7 @@ const INTENTS = [
   { id: 'avail', words: ['available', 'availability', 'vacancy', 'vacant', 'free room', 'book', 'booking', 'reserve', 'reservation', 'confirm'], answer: () => `I can't check live availability or make bookings. [Send an enquiry](/enquire) with your dates, or message us on WhatsApp, and our team will confirm availability and the rate. [[WHATSAPP]]` },
   { id: 'checkin', words: ['check in', 'check-in', 'checkin', 'check out', 'check-out', 'checkout', 'early', 'late', 'arrival time', 'timing'], answer: () => (HOTEL.checkIn ? `Check-in is from ${HOTEL.checkIn} and check-out is by ${HOTEL.checkOut}.` : notConfirmed('check-in and check-out times')) },
   { id: 'photos', words: ['photo', 'photos', 'picture', 'pictures', 'image', 'images', 'pic', 'pics', 'look like', 'gallery', 'video', 'tour'], answer: () => `Here are our rooms. Tap one to see all its photos. You can also browse the [gallery](/gallery) or watch the [room tour video](/room-tour).`, showRooms: true },
-  { id: 'seaview', words: ['sea view', 'seaview', 'sunrise', 'ocean', 'facing'], answer: ({ rooms }) => {
+  { id: 'seaview', words: ['sea view', 'seaview', 'sea-facing', 'sea facing', 'face the sea', 'faces the sea', 'sunrise', 'ocean', 'facing', 'balcony view'], answer: ({ rooms }) => {
     const sea = rooms.filter((r) => /sea/i.test(`${r.view} ${r.name}`) || (r.amenities || []).includes('sea_view'));
     return `Our sea-facing rooms look out towards the Vivekananda Rock Memorial and the Thiruvalluvar Statue, so you can watch the sunrise from your room:\n${sea.map(roomLine).join('\n')}\nSunrise times are on [Plan your visit](/plan-your-visit).`;
   }, showRooms: true },
@@ -146,7 +150,8 @@ export function localAnswer(question, rooms = []) {
     return q.includes(n) || (key.length && key.every((w) => q.includes(w)));
   });
   const wantsPhotos = has(q, INTENTS.find((i) => i.id === 'photos').words) > 0;
-  if (named && !has(q, ['price', 'rate', 'cost', 'tariff', 'available', 'availability'])) {
+  if (OFF_TOPIC.test(q)) return { answer: `I can only help with questions about ${HOTEL.name}: rooms, facilities, dining, directions and enquiries. What would you like to know?` };
+  if (named && !has(q, [...PRICE_WORDS, 'available', 'availability', 'book', 'booking'])) {
     const amen = (named.amenities || []).map(amenityLabel).filter(Boolean);
     return {
       answer: `${named.name}: ${named.summary || named.description || ''}\n${[named.view && `- View: ${named.view}`, named.beds && `- Beds: ${named.beds}`, named.occupancy && `- Sleeps: ${named.occupancy}`, named.size && `- Size: ${named.size}`, amen.length && `- Amenities: ${amen.join(', ')}`].filter(Boolean).join('\n')}\n${wantsPhotos ? 'Photos are on the room page.' : ''} [See the ${named.name}](/rooms/${named.id}).`.trim(),
