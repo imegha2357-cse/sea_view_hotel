@@ -124,3 +124,12 @@ Other changes:
 - **Enquiry form:** dates are optional. Submitting opens WhatsApp (+91 94894 74968; change it with `NEXT_PUBLIC_WHATSAPP_NUMBER`) with a formatted message. The page says the guest still has to press Send there. A copy of the enquiry is also saved to the dashboard.
 - **Logo:** the official logo from hotelseaview.in (gold "S" and the SEA VIEW wordmark) is in the header, footer and dashboards. A light version is used on dark backgrounds.
 - **Loader:** a logo loader shows once per visit. It lasts at least 0.9 s, is hidden after 4 s at the latest, and does not pulse when "reduce motion" is on.
+
+## October 2026 update 2: chat assistant, admin sidebar, redesigned sections
+
+- **Chat assistant:** a floating button at the bottom right of every public page opens it. It answers only from the hotel's own information: rooms from the admin panel, facilities, dining, directions, policies and FAQs (`src/lib/hotel-knowledge.js`). It shows room photo cards. It offers WhatsApp whenever it can't answer or the detail isn't confirmed (check-in times, pets, prices, availability).
+  - **To make it fully AI-powered,** add `ANTHROPIC_API_KEY` in Vercel → Settings → Environment Variables, then redeploy. You can optionally set `CHAT_MODEL` (default `claude-haiku-5-5`).
+  - **Without the key** it uses built-in answers from the same information. That is what runs today.
+- **Admin:** Enquiries and Reports are removed. The sidebar now reads: Website (Rooms, Photo library, Slides/banners/gallery, Offers), then Hotel (Fully booked nights, Inbox). On phones the sidebar becomes a swipeable bar. Guest enquiries arrive on WhatsApp.
+- **Highlights:** the first card now uses the HD Corner Deluxe sea-view photo. Every Highlights photo can be changed in Website → Slides, banners and gallery → Homepage highlights.
+- **Redesigned sections:** Reviews, Location and the footer were redesigned. The "Check availability" button in the closing band was invisible and is fixed.
