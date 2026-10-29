@@ -246,3 +246,8 @@ html[data-theme='dark'] .mosaic-text { background: var(--charcoal); }
 /* Location column can shrink on 320px phones */
 .loc-grid > * { grid-template-columns: minmax(0, 1fr); }
 .reach-tabs { max-width: 100%; }
+
+/* Stronger teal shade behind the headline so Sand Gold and white stay readable on bright sky photos */
+.hero.coast::after { background: linear-gradient(90deg, rgba(var(--shade), 0.82) 0%, rgba(var(--shade), 0.62) 40%, rgba(var(--shade), 0.25) 68%, rgba(var(--shade), 0.08) 85%), linear-gradient(180deg, rgba(var(--shade), 0.4) 0%, rgba(var(--shade), 0) 22%, rgba(var(--shade), 0) 58%, rgba(var(--shade), 0.8) 100%); }
+.hero-h1 em { text-shadow: 0 2px 24px rgba(var(--shade), 0.6); }
+@media (max-width: 900px) { .hero.coast::after { background: linear-gradient(180deg, rgba(var(--shade), 0.55) 0%, rgba(var(--shade), 0.6) 45%, rgba(var(--shade), 0.85) 100%); } }
