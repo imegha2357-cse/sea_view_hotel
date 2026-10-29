@@ -19,6 +19,23 @@ export default function Boot() {
     if (/^\/(admin|account|login)/.test(pathname)) return undefined;
     return initSmoothScroll();
   }, [pathname]);
+  // Loader fallback: some responses (like "page not found") replace the document after the head
+  // script ran, so make sure the logo loader is dismissed once React is running.
+  useEffect(() => {
+    const d = document.documentElement;
+    if (d.dataset.boot === 'done') return undefined;
+    let seen = false;
+    try {
+      seen = Boolean(sessionStorage.getItem('sv-boot'));
+    } catch {}
+    const t = setTimeout(() => {
+      d.dataset.boot = 'done';
+      try {
+        sessionStorage.setItem('sv-boot', '1');
+      } catch {}
+    }, seen ? 0 : 900);
+    return () => clearTimeout(t);
+  }, [pathname]);
   // New page: start at the top unless a #section was asked for.
   useEffect(() => {
     if (!window.location.hash) window.scrollTo(0, 0);
