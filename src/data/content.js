@@ -282,3 +282,34 @@ export const ITINERARIES = [
     ],
   },
 ];
+
+// Home page "Highlights" carousel (image card on a blurred backdrop, in the style of the Taj reference).
+// Every line is a published fact about the hotel; nothing here is a ranking or award.
+export const HIGHLIGHT_SLIDES = [
+  { title: 'Sunrise from your room', image: 'seaView', text: 'Sea-facing rooms look out towards the Vivekananda Rock Memorial and the Thiruvalluvar Statue, so the sunrise comes to you.', href: '/rooms', cta: 'Sea-view rooms' },
+  { title: 'Deluxe Seaview Room', image: 'roomDeluxe', text: 'Watch the sun come up over the sea from your bed, with a private bathroom, television and work area.', href: '/rooms/deluxe-seaview', cta: 'View the room' },
+  { title: 'Sea View Restaurant', image: 'restaurant1', text: 'A fully air-conditioned, multi-cuisine restaurant serving Indian, Chinese and Continental dishes, vegetarian and non-vegetarian.', href: '/dining#restaurant', cta: 'Dining' },
+  { title: 'Wave Bar', image: 'bar1', text: 'A drink before dinner or a nightcap after a day of sightseeing, with a snack menu alongside.', href: '/dining#bar', cta: 'Wave Bar' },
+  { title: 'Conference hall', image: 'meeting', text: 'Meetings, training sessions and family functions, with catering from our restaurant and rooms for your guests.', href: '/meetings', cta: 'Meetings and events' },
+  { title: 'Travel desk', image: 'vivekananda', text: 'Our team arranges sightseeing and package tours, from the island memorials to the rest of the region.', href: '/experiences', cta: 'Experiences' },
+  { title: '24-hour room service', image: 'dining', text: 'Meals and help at any hour of the day or night.', href: '/dining#room-service', cta: 'Room service' },
+];
+
+export const HERO_SLIDES = [
+  { image: 'building', caption: 'Hotel Sea View, East Car Street' },
+  { image: 'seaView', caption: 'The view from a sea-facing room' },
+  { image: 'roomDeluxe', caption: 'Deluxe Seaview Room' },
+  { image: 'restaurant1', caption: 'Sea View Restaurant' },
+  { image: 'vivekananda', caption: 'Vivekananda Rock Memorial' },
+];
+
+export const OVERVIEW = {
+  eyebrow: 'Welcome',
+  title: 'Sunrise at the tip of India',
+  short:
+    'Hotel Sea View stands on East Car Street in Kanyakumari, close to the beach where three seas meet and a few minutes from the bus terminus.',
+  more: [
+    'Several rooms look out over the sea towards the Vivekananda Rock Memorial and the Thiruvalluvar Statue, so you can watch the sunrise without leaving your room.',
+    'Every room has a private bathroom, television and direct-dial telephone, with room service around the clock. Sea View Restaurant serves Indian, Chinese and Continental food, the Wave Bar is open for a drink in the evening, and our travel desk arranges sightseeing across the region.',
+  ],
+};

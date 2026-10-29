@@ -3,7 +3,7 @@
 // Nothing is loaded or stored before consent. Without VITE_GA_ID this file does nothing.
 
 // Measurement ID from the client's Firebase / Google Analytics property. Set VITE_GA_ID=off to disable.
-const RAW = import.meta.env.VITE_GA_ID || 'G-R1LGWTMCRK';
+const RAW = process.env.NEXT_PUBLIC_GA_ID || 'G-R1LGWTMCRK';
 export const GA_ID = RAW === 'off' ? '' : RAW;
 export const analyticsEnabled = Boolean(GA_ID);
 

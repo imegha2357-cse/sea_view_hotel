@@ -1,5 +1,7 @@
+'use client';
+
 import { useEffect, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation } from '@/lib/router';
 import { AnimatePresence, motion } from 'framer-motion';
 import { analyticsEnabled, getConsent, loadAnalytics, setConsent, trackEvent, trackPage } from '../lib/analytics';
 import { EASE } from './Motion';

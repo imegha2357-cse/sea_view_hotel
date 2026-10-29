@@ -1,6 +1,16 @@
 // Firebase loads on demand (feature #71): only when someone signs in, opens a dashboard
 // or reaches the enquiry form. Pages that never need it never download it.
-const env = import.meta.env || {};
+// Next.js only inlines NEXT_PUBLIC_* values that are written out in full.
+const env = {
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+  recaptcha: process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY,
+  emulators: process.env.NEXT_PUBLIC_USE_EMULATORS === 'true',
+};
 
 // Public web config for the "sea-view-hotel" project. These values identify the project and are
 // public by design; access is controlled by firestore.rules and Authentication.
@@ -14,12 +24,12 @@ const DEFAULTS = {
 };
 
 export const config = {
-  apiKey: env.VITE_FIREBASE_API_KEY || DEFAULTS.apiKey,
-  authDomain: env.VITE_FIREBASE_AUTH_DOMAIN || DEFAULTS.authDomain,
-  projectId: env.VITE_FIREBASE_PROJECT_ID || DEFAULTS.projectId,
-  storageBucket: env.VITE_FIREBASE_STORAGE_BUCKET || DEFAULTS.storageBucket,
-  messagingSenderId: env.VITE_FIREBASE_MESSAGING_SENDER_ID || DEFAULTS.messagingSenderId,
-  appId: env.VITE_FIREBASE_APP_ID || DEFAULTS.appId,
+  apiKey: env.apiKey || DEFAULTS.apiKey,
+  authDomain: env.authDomain || DEFAULTS.authDomain,
+  projectId: env.projectId || DEFAULTS.projectId,
+  storageBucket: env.storageBucket || DEFAULTS.storageBucket,
+  messagingSenderId: env.messagingSenderId || DEFAULTS.messagingSenderId,
+  appId: env.appId || DEFAULTS.appId,
 };
 
 export const firebaseReady = Boolean(config.apiKey && config.projectId && config.appId);
@@ -36,13 +46,13 @@ export function loadFirebase() {
       const [{ initializeApp }, A, F] = await Promise.all([import('firebase/app'), import('firebase/auth'), import('firebase/firestore')]);
       const app = initializeApp(config);
       // PRD 10.4 abuse protection: Firebase App Check with reCAPTCHA v3, when a site key is supplied.
-      if (env.VITE_RECAPTCHA_SITE_KEY && env.VITE_USE_EMULATORS !== 'true') {
+      if (env.recaptcha && !env.emulators) {
         const { initializeAppCheck, ReCaptchaV3Provider } = await import('firebase/app-check');
-        initializeAppCheck(app, { provider: new ReCaptchaV3Provider(env.VITE_RECAPTCHA_SITE_KEY), isTokenAutoRefreshEnabled: true });
+        initializeAppCheck(app, { provider: new ReCaptchaV3Provider(env.recaptcha), isTokenAutoRefreshEnabled: true });
       }
       const auth = A.getAuth(app);
       const db = F.getFirestore(app);
-      if (env.VITE_USE_EMULATORS === 'true') {
+      if (env.emulators) {
         A.connectAuthEmulator(auth, 'http://127.0.0.1:9099', { disableWarnings: true });
         F.connectFirestoreEmulator(db, '127.0.0.1', 8080);
       }

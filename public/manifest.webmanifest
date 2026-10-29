@@ -5,9 +5,14 @@
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "background_color": "#f4f0e7",
-  "theme_color": "#173b3a",
+  "background_color": "#ffffff",
+  "theme_color": "#1d2827",
   "icons": [
-    { "src": "https://hotelseaview.in/wp-content/uploads/2025/07/cropped-web-app-manifest-192x192-1-270x270.png", "sizes": "270x270", "type": "image/png", "purpose": "any" }
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
   ]
 }

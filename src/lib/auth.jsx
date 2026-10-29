@@ -1,5 +1,7 @@
+'use client';
+
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation } from '@/lib/router';
 import { firebaseReady, loadFirebase, NOT_CONFIGURED } from './firebase';
 
 const AuthContext = createContext(null);

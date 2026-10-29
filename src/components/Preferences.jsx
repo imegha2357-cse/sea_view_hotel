@@ -1,3 +1,5 @@
+'use client';
+
 import { useEffect, useState } from 'react';
 
 // Features #81/#82: dark mode and larger text, remembered in this browser.

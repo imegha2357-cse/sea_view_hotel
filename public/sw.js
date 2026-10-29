@@ -1,7 +1,7 @@
 // Feature #77: a light offline layer. Pages always come from the network first (so a new release shows at once);
 // if the connection drops, the last copy is shown. Hashed build files are cached for speed.
-// Nothing from Firebase, /api or the image optimizer is cached.
-const CACHE = 'seaview-v1';
+// Nothing from Firebase, /api or the image optimiser (/_next/image) is cached.
+const CACHE = 'seaview-v2';
 self.addEventListener('install', () => self.skipWaiting());
 self.addEventListener('activate', (e) => {
   e.waitUntil(caches.keys().then((keys) => Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k)))).then(() => self.clients.claim()));
@@ -11,7 +11,7 @@ self.addEventListener('fetch', (e) => {
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
   if (url.origin !== self.location.origin) return;
-  if (/^\/(api|_vercel)\//.test(url.pathname)) return;
+  if (/^\/(api|_vercel|_next\/image)/.test(url.pathname)) return;
   if (req.mode === 'navigate') {
     e.respondWith(
       fetch(req)
@@ -24,7 +24,7 @@ self.addEventListener('fetch', (e) => {
     );
     return;
   }
-  if (url.pathname.startsWith('/assets/')) {
+  if (url.pathname.startsWith('/_next/static/')) {
     e.respondWith(
       caches.match(req).then(
         (hit) =>

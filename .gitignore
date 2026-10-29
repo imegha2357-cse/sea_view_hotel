@@ -5,3 +5,4 @@
 dist
 node_modules
 service-account.json
+.next

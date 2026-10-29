@@ -7,7 +7,7 @@ const seen = new Set();
 
 export function reportError(message) {
   const msg = String(message || 'Unknown error').slice(0, 500);
-  if (!firebaseReady || sent >= 3 || seen.has(msg) || import.meta.env.DEV) return;
+  if (!firebaseReady || sent >= 3 || seen.has(msg) || process.env.NODE_ENV === 'development') return;
   // Ignore noise from browser extensions and cancelled media loads.
   if (/extension:|ResizeObserver loop|AbortError|Load failed|NetworkError/i.test(msg)) return;
   seen.add(msg);
