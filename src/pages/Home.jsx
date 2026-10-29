@@ -1,19 +1,23 @@
 import { useEffect, useState } from 'react';
 import Hero from '../sections/Hero';
-import BookingBar from '../sections/BookingBar';
-import SubNav from '../sections/SubNav';
-import About from '../sections/About';
+import Marquee from '../sections/Marquee';
+import Statement from '../sections/Statement';
+import Building from '../sections/Building';
 import Rooms from '../sections/Rooms';
+import Amenities from '../sections/Amenities';
+import Highlights from '../sections/Highlights';
+import VideoBand from '../sections/VideoBand';
 import Facilities from '../sections/Facilities';
 import Experiences from '../sections/Experiences';
 import Gallery from '../sections/Gallery';
+import Testimonials from '../sections/Testimonials';
 import Attractions from '../sections/Attractions';
 import Location from '../sections/Location';
 import Faq from '../sections/Faq';
 import Enquire from '../sections/Enquire';
-import Testimonials from '../sections/Testimonials';
-import { WaveDivider } from '../components/Motion';
+import VideoModal from '../components/VideoModal';
 import { usePageMeta } from '../lib/seo';
+import { scrollToId } from '../lib/scroll';
 
 export default function Home() {
   const [prefill, setPrefill] = useState(null);
@@ -25,29 +29,28 @@ export default function Home() {
   );
 
   useEffect(() => {
-    if (window.location.hash) {
-      const el = document.getElementById(window.location.hash.slice(1));
-      if (el) setTimeout(() => el.scrollIntoView(), 50);
-    }
+    if (window.location.hash) setTimeout(() => scrollToId(window.location.hash.slice(1)), 120);
   }, []);
 
   return (
     <main id="main">
-      <Hero />
-      <BookingBar onPrefill={merge} />
-      <div style={{ height: 40 }} />
-      <SubNav />
-      <About />
+      <Hero onPrefill={merge} />
+      <Marquee />
+      <Statement />
+      <Building />
       <Rooms onEnquire={merge} />
+      <Amenities />
+      <Highlights />
+      <VideoBand />
       <Facilities />
       <Experiences />
-      <WaveDivider />
       <Gallery />
       <Testimonials />
       <Attractions />
       <Location />
       <Faq />
       <Enquire prefill={prefill} />
+      <VideoModal />
     </main>
   );
 }

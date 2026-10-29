@@ -11,12 +11,15 @@ import NotFound from './pages/NotFound';
 import Login from './pages/Login';
 import AdminLogin from './pages/admin/AdminLogin';
 import CookieConsent from './components/CookieConsent';
+import { IntroProvider } from './components/Intro';
+import { initSmoothScroll } from './lib/scroll';
 
 // Dashboards load only when someone signs in, keeping the public page light.
 const Account = lazy(() => import('./pages/account/Account'));
 const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
 
 function Site({ children }) {
+  useEffect(() => initSmoothScroll(), []);
   return (
     <>
       <a href="#main" className="skip-link">
@@ -48,6 +51,7 @@ export default function App() {
   return (
     // reducedMotion="user" turns movement into simple fades for people who ask for reduced motion
     <MotionConfig reducedMotion="user">
+      <IntroProvider>
       <AnimatePresence mode="wait">
         <Suspense fallback={null}>
           <Routes location={location} key={location.pathname}>
@@ -62,6 +66,7 @@ export default function App() {
         </Suspense>
       </AnimatePresence>
       <CookieConsent />
+      </IntroProvider>
     </MotionConfig>
   );
 }

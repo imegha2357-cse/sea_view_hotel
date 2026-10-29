@@ -152,23 +152,51 @@ export const ATTRACTIONS = [
 ];
 
 export const GALLERY = [
+  { image: 'building', cat: 'Hotel' },
   { image: 'roomDeluxe', cat: 'Rooms' },
-  { image: 'front', cat: 'Hotel' },
-  { image: 'restaurant1', cat: 'Dining' },
   { image: 'vivekananda', cat: 'Views' },
+  { image: 'lobby', cat: 'Hotel' },
+  { image: 'restaurant1', cat: 'Dining' },
   { image: 'roomSuite', cat: 'Rooms' },
-  { image: 'bar1', cat: 'Dining' },
   { image: 'thiruvalluvar', cat: 'Views' },
+  { image: 'entrance', cat: 'Hotel' },
+  { image: 'bar1', cat: 'Dining' },
   { image: 'roomCorner', cat: 'Rooms' },
-  { image: 'frontAlt', cat: 'Hotel' },
-  { image: 'restaurant2', cat: 'Dining' },
   { image: 'sunset', cat: 'Views' },
+  { image: 'dining', cat: 'Dining' },
   { image: 'roomTwin', cat: 'Rooms' },
   { image: 'meeting', cat: 'Hotel' },
   { image: 'beach', cat: 'Views' },
+  { image: 'restaurant2', cat: 'Dining' },
   { image: 'roomStandard', cat: 'Rooms' },
   { image: 'bar2', cat: 'Dining' },
+  { image: 'gandhi', cat: 'Views' },
 ];
+
+// "Our benefits" from the original site, rewritten. Templated claims (e.g. "historical luxury") removed.
+export const AMENITIES = [
+  { icon: 'rings', title: 'Weddings and events', text: 'Our conference hall and restaurant host family functions, meetings and celebrations.', link: '#dining' },
+  { icon: 'umbrella', title: 'Beach location', text: 'Stay a short walk from the shore where three seas meet.', link: '#location' },
+  { icon: 'dish', title: 'Restaurant', text: 'Indian, Chinese and Continental dishes, vegetarian and non-vegetarian.', link: '#dining' },
+  { icon: 'glass', title: 'Wave Bar', text: 'A drink before dinner or a nightcap after a day of sightseeing.', link: '#dining' },
+];
+
+export const HIGHLIGHTS = [
+  { title: 'Comfortable rooms', image: 'roomDeluxe', text: 'Five room types, from city-view Standard Rooms to the Executive Suite, each with a private bathroom and TV.' },
+  { title: 'Prime location', image: 'building', text: 'On East Car Street, close to the beach, the ferry to Vivekananda Rock and the bus terminus.' },
+  { title: 'Safe pick and drop', image: 'entrance', text: 'Ask our travel desk to arrange your transfer from the station, bus stand or airport.' },
+  { title: 'Quality room service', image: 'dining', text: 'Meals and help at any hour, around the clock.' },
+];
+
+// Verified facts only (PRD 10.1). The old site's visitor counts were unverified and are not used.
+export const FACTS = [
+  { value: 3, label: 'Seas meet at the shore' },
+  { value: 5, label: 'Room types' },
+  { value: 24, label: 'Hour room service' },
+];
+
+// For the sunrise and sunset times shown in the hero
+export const GEO = { lat: 8.0883, lon: 77.5385, tzHours: 5.5 };
 
 export const FAQS = [
   { q: 'How do I book a room?', a: 'Send an enquiry on this page or message us on WhatsApp. Our team confirms availability, price and booking terms with you directly. The website does not confirm reservations by itself.' },
@@ -185,3 +213,11 @@ export const FAQS = [
 export const TESTIMONIALS = [];
 
 export const ENQUIRY_STATUSES = ['New', 'Contacted', 'Availability Checked', 'Awaiting Guest', 'Confirmed', 'Cancelled', 'Closed'];
+
+export const VIDEO = {
+  tour: '/media/room-tour.mp4',
+  tourPoster: '/media/room-tour-poster.jpg',
+  loop: '/media/sea-loop.mp4',
+  loopPoster: '/media/sea-loop-poster.jpg',
+  duration: '1:13',
+};

@@ -30,6 +30,15 @@ Live site: https://seaviewhotel-8x42.vercel.app/ (deploys automatically from `ma
 | 10.3 Accessibility | throughout | Keyboard focus, labels, alt text, reduced motion |
 | 10.4 Security and privacy | `firestore.rules`, `lib/firebase.js` (App Check), `CookieConsent.jsx` | Done; privacy text needs approval |
 
+## Demo data
+
+Staff can click **Add 15 demo enquiries** in `/admin` to try the dashboard. Demo records are tagged "Demo", use fake `90000` phone numbers and `example.com` emails, and are removed with **Remove demo enquiries**. This needs the current `firestore.rules` published. Remove demo data before launch.
+
+## Media
+
+- `public/media/room-tour.mp4` (73 s room tour, 7 MB) and `public/media/sea-loop.mp4` (12 s silent hero loop, 1.7 MB) were cut from the client's screen recording of the hotel's own room-tour video. Confirm the hotel owns this video.
+- Photos still load from hotelseaview.in, resized through Vercel.
+
 ## Known limitations
 
 - **Not a booking engine.** The site collects enquiries only; staff confirm availability and price (PRD 2.2).

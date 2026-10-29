@@ -8,6 +8,7 @@ import { formatDate, nights } from '../../lib/enquiry';
 import { ENQUIRY_STATUSES, HOTEL } from '../../data/content';
 import { Brand } from '../../components/Header';
 import { EASE } from '../../components/Motion';
+import { addDemoEnquiries, removeDemoEnquiries } from '../../lib/demo';
 
 const pillClass = (s) => `pill st-${s.replace(/ /g, '-')}`;
 const toISO = (ts) => (ts?.toDate ? ts.toDate().toISOString().slice(0, 10) : '');
@@ -59,6 +60,25 @@ export default function AdminDashboard() {
   }, [rows, status, search]);
 
   const sel = rows?.find((r) => r.id === selId) || null;
+  const demoCount = rows?.filter((r) => r.source === 'demo').length || 0;
+  const [demoBusy, setDemoBusy] = useState(false);
+  const [demoMsg, setDemoMsg] = useState('');
+  const runDemo = async (fn, ok) => {
+    setDemoBusy(true);
+    setDemoMsg('');
+    try {
+      const n = await fn();
+      setDemoMsg(ok(n));
+    } catch (err) {
+      setDemoMsg(
+        err?.code === 'permission-denied'
+          ? 'Firebase refused this. Publish the updated firestore.rules from the GitHub repo (Firestore → Rules → Publish), then try again.'
+          : 'Something went wrong. Check your connection and try again.'
+      );
+    } finally {
+      setDemoBusy(false);
+    }
+  };
   const stats = [
     ['All', 'All enquiries'],
     ['New', 'New'],
@@ -88,10 +108,29 @@ export default function AdminDashboard() {
             <h1>Enquiries</h1>
             <p>New website enquiries appear here instantly. Update the status as you follow up.</p>
           </div>
-          <button className="btn outline" onClick={() => exportCsv(filtered)} disabled={!filtered.length}>
-            Export CSV
-          </button>
+          <div className="head-actions">
+            {demoCount ? (
+              <button className="btn outline" disabled={demoBusy} onClick={() => runDemo(removeDemoEnquiries, (n) => `Removed ${n} demo enquiries.`)}>
+                {demoBusy && <span className="spin dark" aria-hidden="true" />}
+                Remove {demoCount} demo enquiries
+              </button>
+            ) : (
+              <button className="btn outline" disabled={demoBusy || !rows} onClick={() => runDemo(addDemoEnquiries, (n) => `Added ${n} demo enquiries, marked Demo.`)}>
+                {demoBusy && <span className="spin dark" aria-hidden="true" />}
+                Add 15 demo enquiries
+              </button>
+            )}
+            <button className="btn outline" onClick={() => exportCsv(filtered)} disabled={!filtered.length}>
+              Export CSV
+            </button>
+          </div>
         </div>
+
+        {demoMsg && (
+          <div className={demoMsg.startsWith('Firebase') || demoMsg.startsWith('Something') ? 'form-alert' : 'info-box'} role="status">
+            {demoMsg}
+          </div>
+        )}
 
         <div className="stats">
           {stats.map(([key, label], i) => (
@@ -133,6 +172,7 @@ export default function AdminDashboard() {
                     <td className="num">{formatDate(r.created_at)}</td>
                     <td>
                       {r.guest_name}
+                      {r.source === 'demo' && <span className="demo-tag">Demo</span>}
                       <span className="sub">{r.phone}</span>
                     </td>
                     <td className="num">

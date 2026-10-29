@@ -4,6 +4,7 @@ import { GALLERY } from '../data/content';
 import { img } from '../data/images';
 import SmartImg from '../components/SmartImg';
 import { EASE, SectionHeading } from '../components/Motion';
+import { lockScroll, unlockScroll } from '../lib/scroll';
 
 const CATS = ['All', 'Rooms', 'Dining', 'Views', 'Hotel'];
 
@@ -74,13 +75,16 @@ function Lightbox({ items, cat, index, setIndex }) {
       if (e.key === 'ArrowRight') go(1);
       if (e.key === 'ArrowLeft') go(-1);
     };
-    document.body.style.overflow = 'hidden';
     window.addEventListener('keydown', onKey);
     return () => {
-      document.body.style.overflow = '';
       window.removeEventListener('keydown', onKey);
     };
   });
+
+  useEffect(() => {
+    lockScroll();
+    return unlockScroll;
+  }, []);
 
   useEffect(() => {
     const strip = stripRef.current;
@@ -93,7 +97,7 @@ function Lightbox({ items, cat, index, setIndex }) {
   }, [index]);
 
   return (
-    <motion.div className="lightbox" role="dialog" aria-modal="true" aria-label="Photo viewer" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
+    <motion.div className="lightbox" role="dialog" aria-modal="true" aria-label="Photo viewer" data-lenis-prevent initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
       <div className="lb-top">
         <span>
           {index + 1} / {items.length} · {meta.alt}

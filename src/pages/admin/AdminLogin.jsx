@@ -41,7 +41,7 @@ export default function AdminLogin() {
   return (
     <main id="main" className="auth-page admin-theme">
       <div className="auth-media">
-        <SmartImg name="front" eager />
+        <SmartImg name="lobby" eager />
         <div className="quote">
           <h2>Enquiry desk</h2>
           <p style={{ color: 'rgba(255,255,255,.85)' }}>Review new enquiries, update their status and follow up with guests.</p>

@@ -33,10 +33,27 @@ service cloud.firestore {
         && (d.userId == null || (signedIn() && d.userId == request.auth.uid));
     }
 
+    // Demo data for trying the dashboard: only staff may add it, it must be marked source == 'demo',
+    // and only demo records can ever be deleted.
+    function validDemo(d) {
+      return isAdmin()
+        && d.keys().hasOnly(['guest_name', 'phone', 'email', 'check_in', 'check_out', 'adults', 'children',
+                             'room_type', 'message', 'source', 'status', 'userId', 'created_at', 'updated_at', 'staff_notes'])
+        && d.source == 'demo'
+        && validStatus(d.status)
+        && d.guest_name is string && d.guest_name.size() > 0 && d.guest_name.size() <= 80
+        && d.phone is string && d.phone.size() <= 20
+        && d.check_in is timestamp && d.check_out is timestamp && d.check_out > d.check_in
+        && d.adults is int && d.children is int
+        && d.created_at is timestamp && d.updated_at is timestamp
+        && d.userId == null
+        && optString(d, 'staff_notes', 2000);
+    }
+
     match /booking_enquiries/{id} {
       // Anyone may submit a valid enquiry; nobody but staff can list or read them,
       // except a signed-in guest reading their own.
-      allow create: if validNewEnquiry(request.resource.data);
+      allow create: if validNewEnquiry(request.resource.data) || validDemo(request.resource.data);
       allow read: if isAdmin() || (signedIn() && resource.data.userId == request.auth.uid);
       // Staff may change only status, notes and the update time.
       allow update: if isAdmin()
@@ -44,7 +61,7 @@ service cloud.firestore {
         && validStatus(request.resource.data.status)
         && optString(request.resource.data, 'staff_notes', 2000)
         && request.resource.data.updated_at == request.time;
-      allow delete: if false; // retention/deletion handled by agreed procedure (PRD 7.2)
+      allow delete: if isAdmin() && resource.data.source == 'demo'; // real enquiries: agreed retention procedure (PRD 7.2)
     }
 
     match /users/{uid} {

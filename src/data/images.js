@@ -11,8 +11,10 @@ export const IMAGE_MANIFEST = {
   logoFooter: { path: '2025/06/seaviewl.png', alt: 'Hotel Sea View logo' },
   favicon: { path: '2025/07/cropped-web-app-manifest-192x192-1-270x270.png', alt: '' },
 
-  front: { path: '2025/07/sea-view-front.jpg', alt: 'Hotel Sea View building from the street' },
-  frontAlt: { path: '2025/07/sea-view-frount.jpg', alt: 'Front view of Hotel Sea View, Kanyakumari' },
+  building: { path: '2025/07/Hotel-Sea-View-scaled.jpg', alt: 'Hotel Sea View building on East Car Street, Kanyakumari' },
+  entrance: { path: '2025/07/hotel-sea-view-door.jpg', alt: 'Hotel entrance porch at night' },
+  lobby: { path: '2025/07/sea-view-front.jpg', alt: 'Hotel lobby with leather sofas' },
+  dining: { path: '2025/07/sea-view-frount.jpg', alt: 'Dining area with lattice screens' },
 
   roomStandard: { path: '2025/06/Hotel-Sea-View-Standard-Rooms.jpg', alt: 'Standard Room with wooden furnishings' },
   roomDeluxe: { path: '2025/06/Hotel-Sea-View-Deluxe-Seaview-Rooms.jpg', alt: 'Deluxe Seaview Room facing the sea' },

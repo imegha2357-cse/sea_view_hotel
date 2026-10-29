@@ -1,4 +1,5 @@
-import { motion, useReducedMotion } from 'framer-motion';
+import { Fragment, useEffect, useRef, useState } from 'react';
+import { motion, useInView, useMotionValue, useReducedMotion, useSpring } from 'framer-motion';
 
 export const EASE = [0.22, 1, 0.36, 1];
 const VIEW = { once: true, amount: 0.25 };
@@ -110,4 +111,66 @@ export function WaveDivider({ color }) {
       </motion.svg>
     </div>
   );
+}
+
+// Big statements: each word rises with a stagger when the line enters view.
+export function SplitWords({ text, as = 'h2', className, delay = 0, onMount = false, ready = true }) {
+  const Tag = motion[as];
+  const words = text.split(' ');
+  const trigger = onMount ? { animate: ready ? 'show' : 'hide' } : { whileInView: 'show', viewport: VIEW };
+  return (
+    <Tag className={className} initial="hide" {...trigger} aria-label={text}>
+      {words.map((w, i) => (
+        <Fragment key={i}>
+          <span className="mask word" aria-hidden="true">
+            <motion.span variants={{ hide: { y: '110%', rotate: 4 }, show: { y: '0%', rotate: 0, transition: { duration: 0.9, ease: EASE, delay: delay + i * 0.06 } } }}>
+              {w}
+            </motion.span>
+          </span>
+          {i < words.length - 1 ? ' ' : null}
+        </Fragment>
+      ))}
+    </Tag>
+  );
+}
+
+// Buttons drift a few pixels toward the pointer (desktop only).
+export function Magnetic({ children, strength = 0.25, className }) {
+  const reduce = useReducedMotion();
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  const sx = useSpring(x, { stiffness: 220, damping: 18, mass: 0.4 });
+  const sy = useSpring(y, { stiffness: 220, damping: 18, mass: 0.4 });
+  const move = (e) => {
+    if (reduce || e.pointerType !== 'mouse') return;
+    const r = e.currentTarget.getBoundingClientRect();
+    x.set((e.clientX - r.left - r.width / 2) * strength);
+    y.set((e.clientY - r.top - r.height / 2) * strength);
+  };
+  return (
+    <motion.span className={`magnetic ${className || ''}`} style={{ x: sx, y: sy }} onPointerMove={move} onPointerLeave={() => { x.set(0); y.set(0); }}>
+      {children}
+    </motion.span>
+  );
+}
+
+// Verified numbers roll up once when they come into view.
+export function CountUp({ to, duration = 1.6 }) {
+  const ref = useRef(null);
+  const inView = useInView(ref, { once: true, amount: 0.6 });
+  const reduce = useReducedMotion();
+  const [n, setN] = useState(reduce ? to : 0);
+  useEffect(() => {
+    if (!inView || reduce) return undefined;
+    let raf;
+    const t0 = performance.now();
+    const tick = (t) => {
+      const p = Math.min(1, (t - t0) / (duration * 1000));
+      setN(Math.round(to * (1 - Math.pow(1 - p, 4))));
+      if (p < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [inView, reduce, to, duration]);
+  return <span ref={ref}>{n}</span>;
 }

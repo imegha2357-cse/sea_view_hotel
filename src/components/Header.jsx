@@ -6,6 +6,7 @@ import { HOTEL } from '../data/content';
 import { useAuth } from '../lib/auth';
 import { UserIcon } from './Icons';
 import { EASE } from './Motion';
+import { lockScroll, unlockScroll } from '../lib/scroll';
 
 export const NAV = [
   { id: 'rooms', label: 'Rooms' },
@@ -36,10 +37,14 @@ export default function Header() {
   const progress = useSpring(scrollYProgress, { stiffness: 140, damping: 30, mass: 0.3 });
 
   useEffect(() => {
-    document.body.style.overflow = open ? 'hidden' : '';
+    if (!open) return undefined;
+    lockScroll();
     const onKey = (e) => e.key === 'Escape' && setOpen(false);
     window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
+    return () => {
+      unlockScroll();
+      window.removeEventListener('keydown', onKey);
+    };
   }, [open]);
 
   const href = (id) => (onHome ? `#${id}` : `/#${id}`);
@@ -90,6 +95,7 @@ export default function Header() {
             role="dialog"
             aria-modal="true"
             aria-label="Menu"
+            data-lenis-prevent
           >
             <button className="close" aria-label="Close menu" onClick={() => setOpen(false)}>
               ×

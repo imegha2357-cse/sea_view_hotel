@@ -1,7 +1,7 @@
-node_modules
-dist
+*.log
 .env
 .env.local
-service-account.json
-*.log
 .firebase
+dist
+node_modules
+service-account.json

@@ -1,4 +1,6 @@
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { EASE } from './Motion';
 import { HOTEL, mapsLink } from '../data/content';
 import { Brand, NAV } from './Header';
 import { analyticsEnabled } from '../lib/analytics';
@@ -60,6 +62,13 @@ export default function Footer() {
           </ul>
         </div>
       </div>
+      <motion.div className="footer-word" aria-hidden="true" initial="hide" whileInView="show" viewport={{ once: true, amount: 0.4 }}>
+        {'SEA VIEW'.split('').map((c, i) => (
+          <span className="mask" key={i}>
+            <motion.span variants={{ hide: { y: '100%' }, show: { y: '0%', transition: { duration: 1, ease: EASE, delay: i * 0.05 } } }}>{c === ' ' ? '\u00a0' : c}</motion.span>
+          </span>
+        ))}
+      </motion.div>
       <div className="container footer-bottom">
         <span>© {new Date().getFullYear()} Hotel Sea View, Kanyakumari</span>
         <span style={{ display: 'flex', gap: 18, flexWrap: 'wrap' }}>
