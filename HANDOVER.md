@@ -162,3 +162,25 @@ Other changes:
   - The sea-view photo added to the Corner Deluxe Room.
 - **Blurry image fixed:** the old video still (`seaView`) now shows the HD corner-room sea view wherever it was used.
 - **Old site needs a check:** its media library contains a spam upload (an online-betting image from May 2026). The site should be checked for a break-in.
+
+## Update 5: the rest of the 100-feature list (except #1–5: online payment, prices, seasonal pricing, best-rate banner, promo codes)
+
+Admin panel (new sections)
+- Website → Menu, reviews and lists: restaurant menu, guest reviews, policies, local timings, festivals, awards, guest photos (Firestore `lists/{id}`). Nothing shows on the site until staff add entries.
+- Website → News and blog (`posts`), Settings and theme (`site/settings`: festival ribbon, check-in/out times, social links, review link, loyalty rules, room-guide info), Change history (undo any change; `history`).
+- Hotel → Requests (all website request forms), Rooms left per night (`inventory`, shows "Only N left"), Housekeeping board, Guests and loyalty (points, birthdays), QR codes, Staff accounts (owners only).
+- Room editor: view photo, 360° photo, accessibility list. Offer editor: show-from / hide-after dates, "package" type.
+
+Public site (new pages)
+- /request/{group,corporate,gift,tour,table,celebration,agent,callback}; /stay (room guide from the QR code, ?room=204)
+- /dining/menu, /news, /rooms/compare, /room-finder, recently viewed rooms, room view/360°/accessibility
+- Sunrise countdown on the home page, rainy-day ideas on Plan your visit, timings and festivals, awards on About, house rules on Policies, guest photos on Gallery, reviews from the list
+- Landing pages: /kanyakumari-sunrise-hotel, /hotel-near-kanyakumari-beach, /family-hotel-kanyakumari; Tamil /ta, Hindi /hi, Malayalam /ml; /brochure (print or PDF); /brand
+- 4 new guides; footer: social links from Settings, language links; Preferences: high contrast, reduce motion, save mobile data
+- Account: birthday/anniversary, loyalty points, saved guides, invite link (?ref=)
+- Chat: "Talk to a person" sends a summary to WhatsApp; uses check-in times and policies from the admin panel
+- Offline page; pre-arrival and thank-you emails (digest cron, needs RESEND_API_KEY and MAIL_FROM)
+
+Operations
+- GitHub Actions: daily content backup to the `backups` branch, hourly uptime check (opens an issue), 200 kB speed budget in CI. A `staging` branch gives Vercel preview deployments.
+- firestore.rules published 30 Oct 2026.
