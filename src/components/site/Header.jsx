@@ -154,7 +154,7 @@ export default function Header() {
   const { rooms, offers } = useSiteData();
   const MAIN_NAV = useMemo(() => buildNav({ rooms, offers }), [rooms, offers]);
   const pathname = usePathname();
-  const { user, isAdmin } = useAuth();
+  const { user } = useAuth();
   const [hero, setHero] = useState(true);
   const [scrolled, setScrolled] = useState(false);
   const [hidden, setHidden] = useState(false);
@@ -227,7 +227,8 @@ export default function Header() {
   };
 
   const solid = !hero || scrolled || Boolean(openId);
-  const account = user ? { href: isAdmin ? '/admin' : '/account', label: isAdmin ? 'Admin dashboard' : 'My dashboard' } : { href: '/login', label: 'Login / Join' };
+  // The admin panel is never linked from the public website; staff open /admin directly.
+  const account = user ? { href: '/account', label: 'My dashboard' } : { href: '/login', label: 'Login / Join' };
   const active = (item) => item.href && (pathname === item.href || pathname.startsWith(`${item.href}/`));
 
   return (

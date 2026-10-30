@@ -128,7 +128,6 @@ export const LEGAL_LINKS = [
   { label: 'Accessibility', href: '/accessibility' },
   { label: 'Hotel policies', href: '/policies' },
   { label: 'Sitemap', href: '/sitemap.xml' },
-  { label: 'Staff sign in', href: '/admin/login' },
 ];
 
 // Only the social profile the hotel actually publishes.
