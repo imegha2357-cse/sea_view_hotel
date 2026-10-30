@@ -40,7 +40,7 @@ export default {
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
           { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
           { key: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains' },
-          { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=(), payment=(), usb=()' },
+          { key: 'Permissions-Policy', value: 'camera=(), microphone=(self), geolocation=(), payment=(), usb=()' },
           { key: 'Cross-Origin-Opener-Policy', value: 'same-origin-allow-popups' },
           { key: 'Content-Security-Policy', value: csp },
         ],
@@ -48,6 +48,22 @@ export default {
     ];
   },
   async redirects() {
-    return [{ source: '/admin/', destination: '/admin', permanent: true }];
+    // Old WordPress addresses on hotelseaview.in, so links and Google results land on the right new page
+    // once the domain points here.
+    const old = [
+      ['/hotel-sea-view-kanyakumari', '/'],
+      ['/accommodations', '/rooms'],
+      ['/accommodation', '/rooms'],
+      ['/restaurant', '/dining'],
+      ['/bar', '/dining#bar'],
+      ['/conference-hall', '/meetings'],
+      ['/reservaton', '/enquire'],
+      ['/reservation', '/enquire'],
+      ['/contact', '/contact'],
+      ['/accommodation/:slug*', '/rooms'],
+      ['/room-type/:slug*', '/rooms'],
+      ['/rooms-2/:slug*', '/rooms'],
+    ].filter(([a, b]) => a !== b);
+    return [{ source: '/admin/', destination: '/admin', permanent: true }, ...old.map(([source, destination]) => ({ source, destination, permanent: true }))];
   },
 };

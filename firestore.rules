@@ -420,6 +420,27 @@ service cloud.firestore {
       allow delete: if isOwner();
     }
 
+    // Newsletter unsubscribes (anyone may add their own address; the sender skips these).
+    match /unsubscribes/{id} {
+      allow create: if request.resource.data.keys().hasOnly(['email', 'at'])
+        && request.resource.data.email is string && request.resource.data.email.matches('^[^\\s@]+@[^\\s@]+\\.[^\\s@]{2,}$') && request.resource.data.email.size() <= 120
+        && request.resource.data.at == request.time;
+      allow read: if isAdmin();
+      allow delete: if canEdit();
+    }
+
+    // Browsers that asked for offer alerts (push). Only the push address is stored, nothing personal.
+    match /push_subs/{id} {
+      allow create, update: if id.matches('^[a-f0-9]{32}$')
+        && request.resource.data.keys().hasOnly(['endpoint', 'p256dh', 'auth', 'created_at', 'lang'])
+        && request.resource.data.endpoint is string && request.resource.data.endpoint.matches('^https://.*') && request.resource.data.endpoint.size() <= 800
+        && request.resource.data.p256dh is string && request.resource.data.p256dh.size() <= 200
+        && request.resource.data.auth is string && request.resource.data.auth.size() <= 100
+        && request.resource.data.created_at == request.time
+        && optString(request.resource.data, 'lang', 8);
+      allow read, delete: if canEdit();
+    }
+
     match /{document=**} {
       allow read, write: if false;
     }

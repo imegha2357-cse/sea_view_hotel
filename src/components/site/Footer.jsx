@@ -11,6 +11,7 @@ import { loadFirebase, firebaseReady } from '@/lib/firebase';
 import { openCookieSettings } from '../CookieConsent';
 import Feedback from '../Feedback';
 import { Preferences } from '../Preferences';
+import PushOptIn from './PushOptIn';
 import { EASE, Icon } from './ui';
 import { useSiteData } from '../SiteData';
 
@@ -248,6 +249,7 @@ export default function Footer() {
             </li>
             <li>
               <Preferences />
+              <PushOptIn />
             </li>
           </ul>
         </div>

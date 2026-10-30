@@ -1,7 +1,7 @@
 // Feature #77 (and #94 offline page): a light offline layer. Pages always come from the network first (so a new release shows at once);
 // if the connection drops, the last copy is shown. Hashed build files are cached for speed.
 // Nothing from Firebase, /api or the image optimiser (/_next/image) is cached.
-const CACHE = 'seaview-v3';
+const CACHE = 'seaview-v4';
 const OFFLINE = ['/offline.html', '/brand/s-mark.png'];
 self.addEventListener('install', (e) => {
   self.skipWaiting();
@@ -41,4 +41,25 @@ self.addEventListener('fetch', (e) => {
       )
     );
   }
+});
+
+// Offer alerts (push notifications sent from the admin panel).
+self.addEventListener('push', (e) => {
+  let d = {};
+  try {
+    d = e.data ? e.data.json() : {};
+  } catch {
+    d = { title: 'Hotel Sea View', body: e.data ? e.data.text() : '' };
+  }
+  e.waitUntil(self.registration.showNotification(d.title || 'Hotel Sea View', { body: d.body || '', icon: '/brand/s-mark.png', badge: '/brand/s-mark.png', data: { url: d.url || '/offers' } }));
+});
+self.addEventListener('notificationclick', (e) => {
+  e.notification.close();
+  const url = new URL(e.notification.data?.url || '/', self.location.origin).href;
+  e.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((list) => {
+      const open = list.find((c) => c.url === url);
+      return open ? open.focus() : self.clients.openWindow(url);
+    })
+  );
 });

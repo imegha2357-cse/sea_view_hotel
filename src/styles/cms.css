@@ -808,3 +808,10 @@ html[data-theme='dark'] .pstrip-head h2, html[data-theme='dark'] .pstrip-text { 
 :root[data-contrast='high'][data-theme='dark'] body { color: #fff; background: #000; }
 .stay { padding-top: clamp(96px, 14vw, 128px); }
 .stay-k { margin: 0; letter-spacing: .14em; text-transform: uppercase; font-size: .75rem; color: #8a6a3f; }
+.setup-list { list-style: none; padding: 0; margin: 16px 0 28px; display: grid; gap: 10px; }
+.setup-list li { display: grid; grid-template-columns: 28px 1fr; gap: 12px; padding: 14px; border: 1px solid rgba(23,59,58,.14); border-radius: 12px; background: #fff; }
+.setup-list li.on { border-color: #2f7a55; }
+.setup-dot { width: 24px; height: 24px; border-radius: 50%; border: 2px solid rgba(23,59,58,.3); display: grid; place-items: center; color: #fff; font-size: .8rem; }
+.setup-list li.on .setup-dot { background: #2f7a55; border-color: #2f7a55; }
+.setup-list p { margin: 4px 0; }
+.setup-list code { font-size: .78rem; background: #F4F0E7; padding: 2px 6px; border-radius: 4px; }
