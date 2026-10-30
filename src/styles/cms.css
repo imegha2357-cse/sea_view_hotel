@@ -764,8 +764,14 @@ html[data-theme='dark'] .pstrip-head h2, html[data-theme='dark'] .pstrip-text { 
 .rv-quote-card blockquote { margin: 0 0 12px; font-size: 1.02rem; line-height: 1.6; }
 .rv-write { align-self: center; color: inherit; font-weight: 600; }
 
-.ribbon { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 8px 44px 8px 16px; background: #173B3A; color: #F4F0E7; font-size: .9rem; position: relative; text-align: center; flex-wrap: wrap; }
-.ribbon a { color: #e8c48f; }
+.ribbon { position: fixed; top: 0; left: 0; right: 0; z-index: 70; display: flex; align-items: center; justify-content: center; gap: 6px 12px; min-height: 36px; padding: 6px 48px 6px 16px; background: #102a29; color: #F4F0E7; font-size: .88rem; line-height: 1.35; text-align: center; flex-wrap: wrap; box-shadow: 0 1px 0 rgba(226,192,143,.25); }
+html[data-ribbon] .hdr { top: var(--ribbon-h, 0px); }
+html[data-ribbon] .tabs-bar { top: var(--ribbon-h, 0px); }
+html[data-ribbon][data-hdr='shown'] .tabs-bar { top: calc(var(--ribbon-h, 0px) + var(--header-h)); }
+html[data-ribbon] main#main { padding-top: var(--ribbon-h, 0px); }
+html[data-ribbon] .dash-top, html[data-ribbon] .stay { scroll-margin-top: var(--ribbon-h, 0px); }
+.ribbon a { color: #e8c48f; text-underline-offset: 3px; }
+.ribbon-art { flex: none; }
 .ribbon button { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); background: none; border: 0; color: inherit; font-size: 1.3rem; width: 36px; height: 36px; cursor: pointer; }
 .ribbon-art { width: 22px; height: 22px; border-radius: 50%; background: radial-gradient(circle, #f6d9a8 30%, #B58A55 70%); box-shadow: 0 0 12px #e8c48f; }
 .ribbon-diwali .ribbon-art { background: radial-gradient(circle at 50% 70%, #ffd27a 25%, #e07a1f 60%, transparent 62%); }
