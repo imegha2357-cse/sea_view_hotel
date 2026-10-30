@@ -4,6 +4,7 @@ import { slug } from '@/data/nav';
 import { meta } from '@/lib/meta';
 import PageTop from '@/components/site/PageTop';
 import Split from '@/components/site/Split';
+import Photo from '@/components/Photo';
 import { Chevron, LineTitle, Reveal } from '@/components/site/ui';
 
 export const metadata = meta('/experiences');
@@ -28,6 +29,11 @@ export default function Experiences() {
           <div className="itins">
             {ITINERARIES.map((it, i) => (
               <Reveal key={it.title} i={i} className="itin">
+                {it.image && (
+                  <div className="frame itin-photo zoom-hover">
+                    <Photo k={it.image} sizes="(max-width: 900px) 100vw, 45vw" alt="" />
+                  </div>
+                )}
                 <h3>{it.title}</h3>
                 <ol>
                   {it.steps.map((s) => (

@@ -4,6 +4,7 @@ import { meta } from '@/lib/meta';
 import PageTop from '@/components/site/PageTop';
 import Highlights from '@/components/site/Highlights';
 import Facilities from '@/components/site/Facilities';
+import PhotoStrip from '@/components/site/PhotoStrip';
 import { Chevron, LineTitle, Reveal } from '@/components/site/ui';
 import Photo from '@/components/Photo';
 
@@ -39,6 +40,20 @@ export default function About() {
           </Reveal>
         </div>
       </section>
+      <PhotoStrip
+        id="inside"
+        tone="cream"
+        kicker="Around the hotel"
+        title="Inside Hotel Sea View"
+        items={[
+          { image: 'frontNight', caption: 'The entrance porch at night' },
+          { image: 'lounge', caption: 'Lounge' },
+          { image: 'entranceDoors', caption: 'Entrance' },
+          { image: 'roomCornerView', caption: 'The view from a corner room' },
+          { image: 'dining', caption: 'Dining hall' },
+          { image: 'lobbyEntrance', caption: 'Lobby' },
+        ]}
+      />
       <Highlights slides={HIGHLIGHT_SLIDES} title="What to expect" id="expect" />
       <section className="sec" aria-labelledby="fac-h">
         <div className="container wide">

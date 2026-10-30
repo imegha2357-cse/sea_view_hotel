@@ -176,6 +176,15 @@ export const GALLERY = [
   { image: 'roomStandard', cat: 'Rooms' },
   { image: 'bar2', cat: 'Dining' },
   { image: 'gandhi', cat: 'Views' },
+  { image: 'lounge', cat: 'Hotel' },
+  { image: 'lobbyEntrance', cat: 'Hotel' },
+  { image: 'foyer', cat: 'Hotel' },
+  { image: 'roomCornerView', cat: 'Rooms' },
+  { image: 'buffetArea', cat: 'Dining' },
+  { image: 'buffet', cat: 'Dining' },
+  { image: 'restaurantHall', cat: 'Dining' },
+  { image: 'conferenceTheatre', cat: 'Hotel' },
+  { image: 'meetingHall', cat: 'Hotel' },
 ];
 
 // "Our benefits" from the original site, rewritten. Templated claims (e.g. "historical luxury") removed.
@@ -323,7 +332,12 @@ export const GUIDES = [
   {
     slug: 'sunrise-in-kanyakumari',
     title: 'Seeing the sunrise in Kanyakumari',
-    image: 'seaView',
+    image: 'roomCornerView',
+    photos: [
+      { image: 'vivekananda', caption: 'The Vivekananda Rock Memorial at first light' },
+      { image: 'roomCornerView', caption: 'The view from a corner room' },
+      { image: 'thiruvalluvar', caption: 'The Thiruvalluvar Statue' },
+    ],
     summary: 'Where to watch the sun come up over the sea, when to be there and what to expect.',
     body: [
       ['p', 'Kanyakumari sits at the southern tip of India, where the Arabian Sea, the Bay of Bengal and the Indian Ocean meet. On a clear morning the sun rises straight out of the sea, with the Vivekananda Rock Memorial and the Thiruvalluvar Statue in front of it.'],
@@ -339,6 +353,11 @@ export const GUIDES = [
     slug: 'best-time-to-visit-kanyakumari',
     title: 'The best time to visit Kanyakumari',
     image: 'beach',
+    photos: [
+      { image: 'beach', caption: 'Kanyakumari beach' },
+      { image: 'sunset', caption: 'Sunset Point' },
+      { image: 'gandhi', caption: 'Gandhi Memorial Mandapam' },
+    ],
     summary: 'What the weather is like through the year, and how to plan around it.',
     body: [
       ['p', 'Kanyakumari is warm all year. The difference between seasons is mostly about heat, humidity and rain.'],
@@ -388,6 +407,7 @@ export const HOW_TO_REACH = [
 export const ITINERARIES = [
   {
     title: 'One day at the tip of India',
+    image: 'vivekananda',
     steps: [
       { time: 'Sunrise', text: 'Watch the sun come up over the sea from a sea-facing room or the shore.' },
       { time: 'Morning', text: 'Take the ferry to the Vivekananda Rock Memorial and the Thiruvalluvar Statue.' },
@@ -398,6 +418,7 @@ export const ITINERARIES = [
   },
   {
     title: 'Two relaxed days',
+    image: 'sunset',
     steps: [
       { time: 'Day 1', text: 'Arrive, settle in, sunset at Sunset Point and the beach in the evening.' },
       { time: 'Day 2 morning', text: 'Sunrise from your room, then the ferry to the island memorials.' },

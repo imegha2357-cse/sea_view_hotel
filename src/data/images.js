@@ -9,10 +9,11 @@ const P = (file, w, h, alt) => ({ src: `/images/${file}`, width: w, height: h, a
 
 export const PHOTOS = {
   building: P('Hotel-Sea-View.jpg', 2560, 1097, 'Hotel Sea View building on East Car Street, Kanyakumari'),
-  entrance: P('hotel-sea-view-door.jpg', 1360, 765, 'Hotel entrance porch at night'),
+  entrance: P('Hotel-Sea-View-Front-Night.jpg', 2560, 1440, 'Hotel entrance porch at night'),
   lobby: P('sea-view-front.jpg', 2560, 1923, 'Hotel lobby with leather sofas and a flower rangoli'),
   dining: P('sea-view-frount.jpg', 2560, 1919, 'Dining area with lattice screens'),
-  seaView: { src: '/media/sea-loop-poster.jpg', width: 1600, height: 666, alt: 'View from a sea-facing room over Kanyakumari towards the Vivekananda Rock Memorial' },
+  // 'seaView' used to be a blurry video still; it now shows the HD corner-room view of the sea.
+  seaView: P('Hotel-Sea-View-Corner-Room-View.jpg', 1600, 630, 'View from a sea-facing room towards the Vivekananda Rock Memorial'),
   tourPoster: { src: '/media/room-tour-poster.jpg', width: 1280, height: 720, alt: 'Still from the Hotel Sea View room tour video' },
 
   roomStandard: P('Hotel-Sea-View-Standard-Rooms.jpg', 2560, 1704, 'Standard Room with wooden furnishings'),
@@ -32,10 +33,23 @@ export const PHOTOS = {
   beach: P('kanyakumari-beach.jpg', 2560, 1905, 'Kanyakumari beach'),
   gandhi: P('Gandhi-Memorial-kanyakumari.jpg', 2560, 1905, 'Gandhi Memorial Mandapam'),
   sunset: P('Sun-Set-Point.jpg', 2560, 1905, 'Sunset Point, Kanyakumari'),
+
+  // More of the hotel's own photos from hotelseaview.in (small ones enlarged with Real-ESRGAN).
+  frontNight: P('Hotel-Sea-View-Front-Night.jpg', 2560, 1440, 'Hotel Sea View entrance porch lit up at night'),
+  lounge: P('Hotel-Sea-View-Lounge.jpg', 1360, 1020, 'Lounge with leather sofas beside the lobby'),
+  lobbyEntrance: P('Hotel-Sea-View-Lobby-Entrance.jpg', 1360, 1020, 'Lobby and the glass entrance doors'),
+  foyer: P('Hotel-Sea-View-Foyer.jpg', 1440, 1920, 'Marble steps up to the hotel lobby'),
+  entranceDoors: P('Hotel-Sea-View-Entrance-Doors.jpg', 1440, 1920, 'The hotel entrance with brass rope stands'),
+  buffet: P('Hotel-Sea-View-Buffet.jpg', 1360, 764, 'Buffet counter in the restaurant'),
+  buffetArea: P('Hotel-Sea-View-Buffet-Area.jpg', 1360, 1020, 'Buffet area under the carved ceiling'),
+  restaurantHall: P('Hotel-Sea-View-Restaurant-Hall.jpg', 1360, 764, 'Restaurant seating along the hall'),
+  meetingHall: P('Hotel-Sea-View-Meeting-Hall.jpg', 1360, 518, 'Hall set with rows of chairs for an event'),
+  conferenceTheatre: P('Hotel-Sea-View-Conference-Theatre.jpg', 2560, 836, 'Conference hall in theatre-style seating'),
+  roomCornerView: P('Hotel-Sea-View-Corner-Room-View.jpg', 1600, 630, 'Corner room window looking out to the Vivekananda Rock Memorial'),
 };
 
 // Enlarged with Real-ESRGAN x4 from the low-resolution originals (all others are the hotel's own HD files).
-export const UPSCALED = ['roomStandard', 'roomCorner', 'roomTwin', 'roomSuite', 'lobby', 'dining', 'meeting', 'vivekananda', 'thiruvalluvar', 'beach', 'gandhi', 'sunset'];
+export const UPSCALED = ['foyer', 'entranceDoors', 'conferenceTheatre', 'roomStandard', 'roomCorner', 'roomTwin', 'roomSuite', 'lobby', 'dining', 'meeting', 'vivekananda', 'thiruvalluvar', 'beach', 'gandhi', 'sunset'];
 
 // A photo reference is either a built-in key above (e.g. 'roomDeluxe') or 'm:<id>' for a photo uploaded
 // in the admin panel (served by /api/media/<id>). Unknown references return null, so nothing broken shows.

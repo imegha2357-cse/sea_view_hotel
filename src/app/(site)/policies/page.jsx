@@ -3,6 +3,7 @@ import { meta } from '@/lib/meta';
 import { JsonLd, faqLd } from '@/lib/ld';
 import PageTop from '@/components/site/PageTop';
 import Faq from '@/components/site/Faq';
+import PhotoStrip from '@/components/site/PhotoStrip';
 import { LineTitle, Reveal } from '@/components/site/ui';
 
 export const metadata = meta('/policies');
@@ -26,6 +27,18 @@ export default function Policies() {
           </div>
         </div>
       </section>
+      <PhotoStrip
+        id="arrival"
+        kicker="Your arrival"
+        title="Reception, lounge and lobby"
+        text="Reception is up the marble steps from the entrance porch. Our team can help with anything not covered on this page."
+        items={[
+          { image: 'entranceDoors', caption: 'Entrance' },
+          { image: 'lobbyEntrance', caption: 'Lobby' },
+          { image: 'lounge', caption: 'Lounge' },
+          { image: 'frontNight', caption: 'The entrance porch at night' },
+        ]}
+      />
       <section className="sec grey" id="faqs" aria-labelledby="faq-h">
         <div className="container" style={{ maxWidth: 920 }}>
           <div className="sec-head center">

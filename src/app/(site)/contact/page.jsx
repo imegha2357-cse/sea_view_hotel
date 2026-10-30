@@ -3,6 +3,7 @@ import { meta } from '@/lib/meta';
 import PageTop from '@/components/site/PageTop';
 import MapEmbed from '@/components/site/MapEmbed';
 import ReachTabs from '@/components/site/ReachTabs';
+import PhotoStrip from '@/components/site/PhotoStrip';
 import { Chevron, LineTitle, Reveal } from '@/components/site/ui';
 
 export const metadata = meta('/contact');
@@ -37,6 +38,19 @@ export default function Contact() {
           </div>
         </div>
       </section>
+      <PhotoStrip
+        id="arrive"
+        kicker="When you arrive"
+        title="Finding us on East Car Street"
+        text="Look for the hotel's name on the rooftop. The entrance porch is lit at night, and reception is up the marble steps."
+        items={[
+          { image: 'frontNight', caption: 'The entrance at night' },
+          { image: 'building', caption: 'Hotel Sea View, East Car Street' },
+          { image: 'foyer', caption: 'Steps up to the lobby' },
+          { image: 'lobbyEntrance', caption: 'Lobby and entrance' },
+          { image: 'lounge', caption: 'Lounge beside the lobby' },
+        ]}
+      />
       <section className="sec cream" id="reach" aria-labelledby="reach-h">
         <div className="container wide loc-grid">
           <Reveal style={{ display: 'grid', gap: 20, alignContent: 'start' }}>

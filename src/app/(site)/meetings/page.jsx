@@ -2,6 +2,7 @@ import { MEETINGS } from '@/data/content';
 import { meta } from '@/lib/meta';
 import PageTop from '@/components/site/PageTop';
 import Split from '@/components/site/Split';
+import PhotoStrip from '@/components/site/PhotoStrip';
 import EnquiryForm from '@/components/EnquiryForm';
 import { LineTitle } from '@/components/site/ui';
 import { EventGrid, EventSteps } from '@/components/site/EventTypes';
@@ -14,10 +15,10 @@ export default function Meetings() {
       <PageTop slot="meetings" title="Meetings and events" text="A conference hall for meetings, training and family functions." trail={[{ label: 'Meetings and events', href: '/meetings' }]} />
       <section className="sec" style={{ paddingTop: 24 }}>
         <div className="container wide">
-          <Split images={[MEETINGS.image]} tag="Conference hall" title={MEETINGS.title} text={MEETINGS.text} list={MEETINGS.facts} />
+          <Split images={[MEETINGS.image, 'conferenceTheatre']} tag="Conference hall" title={MEETINGS.title} text={MEETINGS.text} list={MEETINGS.facts} />
           <Split
             id="weddings-hall"
-            images={['restaurant2']}
+            images={['meetingHall']}
             tag="Celebrations"
             title="Weddings and family events"
             text="Celebrate with family and friends, with catering from Sea View Restaurant and rooms for guests travelling in. Tell us the date and numbers and we will plan it with you."
@@ -26,6 +27,18 @@ export default function Meetings() {
           />
         </div>
       </section>
+      <PhotoStrip
+        id="event-photos"
+        kicker="Spaces"
+        title="Where your event takes place"
+        items={[
+          { image: 'conferenceTheatre', caption: 'Conference hall, theatre seating' },
+          { image: 'meeting', caption: 'Set up for a meeting' },
+          { image: 'meetingHall', caption: 'Rows of chairs for a function' },
+          { image: 'buffetArea', caption: 'Buffet for your guests' },
+          { image: 'dining', caption: 'Dining hall' },
+        ]}
+      />
       <section className="sec cream" id="occasions" aria-labelledby="occ-h">
         <div className="container wide">
           <div className="sec-head">

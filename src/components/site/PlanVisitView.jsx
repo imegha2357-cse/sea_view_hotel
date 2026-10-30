@@ -1,5 +1,6 @@
 'use client';
 
+import Photo from '../Photo';
 import { useEffect, useMemo, useState } from 'react';
 import { GEO, HOTEL, HOW_TO_REACH, ITINERARIES, mapsLink } from '@/data/content';
 import { sunOn } from '@/lib/sun';
@@ -137,6 +138,11 @@ export default function PlanVisitView() {
           <div className="itins">
             {ITINERARIES.map((it) => (
               <article key={it.title} className="itin">
+                {it.image && (
+                  <div className="frame itin-photo zoom-hover">
+                    <Photo k={it.image} sizes="(max-width: 900px) 100vw, 45vw" alt="" />
+                  </div>
+                )}
                 <h3>{it.title}</h3>
                 <ol>
                   {it.steps.map((s) => (

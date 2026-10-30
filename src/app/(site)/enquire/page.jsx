@@ -4,6 +4,7 @@ import { meta } from '@/lib/meta';
 import Crumbs from '@/components/site/Crumbs';
 import EnquireForm from '@/components/site/EnquireForm';
 import { LineTitle } from '@/components/site/ui';
+import PhotoStrip from '@/components/site/PhotoStrip';
 
 export const metadata = meta('/enquire');
 
@@ -24,6 +25,19 @@ export default function Enquire() {
           </Suspense>
         </div>
       </section>
+      <PhotoStrip
+        id="stay"
+        tone="cream"
+        kicker="Your stay"
+        title="What is waiting for you"
+        items={[
+          { image: 'roomCornerView', caption: 'Sunrise view from a corner room' },
+          { image: 'roomDeluxe', caption: 'Deluxe Seaview Room' },
+          { image: 'roomSuite', caption: 'Executive Suite' },
+          { image: 'dining', caption: 'Sea View Restaurant' },
+          { image: 'frontNight', caption: 'Hotel Sea View at night' },
+        ]}
+      />
     </div>
   );
 }

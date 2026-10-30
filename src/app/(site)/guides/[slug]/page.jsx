@@ -1,3 +1,5 @@
+import { Fragment } from 'react';
+import Photo from '@/components/Photo';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { GUIDES } from '@/data/content';
@@ -36,7 +38,23 @@ export default function Guide({ params }) {
       <article className="sec" style={{ paddingTop: 24 }}>
         <div className="container prose prose-wrap guide-body">
           <p className="lead">{g.summary}</p>
-          {g.body.map(([tag, text]) => (tag === 'h2' ? <h2 key={text}>{text}</h2> : <p key={text.slice(0, 30)}>{text}</p>))}
+          {g.body.map(([tag, text], i) => (
+            <Fragment key={text.slice(0, 30)}>
+              {tag === 'h2' ? <h2>{text}</h2> : <p>{text}</p>}
+              {i === 1 && g.photos?.length > 0 && (
+                <div className="guide-photos">
+                  {g.photos.map((ph, k) => (
+                    <figure key={ph.image} className={k === 0 ? 'wide' : ''}>
+                      <div className="frame zoom-hover">
+                        <Photo k={ph.image} sizes={k === 0 ? '(max-width: 900px) 100vw, 760px' : '(max-width: 900px) 50vw, 380px'} alt={ph.caption} />
+                      </div>
+                      <figcaption>{ph.caption}</figcaption>
+                    </figure>
+                  ))}
+                </div>
+              )}
+            </Fragment>
+          ))}
           <div className="card-actions" style={{ marginTop: 12 }}>
             <Link href="/plan-your-visit" className="btn solid">
               Sunrise times and weather

@@ -207,7 +207,10 @@ export default async function Home() {
         </div>
       </section>
 
-      <section className="sec cta-band">
+      <section className="sec cta-band has-photo">
+        <div className="cta-photo" aria-hidden="true">
+          <Photo k="sunset" sizes="100vw" alt="" quality={60} />
+        </div>
         <div className="container">
           <h2>Wake up to the sunrise</h2>
           <p>Send us your dates and our team will confirm availability and the best rate by phone or WhatsApp.</p>
