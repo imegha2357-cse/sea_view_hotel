@@ -147,3 +147,18 @@ Other changes:
   It still never invents prices or availability. With `ANTHROPIC_API_KEY` set, Claude writes the replies using these findings.
 - **Loader:** the Sea View logo loader shows on every move between pages (at least 0.65 s, and never more than 6 s).
 - **Hotel information:** the homepage section now has a contact card (copy buttons, today's sunrise and sunset) and facility tiles around a photo of the lobby.
+
+## October 2026 update 4: more photos
+
+- **New photos:** 11 more of the hotel's own photos from the hotelseaview.in media library are now on the site: the night entrance porch, lounge, lobby, foyer, entrance, buffet, restaurant hall, meeting and conference halls, and the sea view from a corner room. Small originals were enlarged with Real-ESRGAN. Three uploads on the old site were duplicates of photos already in use and were left out.
+- **Where they appear:**
+  - Captioned photo strips (tap to open full screen) on Dining, Meetings, Contact, About, Policies, Plan your visit and Enquire.
+  - Photos inside the two travel guides and on the suggested-plan cards.
+  - A sunset photo behind the closing "Wake up to the sunrise" band.
+  - A photo on the page-not-found screen.
+- **Added through the admin panel:**
+  - 9 photos added to the gallery (now 28).
+  - A night-entrance slide added to the homepage (now 5 slides).
+  - The sea-view photo added to the Corner Deluxe Room.
+- **Blurry image fixed:** the old video still (`seaView`) now shows the HD corner-room sea view wherever it was used.
+- **Old site needs a check:** its media library contains a spam upload (an online-betting image from May 2026). The site should be checked for a break-in.
