@@ -1,5 +1,6 @@
 import { EXPERIENCES, HOTEL } from '@/data/content';
 import { meta } from '@/lib/meta';
+import { JsonLd, restaurantLd } from '@/lib/ld';
 import PageTop from '@/components/site/PageTop';
 import Split from '@/components/site/Split';
 import PhotoStrip from '@/components/site/PhotoStrip';
@@ -11,6 +12,7 @@ export default function Dining() {
   const bar = EXPERIENCES.find((e) => e.id === 'bar');
   return (
     <>
+      <JsonLd data={restaurantLd} />
       <PageTop slot="dining" title="Dining" text="Sea View Restaurant, the Wave Bar and room service around the clock." trail={[{ label: 'Dining', href: '/dining' }]} />
       <section className="sec" style={{ paddingTop: 24 }}>
         <div className="container wide">
@@ -18,6 +20,12 @@ export default function Dining() {
             <div className="card-actions">
               <a href={`tel:${HOTEL.restaurantPhoneHref}`} className="btn solid">
                 Call the restaurant
+              </a>
+              <a href="/request/table" className="btn outline">
+                Reserve a table
+              </a>
+              <a href="/dining/menu" className="btn outline">
+                See the menu
               </a>
             </div>
           </Split>

@@ -18,6 +18,13 @@ export function applyDisplayPrefs(p = read()) {
   else delete root.dataset.theme;
   if (p.large) root.dataset.text = 'large';
   else delete root.dataset.text;
+  if (p.contrast) root.dataset.contrast = 'high';
+  else delete root.dataset.contrast;
+  if (p.still) root.dataset.motion = 'reduce';
+  else delete root.dataset.motion;
+  if (p.lowData) root.dataset.data = 'low';
+  else delete root.dataset.data;
+  window.dispatchEvent(new Event('sv-display'));
 }
 
 export function Preferences() {
@@ -36,6 +43,15 @@ export function Preferences() {
       </button>
       <button type="button" className="footer-link" onClick={() => setP((s) => ({ ...s, large: !s.large }))} aria-pressed={!!p.large}>
         {p.large ? 'Normal text' : 'Larger text'}
+      </button>
+      <button type="button" className="footer-link" onClick={() => setP((s) => ({ ...s, contrast: !s.contrast }))} aria-pressed={!!p.contrast}>
+        {p.contrast ? 'Normal contrast' : 'High contrast'}
+      </button>
+      <button type="button" className="footer-link" onClick={() => setP((s) => ({ ...s, still: !s.still }))} aria-pressed={!!p.still}>
+        {p.still ? 'Allow animation' : 'Reduce motion'}
+      </button>
+      <button type="button" className="footer-link" onClick={() => setP((s) => ({ ...s, lowData: !s.lowData }))} aria-pressed={!!p.lowData}>
+        {p.lowData ? 'Full-quality photos' : 'Save mobile data'}
       </button>
     </>
   );

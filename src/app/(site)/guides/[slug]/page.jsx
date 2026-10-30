@@ -8,6 +8,7 @@ import { SITE_URL } from '@/data/site';
 import { meta } from '@/lib/meta';
 import { JsonLd } from '@/lib/ld';
 import PageTop from '@/components/site/PageTop';
+import SaveButton from '@/components/site/SaveButton';
 import { Chevron } from '@/components/site/ui';
 
 export const dynamicParams = false;
@@ -38,6 +39,7 @@ export default function Guide({ params }) {
       <article className="sec" style={{ paddingTop: 24 }}>
         <div className="container prose prose-wrap guide-body">
           <p className="lead">{g.summary}</p>
+          <SaveButton href={`/guides/${g.slug}`} title={g.title} />
           {g.body.map(([tag, text], i) => (
             <Fragment key={text.slice(0, 30)}>
               {tag === 'h2' ? <h2>{text}</h2> : <p>{text}</p>}

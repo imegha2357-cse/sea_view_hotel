@@ -1,0 +1,33 @@
+# Feature #96: a daily copy of the website content (rooms, offers, lists, posts, settings, photos
+# list) saved to the "backups" branch of this repository. Reads the public Firestore REST API only
+# (the same data the website shows); no secrets needed. Guest data is never included.
+name: Daily content backup
+on:
+  schedule:
+    - cron: '17 21 * * *' # 02:47 IST
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: node scripts/backup-content.mjs backup
+        env:
+          FIREBASE_PROJECT_ID: ${{ vars.FIREBASE_PROJECT_ID || 'sea-view-hotel' }}
+          FIREBASE_API_KEY: ${{ vars.NEXT_PUBLIC_FIREBASE_API_KEY || secrets.NEXT_PUBLIC_FIREBASE_API_KEY }}
+      - name: Commit to the backups branch
+        run: |
+          git config user.name "Sea View backup"
+          git config user.email "actions@users.noreply.github.com"
+          mv backup /tmp/backup
+          git fetch origin backups || true
+          if git rev-parse --verify origin/backups >/dev/null 2>&1; then git checkout -B backups origin/backups; else git checkout --orphan backups && git rm -rf . >/dev/null; fi
+          rm -rf content && mkdir -p content && cp -r /tmp/backup/* content/
+          git add content
+          git commit -m "Content backup $(date -u +%F)" || echo "No changes"
+          git push origin backups

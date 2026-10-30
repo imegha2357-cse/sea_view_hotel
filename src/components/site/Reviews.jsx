@@ -37,11 +37,12 @@ const WAYS = [
 
 const WORDS = ['Stories', 'from', 'the', 'shore'];
 
-export default function Reviews() {
+export default function Reviews({ items = [], reviewLink = '' }) {
   const ref = useRef(null);
   const reduce = useReducedMotion();
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] });
   const y = useTransform(scrollYProgress, [0, 1], reduce ? ['0%', '0%'] : ['-8%', '8%']);
+  const list = items.length ? items.map((t) => ({ quote: t.text, name: t.name, from: t.place, date: t.date ? new Date(t.date + 'T00:00:00Z').toLocaleDateString('en-IN', { month: 'short', year: 'numeric', timeZone: 'UTC' }) : '', source: t.source })) : TESTIMONIALS;
   const stagger = (i) => ({ initial: { opacity: 0, y: 24 }, whileInView: { opacity: 1, y: 0 }, viewport: { once: true, amount: 0.4 }, transition: { duration: 0.7, ease: EASE, delay: i * 0.12 } });
 
   return (
@@ -71,10 +72,10 @@ export default function Reviews() {
           </motion.p>
         </div>
 
-        {TESTIMONIALS.length > 0 ? (
+        {list.length > 0 ? (
           <div className="rv-cards">
-            {TESTIMONIALS.map((t, i) => (
-              <motion.figure key={t.quote.slice(0, 20)} className="rv-card" {...stagger(i)}>
+            {list.slice(0, 6).map((t, i) => (
+              <motion.figure key={`${t.name}-${i}`} className="rv-card rv-quote-card" {...stagger(i)}>
                 <blockquote>“{t.quote}”</blockquote>
                 <figcaption>
                   <b>{t.name}</b>
@@ -82,6 +83,11 @@ export default function Reviews() {
                 </figcaption>
               </motion.figure>
             ))}
+            {reviewLink && (
+              <a className="rv-write" href={reviewLink} target="_blank" rel="noopener noreferrer">
+                Stayed with us? Write a review <span aria-hidden="true">→</span>
+              </a>
+            )}
           </div>
         ) : (
           <ul className="rv-cards" role="list">

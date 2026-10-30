@@ -8,11 +8,12 @@ const fallback = {
   rooms: SEED_ROOMS.map((r) => ({ id: r.id, name: r.name, image: r.images[0], rate: r.rate, category: r.category })),
   offers: SEED_OFFERS.map((o) => ({ code: o.code, title: o.title, image: o.image, room: o.room, type: o.type })),
   categories: SEED_CATEGORIES,
+  settings: { theme: 'none', social: {}, check_in: '', check_out: '', review_link: '' },
 };
 const Ctx = createContext(fallback);
 
 export function SiteDataProvider({ value, children }) {
-  return <Ctx.Provider value={value || fallback}>{children}</Ctx.Provider>;
+  return <Ctx.Provider value={value ? { ...fallback, ...value, settings: { ...fallback.settings, ...(value.settings || {}) } } : fallback}>{children}</Ctx.Provider>;
 }
 
 export const useSiteData = () => useContext(Ctx);

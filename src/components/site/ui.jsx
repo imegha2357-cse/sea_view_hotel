@@ -107,4 +107,26 @@ export const Icon = {
       <circle cx="12" cy="9.5" r="2.5" />
     </svg>
   ),
+  instagram: () => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+      <rect x="3.5" y="3.5" width="17" height="17" rx="5" />
+      <circle cx="12" cy="12" r="4" />
+      <circle cx="17.3" cy="6.7" r="1" fill="currentColor" stroke="none" />
+    </svg>
+  ),
+  youtube: () => (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M21.6 7.2a2.6 2.6 0 0 0-1.8-1.8C18.2 5 12 5 12 5s-6.2 0-7.8.4A2.6 2.6 0 0 0 2.4 7.2 27 27 0 0 0 2 12a27 27 0 0 0 .4 4.8 2.6 2.6 0 0 0 1.8 1.8C5.8 19 12 19 12 19s6.2 0 7.8-.4a2.6 2.6 0 0 0 1.8-1.8A27 27 0 0 0 22 12a27 27 0 0 0-.4-4.8zM10 15V9l5.2 3z" />
+    </svg>
+  ),
+  x: () => (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M17.8 3h3.1l-6.8 7.7 8 10.3h-6.3l-4.9-6.4L5.3 21H2.2l7.2-8.3L1.8 3h6.4l4.4 5.9zM16.7 19.2h1.7L7.2 4.7H5.4z" />
+    </svg>
+  ),
+  google: () => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+      <path d="M20 12.2c0-.6-.1-1.2-.2-1.7H12v3.3h4.5a4 4 0 0 1-1.7 2.6v2.1h2.8c1.6-1.5 2.4-3.7 2.4-6.3z M12 20.5c2.3 0 4.2-.8 5.6-2l-2.8-2.1c-.8.5-1.7.8-2.8.8a5 5 0 0 1-4.7-3.4H4.4v2.2A8.5 8.5 0 0 0 12 20.5z M7.3 13.8a5 5 0 0 1 0-3.2V8.4H4.4a8.5 8.5 0 0 0 0 7.6z M12 6.8c1.2 0 2.3.4 3.2 1.2l2.4-2.4A8.5 8.5 0 0 0 4.4 8.4l2.9 2.2A5 5 0 0 1 12 6.8z" />
+    </svg>
+  ),
 };

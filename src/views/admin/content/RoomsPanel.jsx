@@ -12,6 +12,7 @@ function RoomEditor({ room, content, me, canEdit, onDone, reload }) {
   const isNew = !room.id;
   const [v, setV] = useState({ ...EMPTY, ...room, rate: room.rate ?? '', features: room.features || [], images: room.images || [], amenities: room.amenities || [] });
   const [featureText, setFeatureText] = useState((room.features || []).join('\n'));
+  const [accessText, setAccessText] = useState((room.access || []).join('\n'));
   const [picker, setPicker] = useState(null); // null | {mode:'add'} | {mode:'replace', i}
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState(null);
@@ -53,6 +54,9 @@ function RoomEditor({ room, content, me, canEdit, onDone, reload }) {
         features: featureText.split('\n').map((s) => s.trim()).filter(Boolean).slice(0, 20),
         amenities: v.amenities.slice(0, 40),
         images: v.images.slice(0, 20),
+        view_image: v.view_image || '',
+        tour360: v.tour360 || '',
+        access: accessText.split('\n').map((s) => s.trim().slice(0, 120)).filter(Boolean).slice(0, 20),
         order: room.order ?? content.rooms.length + 1,
         published: Boolean(v.published),
       };
@@ -175,6 +179,31 @@ function RoomEditor({ room, content, me, canEdit, onDone, reload }) {
             )}
           </ol>
         </div>
+        <div className="cm-grid">
+          {[
+            ['view_image', 'The view from this room (photo taken from the window or balcony)'],
+            ['tour360', '360° photo (a panorama taken with a phone in panorama or 360 mode)'],
+          ].map(([k, l]) => (
+            <div key={k} className="cm-field">
+              <span className="lbl">{l}</span>
+              <div className="cm-inline">
+                <Thumb refKey={v[k]} />
+                <button type="button" className="text-btn" onClick={() => setPicker({ mode: k })}>
+                  {v[k] ? 'Change' : 'Choose photo'}
+                </button>
+                {v[k] && (
+                  <button type="button" className="text-btn" onClick={() => setV((x) => ({ ...x, [k]: '' }))}>
+                    Remove
+                  </button>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+        <label className="cm-field">
+          <span className="lbl">Accessibility (one per line, only what is true, e.g. "Lift to this floor", "Grab rails in bathroom")</span>
+          <textarea className="cm-input" rows={3} value={accessText} onChange={(e) => setAccessText(e.target.value)} />
+        </label>
         <label className="check">
           <input type="checkbox" checked={v.published} onChange={set('published')} />
           <span>Show this room type on the website</span>
@@ -205,6 +234,10 @@ function RoomEditor({ room, content, me, canEdit, onDone, reload }) {
             onClose={() => setPicker(null)}
             title={picker.mode === 'replace' ? 'Replace this photo' : 'Add a photo to this room'}
             onPick={(ref) => {
+              if (picker.mode === 'view_image' || picker.mode === 'tour360') {
+                setV((x) => ({ ...x, [picker.mode]: ref }));
+                return setPicker(null);
+              }
               setV((x) => ({ ...x, images: picker.mode === 'replace' ? x.images.map((r, k) => (k === picker.i ? ref : r)) : [...x.images, ref] }));
               setPicker(null);
             }}
@@ -326,7 +359,7 @@ export default function RoomsPanel({ content, me, canEdit, reload }) {
     setErr('');
     setBusy(r.id);
     try {
-      await deleteRoom(r.id);
+      await deleteRoom(r.id, me);
       await reload();
       setNote(`${r.name} deleted. Its page now shows “not found” and it is gone from menus and lists.`);
     } catch (e) {

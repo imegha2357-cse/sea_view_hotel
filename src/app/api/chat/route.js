@@ -3,8 +3,8 @@
 // has marked fully booked, recommends and compares rooms, and prepares a pre-filled enquiry.
 // With ANTHROPIC_API_KEY set in Vercel, Claude writes the reply from the hotel's information plus those
 // findings; otherwise the reasoning's own reply is used. Nothing is stored on the server.
-import { getRooms } from '@/lib/cms-server';
-import { systemPrompt } from '@/lib/hotel-knowledge';
+import { getList, getRooms, getSettings } from '@/lib/cms-server';
+import { setLiveFacts, systemPrompt } from '@/lib/hotel-knowledge';
 import { think } from '@/lib/chat-brain';
 import { config } from '@/lib/firebase';
 
@@ -107,7 +107,8 @@ export async function POST(req) {
   const last = messages[messages.length - 1];
   if (!last || last.role !== 'user') return Response.json({ error: 'Ask a question' }, { status: 400 });
 
-  const [rooms, blocked] = await Promise.all([getRooms().catch(() => []), blockedNights()]);
+  const [rooms, blocked, settings, policies] = await Promise.all([getRooms().catch(() => []), blockedNights(), getSettings().catch(() => ({})), getList('policies').catch(() => [])]);
+  setLiveFacts({ checkIn: settings.check_in, checkOut: settings.check_out, policies });
   const brain = think(last.content, rooms, cleanState(body.state), { blocked });
   const ai = await askClaude(messages, rooms, brain);
   let answer = ai || brain.answer;

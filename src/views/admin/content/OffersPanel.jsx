@@ -8,7 +8,7 @@ import { ConfirmButton, PhotoPicker, Thumb } from './PhotoTools';
 
 function OfferEditor({ offer, content, me, canEdit, reload, onDone }) {
   const isNew = !offer.code;
-  const [v, setV] = useState({ title: '', tag: '', text: '', image: '', room: '', type: 'stay', published: true, ...offer });
+  const [v, setV] = useState({ title: '', tag: '', text: '', image: '', room: '', type: 'stay', starts: '', ends: '', published: true, ...offer });
   const [inc, setInc] = useState((offer.includes || []).join('\n'));
   const [picker, setPicker] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -20,6 +20,7 @@ function OfferEditor({ offer, content, me, canEdit, reload, onDone }) {
     setErr('');
     if (!v.title.trim()) return setErr('Give the offer a title.');
     if (!code) return setErr('Use letters or numbers in the title.');
+    if (v.starts && v.ends && v.ends < v.starts) return setErr('The end date is before the start date.');
     if (isNew && content.offers.some((o) => o.code === code)) return setErr('An offer with this title already exists.');
     setBusy(true);
     try {
@@ -33,6 +34,8 @@ function OfferEditor({ offer, content, me, canEdit, reload, onDone }) {
           image: v.image || '',
           room: v.room || '',
           type: v.type,
+          starts: v.starts || '',
+          ends: v.ends || '',
           order: offer.order ?? content.offers.length + 1,
           published: Boolean(v.published),
         },
@@ -70,6 +73,7 @@ function OfferEditor({ offer, content, me, canEdit, reload, onDone }) {
               <option value="stay">Stay</option>
               <option value="event">Event</option>
               <option value="meeting">Meeting</option>
+              <option value="package">Package (stay + sightseeing)</option>
             </select>
           </label>
           <label className="cm-field">
@@ -80,6 +84,16 @@ function OfferEditor({ offer, content, me, canEdit, reload, onDone }) {
                 <option key={r.id}>{r.name}</option>
               ))}
             </select>
+          </label>
+        </div>
+        <div className="cm-grid">
+          <label className="cm-field">
+            <span className="lbl">Show from (optional)</span>
+            <input className="cm-input" type="date" value={v.starts} onChange={set('starts')} />
+          </label>
+          <label className="cm-field">
+            <span className="lbl">Hide after (optional)</span>
+            <input className="cm-input" type="date" value={v.ends} onChange={set('ends')} />
           </label>
         </div>
         <label className="cm-field">
@@ -183,6 +197,7 @@ export default function OffersPanel({ content, me, canEdit, reload }) {
               <b>{o.title}</b>
               <span className="meta">
                 {o.type || 'stay'} · code {o.code}
+                {o.ends && ` · until ${o.ends}`}
                 {o.published === false && <span className="pill st-Cancelled">Hidden</span>}
               </span>
             </div>
@@ -196,7 +211,7 @@ export default function OffersPanel({ content, me, canEdit, reload }) {
                   onConfirm={async () => {
                     setErr('');
                     try {
-                      await deleteOffer(o.code);
+                      await deleteOffer(o.code, me);
                       await reload();
                       setNote(`${o.title} deleted.`);
                     } catch (e) {

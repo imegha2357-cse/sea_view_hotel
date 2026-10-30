@@ -1,3 +1,4 @@
+import RequestLinks from '@/components/site/RequestLinks';
 import Link from 'next/link';
 import { HOTEL } from '@/data/content';
 import { getOffers, getRooms } from '@/lib/cms-server';
@@ -44,6 +45,7 @@ export default async function Offers() {
           )}
         </div>
       </section>
+      <RequestLinks types={['gift', 'celebration', 'group']} />
     </>
   );
 }

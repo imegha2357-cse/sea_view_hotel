@@ -1,3 +1,4 @@
+import RequestLinks from '@/components/site/RequestLinks';
 import { MEETINGS } from '@/data/content';
 import { meta } from '@/lib/meta';
 import PageTop from '@/components/site/PageTop';
@@ -64,6 +65,7 @@ export default function Meetings() {
           <EnquiryForm defaultType="meeting" />
         </div>
       </section>
+      <RequestLinks types={['group', 'corporate', 'celebration', 'callback']} />
     </>
   );
 }

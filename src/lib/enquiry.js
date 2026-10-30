@@ -36,7 +36,18 @@ export const ADDONS = [
   { id: 'sightseeing', label: 'Sightseeing tour' },
   { id: 'decoration', label: 'Room decoration (birthday, honeymoon)' },
   { id: 'late_checkout', label: 'Late check-out' },
+  { id: 'early_checkin', label: 'Early check-in' },
 ];
+// Feature #13: what kind of room within the type the guest would like (the team does its best).
+export const ROOM_PREFS = ['No particular request', 'High floor', 'Low floor or near the lift', 'Facing the Vivekananda Rock', 'Quiet room', 'Rooms next to each other'];
+// Feature #57: a guest's referral code (from a friend's link) travels with the enquiry.
+export const getRefCode = () => {
+  try {
+    return (localStorage.getItem('sv-ref') || '').slice(0, 20);
+  } catch {
+    return '';
+  }
+};
 export const CALLBACK_TIMES = ['Any time', 'Morning (9 am – 12 pm)', 'Afternoon (12 – 4 pm)', 'Evening (4 – 8 pm)', 'WhatsApp only, no call'];
 
 export const todayISO = () => {
@@ -58,6 +69,8 @@ export const emptyEnquiry = (profile) => ({
   room_type: '',
   pickup: 'none',
   addons: [],
+  preference: ROOM_PREFS[0],
+  rooms: 1,
   callback_time: CALLBACK_TIMES[0],
   promo_code: '',
   message: '',
@@ -137,7 +150,10 @@ export async function submitEnquiry(v, user) {
     event_guests: !isStay && v.event_guests !== '' ? +v.event_guests : null,
     room_type: isStay ? v.room_type || null : null,
     pickup: v.pickup || 'none',
-    addons: isStay ? v.addons.slice(0, 5) : [],
+    addons: isStay ? v.addons.slice(0, 6) : [],
+    preference: isStay && v.preference && v.preference !== ROOM_PREFS[0] ? v.preference.slice(0, 80) : null,
+    rooms: isStay ? Math.min(60, Math.max(1, +v.rooms || 1)) : null,
+    ref_code: getRefCode() || null,
     callback_time: (v.callback_time || '').slice(0, 40) || null,
     promo_code: v.promo_code.trim().toUpperCase() || null,
     message: v.message.trim() || null,
@@ -191,7 +207,8 @@ export function enquiryMessage(v, { offer, pickups = PICKUPS, addons = ADDONS } 
   lines.push(`Phone: ${v.phone.trim()}`);
   if (v.email?.trim()) lines.push(`Email: ${v.email.trim()}`);
   if (isStay) {
-    lines.push(`Room: ${v.room_type || 'No preference'}`);
+    lines.push(`Room: ${v.room_type || 'No preference'}${+v.rooms > 1 ? ` × ${+v.rooms} rooms` : ''}`);
+    if (v.preference && v.preference !== ROOM_PREFS[0]) lines.push(`Request: ${v.preference}`);
     lines.push(`Guests: ${+v.adults || 1} ${+v.adults === 1 ? 'adult' : 'adults'}${kids ? `, ${kids} ${kids === 1 ? 'child' : 'children'} under 6` : ''}`);
   } else {
     lines.push(`Number of guests: ${v.event_guests || 'not decided yet'}`);
@@ -204,6 +221,8 @@ export function enquiryMessage(v, { offer, pickups = PICKUPS, addons = ADDONS } 
   if (extras.length) lines.push(`Extras: ${extras.join(', ')}`);
   if (v.callback_time && v.callback_time !== CALLBACK_TIMES[0]) lines.push(`Best time to call: ${v.callback_time}`);
   if (v.promo_code?.trim()) lines.push(`Offer: ${offer ? `${offer.title} (${offer.code})` : v.promo_code.trim().toUpperCase()}`);
+  const ref = getRefCode();
+  if (ref) lines.push(`Referred by: ${ref}`);
   if (v.message?.trim()) lines.push('', `Message: ${v.message.trim()}`);
   lines.push('', 'Please let me know availability and the rate. Thank you.');
   return lines.join('\n');

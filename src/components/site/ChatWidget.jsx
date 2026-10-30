@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { HOTEL } from '@/data/content';
+import { trackEvent } from '@/lib/analytics';
 import Photo from '../Photo';
 import { EASE, Icon } from './ui';
 
@@ -11,6 +12,18 @@ const STORE = 'sv-chat';
 const VOICE_PREF = 'sv-chat-voice';
 const WA = `https://wa.me/${HOTEL.whatsapp}?text=${encodeURIComponent(`Hello ${HOTEL.name}, I have a question.`)}`;
 const SUGGEST = ['Which room is best for a family?', 'Which rooms face the sea?', 'I want to book this weekend', 'Sunrise time tomorrow', 'How do I get to the hotel?', 'What facilities do you have?'];
+// "Talk to a person": hand the conversation to the front desk on WhatsApp with a short summary,
+// so the guest does not have to repeat themselves.
+export function handoverText(msgs, brain) {
+  const asked = msgs.filter((m) => m.role === 'user').map((m) => m.content.trim()).filter(Boolean).slice(-4);
+  const b = brain?.booking || {};
+  const lines = [`Hello ${HOTEL.name}, I was chatting with your website assistant and would like to talk to a person.`];
+  const stay = [b.check_in && `arrival ${b.check_in}`, b.check_out && `departure ${b.check_out}`, b.adults && `${b.adults} adult${b.adults > 1 ? 's' : ''}`, b.children && `${b.children} child${b.children > 1 ? 'ren' : ''}`, (b.room || brain?.room) && `room: ${b.room || brain.room}`].filter(Boolean);
+  if (stay.length) lines.push(`My stay: ${stay.join(', ')}.`);
+  if (asked.length) lines.push(`I asked:\n${asked.map((q) => `- ${q.slice(0, 160)}`).join('\n')}`);
+  return lines.join('\n');
+}
+
 const WELCOME = {
   role: 'assistant',
   content: `Hello! I'm the ${HOTEL.name} assistant. Type or tap the microphone and ask me about rooms, dates, facilities, dining or directions.`,
@@ -442,8 +455,8 @@ export default function ChatWidget({ visible = true }) {
             </form>
             <p className="chat-foot">
               Bookings and prices are confirmed by our team.{' '}
-              <a href={WA} target="_blank" rel="noreferrer">
-                Chat on WhatsApp
+              <a href={started ? `https://wa.me/${HOTEL.whatsapp}?text=${encodeURIComponent(handoverText(msgs, brain))}` : WA} target="_blank" rel="noreferrer" className="chat-handover" onClick={() => trackEvent(started ? 'chat_handover' : 'whatsapp_click', { location: 'chat' })}>
+                {started ? 'Talk to a person' : 'Chat on WhatsApp'}
               </a>
             </p>
           </motion.section>
@@ -458,7 +471,11 @@ export default function ChatWidget({ visible = true }) {
             className={`fab-chat ${open ? 'is-open' : ''}`}
             aria-label={open ? 'Minimise chat' : 'Open the chat and voice assistant'}
             aria-expanded={open}
-            onClick={() => (open ? minimise() : setOpen(true))}
+            onClick={() => {
+              if (open) return minimise();
+              trackEvent('chat_open');
+              setOpen(true);
+            }}
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             exit={{ scale: 0 }}

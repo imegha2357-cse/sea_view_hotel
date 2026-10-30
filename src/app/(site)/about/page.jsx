@@ -7,6 +7,9 @@ import Facilities from '@/components/site/Facilities';
 import PhotoStrip from '@/components/site/PhotoStrip';
 import { Chevron, LineTitle, Reveal } from '@/components/site/ui';
 import Photo from '@/components/Photo';
+import { Awards } from '@/components/site/ListSections';
+
+export const revalidate = 600;
 
 export const metadata = meta('/about');
 
@@ -63,6 +66,7 @@ export default function About() {
           <Facilities />
         </div>
       </section>
+      <Awards />
     </>
   );
 }

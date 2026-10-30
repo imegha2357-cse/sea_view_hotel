@@ -6,6 +6,8 @@ import RoomsPanel from './RoomsPanel';
 import PhotosPanel from './PhotosPanel';
 import HomePanel from './HomePanel';
 import OffersPanel from './OffersPanel';
+import ListEditor from './ListEditor';
+import { LISTS } from '@/data/lists';
 
 const SECTIONS = [
   ['rooms', 'Rooms'],
@@ -21,6 +23,7 @@ export default function ContentManager({ canEdit, me, section }) {
   const [own, setSec] = useState('rooms');
   const sec = section || own;
   const [importing, setImporting] = useState(false);
+  const [list, setList] = useState(LISTS[0].id);
 
   const reload = useCallback(async () => {
     try {
@@ -107,6 +110,20 @@ export default function ContentManager({ canEdit, me, section }) {
       {sec === 'photos' && <PhotosPanel {...props} />}
       {sec === 'home' && <HomePanel {...props} />}
       {sec === 'offers' && <OffersPanel {...props} />}
+      {sec === 'lists' && (
+        <>
+          <nav className="cm-subtabs" aria-label="Lists">
+            {LISTS.map((l) => (
+              <button key={l.id} type="button" aria-current={list === l.id ? 'page' : undefined} className={list === l.id ? 'on' : ''} onClick={() => setList(l.id)}>
+                {l.title}
+              </button>
+            ))}
+          </nav>
+          {LISTS.filter((l) => l.id === list).map((l) => (
+            <ListEditor key={l.id} {...l} {...props} />
+          ))}
+        </>
+      )}
     </div>
   );
 }

@@ -43,3 +43,15 @@ export function sunOn({ lat, lon, tzHours }, date) {
   const t = times(date.getFullYear(), date.getMonth(), date.getDate(), lat, lon, tzHours);
   return { sunrise: fmtMinutes(t.rise), sunset: fmtMinutes(t.set) };
 }
+
+// Milliseconds until the next sunrise at the hotel, and whether it is day there now.
+export function nextSunrise({ lat, lon, tzHours }, now = new Date()) {
+  const local = new Date(now.getTime() + tzHours * 3600e3);
+  const y = local.getUTCFullYear();
+  const mo = local.getUTCMonth();
+  const d = local.getUTCDate();
+  const nowMin = local.getUTCHours() * 60 + local.getUTCMinutes() + local.getUTCSeconds() / 60;
+  const today = times(y, mo, d, lat, lon, tzHours);
+  const rise = nowMin < today.rise ? today.rise : 1440 + times(y, mo, d + 1, lat, lon, tzHours).rise;
+  return { ms: (rise - nowMin) * 60e3, at: fmtMinutes(rise % 1440), isDay: nowMin >= today.rise && nowMin <= today.set, today: nowMin < today.rise };
+}

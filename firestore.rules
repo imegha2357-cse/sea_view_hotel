@@ -26,8 +26,8 @@ service cloud.firestore {
       return !(k in d) || d[k] == null || (d[k] is int && d[k] >= lo && d[k] <= hi);
     }
     function optAddons(d) {
-      return !('addons' in d) || d.addons == null || (d.addons is list && d.addons.size() <= 5
-        && d.addons.hasOnly(['breakfast', 'extra_bed', 'sightseeing', 'decoration', 'late_checkout']));
+      return !('addons' in d) || d.addons == null || (d.addons is list && d.addons.size() <= 6
+        && d.addons.hasOnly(['breakfast', 'extra_bed', 'sightseeing', 'decoration', 'late_checkout', 'early_checkin']));
     }
 
     // Every optional field a guest may send with an enquiry.
@@ -35,7 +35,8 @@ service cloud.firestore {
       return ['guest_name', 'phone', 'email', 'check_in', 'check_out', 'adults', 'children',
               'room_type', 'message', 'source', 'status', 'userId', 'created_at', 'updated_at',
               'enquiry_type', 'event_guests', 'pickup', 'addons', 'callback_time', 'promo_code',
-              'referrer', 'utm_source', 'utm_medium', 'utm_campaign', 'privacy_consent_at', 'lang', 'channel'];
+              'referrer', 'utm_source', 'utm_medium', 'utm_campaign', 'privacy_consent_at', 'lang', 'channel',
+              'preference', 'rooms', 'ref_code'];
     }
     function validExtras(d) {
       return optIn(d, 'enquiry_type', ['stay', 'event', 'meeting'])
@@ -49,7 +50,10 @@ service cloud.firestore {
         && optString(d, 'utm_medium', 100)
         && optString(d, 'utm_campaign', 100)
         && optString(d, 'lang', 8)
-        && optIn(d, 'channel', ['whatsapp', 'form']);
+        && optIn(d, 'channel', ['whatsapp', 'form'])
+        && optString(d, 'preference', 80)
+        && optInt(d, 'rooms', 1, 60)
+        && optString(d, 'ref_code', 20);
     }
 
     // Dates are optional on the enquiry form: either both are given (and sensible) or both are null.
@@ -155,12 +159,16 @@ service cloud.firestore {
     match /users/{uid} {
       allow read: if (signedIn() && request.auth.uid == uid) || isAdmin();
       allow create: if signedIn() && request.auth.uid == uid
-        && request.resource.data.keys().hasOnly(['name', 'phone', 'email', 'role', 'createdAt', 'preferences', 'saved_rooms'])
+        && request.resource.data.keys().hasOnly(['name', 'phone', 'email', 'role', 'createdAt', 'preferences', 'saved_rooms', 'saved_items', 'birthday', 'anniversary', 'occasion_offers'])
         && request.resource.data.role == 'guest'
         && request.resource.data.name is string && request.resource.data.name.size() <= 80
         && request.resource.data.phone is string && request.resource.data.phone.size() <= 20;
       allow update: if signedIn() && request.auth.uid == uid
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['name', 'phone', 'preferences', 'saved_rooms'])
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['name', 'phone', 'preferences', 'saved_rooms', 'saved_items', 'birthday', 'anniversary', 'occasion_offers'])
+        && optString(request.resource.data, 'birthday', 10)
+        && optString(request.resource.data, 'anniversary', 10)
+        && (!('occasion_offers' in request.resource.data) || request.resource.data.occasion_offers is bool)
+        && (!('saved_items' in request.resource.data) || (request.resource.data.saved_items is list && request.resource.data.saved_items.size() <= 30))
         && request.resource.data.name is string && request.resource.data.name.size() <= 80
         && request.resource.data.phone is string && request.resource.data.phone.size() <= 20
         && (!('preferences' in request.resource.data) || request.resource.data.preferences is map)
@@ -169,9 +177,16 @@ service cloud.firestore {
     }
 
     // Staff list (for assigning enquiries). Membership and roles are set only in the Firebase console.
+    function isOwner() { return isAdmin() && staffRole() == 'owner'; }
     match /admins/{uid} {
       allow read: if signedIn() && (request.auth.uid == uid || isAdmin());
-      allow write: if false;
+      // Owners add staff and change roles from the admin panel (never their own record).
+      allow create, update: if isOwner() && request.auth.uid != uid
+        && request.resource.data.keys().hasOnly(['email', 'name', 'role', 'added_by', 'updated_at'])
+        && request.resource.data.role in ['owner', 'desk', 'viewer']
+        && optString(request.resource.data, 'email', 120)
+        && optString(request.resource.data, 'name', 80);
+      allow delete: if isOwner() && request.auth.uid != uid;
     }
 
     match /newsletter/{id} {
@@ -222,7 +237,10 @@ service cloud.firestore {
         && id.matches('^[a-z0-9][a-z0-9-]{0,59}$')
         && request.resource.data.keys().hasOnly(['name', 'category', 'summary', 'description', 'view', 'beds',
              'occupancy', 'guests', 'size', 'rate', 'features', 'amenities', 'images', 'order', 'published',
-             'updated_at', 'updated_by'])
+             'view_image', 'tour360', 'access', 'updated_at', 'updated_by'])
+        && optString(request.resource.data, 'view_image', 80)
+        && optString(request.resource.data, 'tour360', 80)
+        && optList(request.resource.data, 'access', 20)
         && request.resource.data.name is string && request.resource.data.name.size() > 0 && request.resource.data.name.size() <= 80
         && optString(request.resource.data, 'category', 60)
         && optString(request.resource.data, 'summary', 400)
@@ -247,7 +265,9 @@ service cloud.firestore {
       allow create, update: if canEdit()
         && code.matches('^[A-Za-z0-9_-]{1,30}$')
         && request.resource.data.keys().hasOnly(['code', 'title', 'tag', 'text', 'includes', 'image', 'room', 'type',
-             'order', 'published', 'updated_at', 'updated_by'])
+             'order', 'published', 'starts', 'ends', 'updated_at', 'updated_by'])
+        && optString(request.resource.data, 'starts', 10)
+        && optString(request.resource.data, 'ends', 10)
         && request.resource.data.title is string && request.resource.data.title.size() > 0 && request.resource.data.title.size() <= 100
         && optString(request.resource.data, 'code', 30)
         && optString(request.resource.data, 'tag', 40)
@@ -255,7 +275,7 @@ service cloud.firestore {
         && optString(request.resource.data, 'image', 80)
         && optString(request.resource.data, 'room', 60)
         && optString(request.resource.data, 'updated_by', 120)
-        && optIn(request.resource.data, 'type', ['stay', 'event', 'meeting'])
+        && optIn(request.resource.data, 'type', ['stay', 'event', 'meeting', 'package'])
         && optNum(request.resource.data, 'order')
         && optBool(request.resource.data, 'published')
         && optList(request.resource.data, 'includes', 12);
@@ -300,6 +320,104 @@ service cloud.firestore {
         && id.matches('^[A-Za-z0-9_-]{6,40}$')
         && request.resource.data.keys().hasOnly(['mime', 'name', 'w', 'h', 'size', 'alt', 'created_at', 'created_by'])
         && validMediaInfo(request.resource.data);
+    }
+
+    // ---------- Content lists, settings, blog (admin-managed, public) ----------
+    match /lists/{id} {
+      allow read: if true;
+      allow write: if canEdit()
+        && id in ['menu', 'timings', 'festivals', 'testimonials', 'awards', 'policies', 'guest_photos']
+        && request.resource.data.keys().hasOnly(['items', 'updated_at', 'updated_by'])
+        && request.resource.data.items is list && request.resource.data.items.size() <= 300
+        && optString(request.resource.data, 'updated_by', 120);
+    }
+    match /site/settings {
+      allow read: if true;
+      allow write: if canEdit()
+        && request.resource.data.keys().hasOnly(['theme', 'social', 'check_in', 'check_out', 'review_link', 'loyalty_rules', 'stay_info', 'updated_at', 'updated_by'])
+        && optIn(request.resource.data, 'theme', ['none', 'pongal', 'diwali', 'christmas', 'newyear', 'onam'])
+        && (!('social' in request.resource.data) || request.resource.data.social is map)
+        && optString(request.resource.data, 'check_in', 40)
+        && optString(request.resource.data, 'check_out', 40)
+        && optString(request.resource.data, 'review_link', 300)
+        && optString(request.resource.data, 'loyalty_rules', 2000)
+        && (!('stay_info' in request.resource.data) || request.resource.data.stay_info is map)
+        && optString(request.resource.data, 'updated_by', 120);
+    }
+    match /posts/{slug} {
+      allow read: if resource.data.published == true || isAdmin();
+      allow delete: if canEdit();
+      allow create, update: if canEdit()
+        && slug.matches('^[a-z0-9][a-z0-9-]{0,79}$')
+        && request.resource.data.keys().hasOnly(['title', 'summary', 'body', 'image', 'date', 'published', 'updated_at', 'updated_by'])
+        && request.resource.data.title is string && request.resource.data.title.size() > 0 && request.resource.data.title.size() <= 120
+        && optString(request.resource.data, 'summary', 300)
+        && optString(request.resource.data, 'body', 20000)
+        && optString(request.resource.data, 'image', 80)
+        && optString(request.resource.data, 'date', 10)
+        && optBool(request.resource.data, 'published');
+    }
+
+    // Rooms available per room type per night (front desk), shown as "only N left".
+    match /inventory/{roomId} {
+      allow read: if true;
+      allow write: if canEdit()
+        && request.resource.data.keys().hasOnly(['counts', 'updated_at', 'updated_by'])
+        && request.resource.data.counts is map && request.resource.data.counts.size() <= 800;
+    }
+
+    // Requests from the website: groups, corporate, gift stays, tours, tables, celebrations,
+    // travel agents, callbacks and in-stay requests. Anyone may send one; only staff read them.
+    function validRequest(d) {
+      return d.keys().hasOnly(['type', 'name', 'phone', 'email', 'fields', 'message', 'room_number', 'status', 'userId', 'created_at', 'updated_at', 'lang'])
+        && d.type in ['group', 'corporate', 'gift', 'tour', 'table', 'celebration', 'agent', 'callback', 'stay']
+        && d.name is string && d.name.size() > 0 && d.name.size() <= 80
+        && d.phone is string && d.phone.matches('^\\+?[0-9][0-9 \\-]{6,16}$')
+        && (!('email' in d) || d.email == null || (d.email is string && d.email.matches('^[^\\s@]+@[^\\s@]+\\.[^\\s@]{2,}$') && d.email.size() <= 120))
+        && (!('fields' in d) || (d.fields is map && d.fields.size() <= 20))
+        && optString(d, 'message', 1000)
+        && optString(d, 'room_number', 10)
+        && optString(d, 'lang', 8)
+        && d.status == 'New'
+        && d.created_at == request.time && d.updated_at == request.time
+        && (!('userId' in d) || d.userId == null || (signedIn() && d.userId == request.auth.uid));
+    }
+    match /requests/{id} {
+      allow create: if validRequest(request.resource.data);
+      allow read: if isAdmin();
+      allow update: if canEdit()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'staff_note', 'updated_at'])
+        && request.resource.data.status in ['New', 'In progress', 'Done', 'Cancelled']
+        && optString(request.resource.data, 'staff_note', 1000);
+      allow delete: if canEdit();
+    }
+
+    // Loyalty points: staff award them; guests see their own.
+    match /loyalty/{uid} {
+      allow read: if isAdmin() || (signedIn() && request.auth.uid == uid);
+      allow write: if canEdit()
+        && request.resource.data.keys().hasOnly(['points', 'history', 'name', 'email', 'updated_at', 'updated_by'])
+        && request.resource.data.points is int && request.resource.data.points >= 0
+        && request.resource.data.history is list && request.resource.data.history.size() <= 200;
+    }
+
+    // Housekeeping board: room status by room number (staff only).
+    match /housekeeping/board {
+      allow read: if isAdmin();
+      allow write: if isAdmin() && staffRole() in ['owner', 'desk']
+        && request.resource.data.keys().hasOnly(['rooms', 'updated_at', 'updated_by'])
+        && request.resource.data.rooms is map && request.resource.data.rooms.size() <= 300;
+    }
+
+    // Change history for website content (who changed what), for undo.
+    match /history/{id} {
+      allow read: if isAdmin();
+      allow create: if canEdit()
+        && request.resource.data.keys().hasOnly(['path', 'data', 'at', 'by', 'note'])
+        && request.resource.data.path is string && request.resource.data.path.size() <= 120
+        && request.resource.data.at == request.time
+        && optString(request.resource.data, 'note', 200);
+      allow delete: if isOwner();
     }
 
     match /{document=**} {

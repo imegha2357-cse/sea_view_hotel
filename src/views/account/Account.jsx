@@ -201,6 +201,10 @@ export default function Account() {
   const [p, setP] = useState({ name: '', phone: '' });
   const [prefs, setPrefs] = useState({ floor: '', bed: '', diet: '', notes: '' });
   const [savedRooms, setSavedRooms] = useState([]);
+  const [occ, setOcc] = useState({ birthday: '', anniversary: '', occasion_offers: false });
+  const [loyalty, setLoyalty] = useState(null);
+  const [copied, setCopied] = useState(false);
+  const { settings } = useSiteData();
   const [saved, setSaved] = useState('');
   const [privacyMsg, setPrivacyMsg] = useState('');
 
@@ -209,7 +213,20 @@ export default function Account() {
     setP({ name: profile?.name || user?.displayName || '', phone: profile?.phone || '' });
     setPrefs({ floor: '', bed: '', diet: '', notes: '', ...(profile?.preferences || {}) });
     setSavedRooms((profile?.saved_rooms || []).filter((id) => rooms.some((r) => r.id === id)));
+    setOcc({ birthday: profile?.birthday || '', anniversary: profile?.anniversary || '', occasion_offers: Boolean(profile?.occasion_offers) });
   }, [profile, user]);
+
+  useEffect(() => {
+    if (!user) return;
+    const { db, F } = fb();
+    F.getDoc(F.doc(db, 'loyalty', user.uid))
+      .then((s) => setLoyalty(s.exists() ? s.data() : { points: 0, history: [] }))
+      .catch(() => setLoyalty(null));
+  }, [user]);
+  const refLink = user ? `${typeof window !== 'undefined' ? window.location.origin : ''}/?ref=${user.uid.slice(0, 8).toUpperCase()}` : '';
+  const removeSaved = async (href) => {
+    await saveProfile({ ...p, saved_items: (profile?.saved_items || []).filter((x) => x.href !== href) }).catch(() => {});
+  };
 
   useEffect(() => {
     if (!user) return undefined;
@@ -229,7 +246,7 @@ export default function Account() {
     e.preventDefault();
     setSaved('');
     try {
-      await saveProfile({ ...p, preferences: prefs, saved_rooms: savedRooms.filter((id) => rooms.some((r) => r.id === id)) });
+      await saveProfile({ ...p, ...occ, preferences: prefs, saved_rooms: savedRooms.filter((id) => rooms.some((r) => r.id === id)) });
       setSaved('Saved');
     } catch {
       setSaved('Could not save. Try again.');
@@ -382,6 +399,18 @@ export default function Account() {
                   <input id="p-notes" placeholder=" " value={prefs.notes} onChange={(e) => setPrefs((s) => ({ ...s, notes: e.target.value.slice(0, 300) }))} />
                   <label htmlFor="p-notes">Other requests we should remember</label>
                 </div>
+                <div className="field static">
+                  <input id="p-bday" type="date" value={occ.birthday} onChange={(e) => setOcc((s) => ({ ...s, birthday: e.target.value }))} />
+                  <label htmlFor="p-bday">Birthday (optional)</label>
+                </div>
+                <div className="field static">
+                  <input id="p-anniv" type="date" value={occ.anniversary} onChange={(e) => setOcc((s) => ({ ...s, anniversary: e.target.value }))} />
+                  <label htmlFor="p-anniv">Anniversary (optional)</label>
+                </div>
+                <label className="check">
+                  <input type="checkbox" checked={occ.occasion_offers} onChange={(e) => setOcc((s) => ({ ...s, occasion_offers: e.target.checked }))} />
+                  <span>Send me an offer for my birthday or anniversary</span>
+                </label>
                 <fieldset className="addons">
                   <legend>Saved rooms</legend>
                   {rooms.map((r) => (
@@ -400,6 +429,59 @@ export default function Account() {
                   {saved && <span className="saved">{saved}</span>}
                 </div>
               </form>
+            </section>
+            {settings?.loyalty_rules && loyalty && (
+              <section className="panel loyalty" aria-labelledby="my-points">
+                <h2 id="my-points">My points</h2>
+                <p className="points">
+                  <b>{loyalty.points || 0}</b> points
+                </p>
+                <p className="meta" style={{ whiteSpace: 'pre-line' }}>
+                  {settings.loyalty_rules}
+                </p>
+                {loyalty.history?.length > 0 && (
+                  <ul className="points-hist">
+                    {loyalty.history.slice(0, 6).map((h) => (
+                      <li key={h.at}>
+                        {h.pts > 0 ? '+' : ''}
+                        {h.pts} · {h.note || 'Points'} · {new Date(h.at).toLocaleDateString('en-IN')}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </section>
+            )}
+            {profile?.saved_items?.length > 0 && (
+              <section className="panel" aria-labelledby="my-saved">
+                <h2 id="my-saved">Saved for later</h2>
+                <ul className="saved-list">
+                  {profile.saved_items.map((x) => (
+                    <li key={x.href}>
+                      <Link to={x.href}>{x.title}</Link>
+                      <button type="button" className="text-btn muted" onClick={() => removeSaved(x.href)}>
+                        Remove
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
+            <section className="panel" aria-labelledby="refer">
+              <h2 id="refer">Invite a friend</h2>
+              <p className="meta">Share your link. When a friend sends an enquiry through it, our team sees that you referred them.</p>
+              <div className="cm-inline">
+                <input className="cm-input" readOnly value={refLink} aria-label="Your invite link" onFocus={(e) => e.target.select()} />
+                <button
+                  type="button"
+                  className="btn outline sm"
+                  onClick={() => {
+                    navigator.clipboard?.writeText(refLink);
+                    setCopied(true);
+                  }}
+                >
+                  {copied ? 'Copied' : 'Copy'}
+                </button>
+              </div>
             </section>
             <section className="panel" aria-labelledby="help">
               <h2 id="help">Need help?</h2>

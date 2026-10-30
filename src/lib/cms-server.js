@@ -79,7 +79,9 @@ export async function getOffers() {
   const site = await getSite();
   if (!site.seeded) return SEED_OFFERS;
   const offers = (await listDocs('offers').catch(offline)) ?? SEED_OFFERS;
-  return offers.filter((o) => o.published !== false).sort(byOrder);
+  // Offers can be scheduled: shown only between their start and end dates (India time).
+  const today = new Date(Date.now() + 5.5 * 3600e3).toISOString().slice(0, 10);
+  return offers.filter((o) => o.published !== false && (!o.starts || o.starts <= today) && (!o.ends || o.ends >= today)).sort(byOrder);
 }
 
 export async function getBanner(slot) {
@@ -87,10 +89,61 @@ export async function getBanner(slot) {
   return site.banners?.[slot] || BANNER_SLOTS.find((b) => b.id === slot)?.fallback || 'building';
 }
 
+// Site-wide settings the admin manages (seasonal theme, social links, check-in times, review link…).
+export async function getSettings() {
+  const s = (await getDoc('site/settings').catch(offline)) || {};
+  return {
+    theme: s.theme || 'none',
+    social: s.social || {},
+    check_in: s.check_in || '',
+    check_out: s.check_out || '',
+    review_link: s.review_link || '',
+    loyalty_rules: s.loyalty_rules || '',
+    stay_info: s.stay_info || {},
+  };
+}
+
+// Admin-managed lists: menu, timings, festivals, testimonials, awards, policies, guest photos.
+export async function getList(id) {
+  const d = await getDoc(`lists/${id}`).catch(offline);
+  return Array.isArray(d?.items) ? d.items.filter((x) => x && x.hidden !== true) : [];
+}
+
+// Blog posts: only published ones are readable without signing in.
+export async function getPosts() {
+  try {
+    const r = await fetch(`${BASE}:runQuery?key=${config.apiKey}`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ structuredQuery: { from: [{ collectionId: 'posts' }], where: { fieldFilter: { field: { fieldPath: 'published' }, op: 'EQUAL', value: { booleanValue: true } } }, limit: 200 } }),
+      next: { revalidate: 600, tags: ['cms'] },
+    });
+    if (!r.ok) return [];
+    const rows = await r.json();
+    return rows
+      .filter((x) => x.document)
+      .map((x) => ({ slug: docId(x.document.name), ...fields(x.document.fields) }))
+      .sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')));
+  } catch (e) {
+    offline(e);
+    return [];
+  }
+}
+export async function getPost(slug) {
+  return (await getPosts()).find((p) => p.slug === slug) || null;
+}
+
+// Rooms left per room type for a night (front desk keeps these in the admin panel).
+export async function getInventory() {
+  const rows = (await listDocs('inventory').catch(() => [])) || [];
+  return Object.fromEntries(rows.map((r) => [r.id, r.counts || {}]));
+}
+
 // Everything the header, forms and account pages need, in one call.
 export async function getSiteData() {
-  const [rooms, offers, site] = await Promise.all([getRooms(), getOffers(), getSite()]);
+  const [rooms, offers, site, settings] = await Promise.all([getRooms(), getOffers(), getSite(), getSettings()]);
   return {
+    settings: { theme: settings.theme, social: settings.social, check_in: settings.check_in, check_out: settings.check_out, review_link: settings.review_link, loyalty_rules: settings.loyalty_rules || '' },
     rooms: rooms.map((r) => ({ id: r.id, name: r.name, image: r.images[0] || null, rate: r.rate ?? null, category: r.category })),
     offers: offers.map((o) => ({ code: o.code, title: o.title, image: o.image, room: o.room || '', type: o.type || 'stay' })),
     categories: site.categories,

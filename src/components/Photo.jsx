@@ -21,6 +21,8 @@ export default function Photo({ k, alt, sizes = '100vw', priority = false, fill 
   const p = photo(k);
   const [loaded, setLoaded] = useState(false);
   if (!p) return null;
+  // Low-data mode (Preferences or the phone's Data Saver): smaller, lighter images.
+  const low = typeof document !== 'undefined' && (document.documentElement.dataset.data === 'low' || navigator.connection?.saveData);
   return (
     <Image
       src={p.src}
@@ -29,7 +31,7 @@ export default function Photo({ k, alt, sizes = '100vw', priority = false, fill 
       unoptimized={false}
       sizes={sizes}
       priority={priority}
-      quality={quality || 85}
+      quality={low ? 45 : quality || 85}
       loader={CLOUD ? cloudinaryLoader : undefined}
       className={`photo ${loaded ? 'is-loaded' : ''} ${className}`}
       style={style}

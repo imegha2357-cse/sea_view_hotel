@@ -12,6 +12,7 @@ import { openCookieSettings } from '../CookieConsent';
 import Feedback from '../Feedback';
 import { Preferences } from '../Preferences';
 import { EASE, Icon } from './ui';
+import { useSiteData } from '../SiteData';
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
@@ -73,8 +74,13 @@ const contactRows = [
 
 const rise = (i) => ({ initial: { opacity: 0, y: 18 }, whileInView: { opacity: 1, y: 0 }, viewport: { once: true, amount: 0.2 }, transition: { duration: 0.6, ease: EASE, delay: i * 0.08 } });
 
+const SOCIAL_LABELS = { facebook: 'Facebook', instagram: 'Instagram', youtube: 'YouTube', x: 'X', google: 'Google' };
+
 export default function Footer() {
   const [open, setOpen] = useState(false);
+  const { settings } = useSiteData();
+  // Social links from Settings in the admin panel; the Facebook page is always there.
+  const social = [...SOCIAL, ...Object.entries(settings?.social || {}).filter(([k, href]) => SOCIAL_LABELS[k] && /^https:\/\//.test(href) && !SOCIAL.some((x) => x.icon === k)).map(([k, href]) => ({ label: SOCIAL_LABELS[k], href, icon: k }))];
   return (
     <footer className="ftr" id="contact">
       <div className="container wide">
@@ -161,7 +167,7 @@ export default function Footer() {
             </h2>
             <Subscribe />
             <div className="ftr-social">
-              {SOCIAL.map((x) => {
+              {social.map((x) => {
                 const I = Icon[x.icon];
                 return (
                   <a key={x.href} href={x.href} target="_blank" rel="noreferrer" aria-label={`${x.label} (opens in a new tab)`}>
@@ -175,6 +181,20 @@ export default function Footer() {
             </div>
           </motion.section>
         </div>
+
+        <nav className="ftr-lang" aria-label="Other languages">
+          <a href="/ta" lang="ta" hrefLang="ta">
+            தமிழ்
+          </a>
+          <a href="/hi" lang="hi" hrefLang="hi">
+            हिन्दी
+          </a>
+          <a href="/ml" lang="ml" hrefLang="ml">
+            മലയാളം
+          </a>
+          <a href="/brochure">Brochure</a>
+          <a href="/brand">Press and partners</a>
+        </nav>
 
         <div className="ftr-spaces">
           <h2 className="ftr-k">Our spaces</h2>

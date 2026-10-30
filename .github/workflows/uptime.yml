@@ -1,0 +1,35 @@
+# Feature #97: checks the live website every hour and opens a GitHub issue if it is down
+# (GitHub emails the repository owner). Closes the issue again when the site is back.
+name: Uptime check
+on:
+  schedule:
+    - cron: '23 * * * *'
+  workflow_dispatch:
+permissions:
+  issues: write
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check the pages
+        id: check
+        run: |
+          SITE="${{ vars.SITE_URL || 'https://seaviewhotel-8x42.vercel.app' }}"
+          FAIL=""
+          for p in / /rooms /enquire; do
+            CODE=$(curl -s -o /dev/null -w '%{http_code}' --max-time 30 "$SITE$p" || echo 000)
+            echo "$p $CODE"
+            if [ "$CODE" -ge 400 -o "$CODE" = "000" ]; then FAIL="$FAIL $p($CODE)"; fi
+          done
+          echo "fail=$FAIL" >> "$GITHUB_OUTPUT"
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            const fail = `${{ steps.check.outputs.fail }}`.trim();
+            const title = 'Website is down';
+            const { data: open } = await github.rest.issues.listForRepo({ ...context.repo, state: 'open', labels: 'uptime' });
+            if (fail && !open.length) {
+              await github.rest.issues.create({ ...context.repo, title, labels: ['uptime'], body: `These pages did not load: ${fail}\n\nChecked ${new Date().toISOString()}. Check Vercel and Firebase.` });
+            } else if (!fail && open.length) {
+              for (const i of open) await github.rest.issues.update({ ...context.repo, issue_number: i.number, state: 'closed', body: `${i.body}\n\nBack up at ${new Date().toISOString()}.` });
+            }

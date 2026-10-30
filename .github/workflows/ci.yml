@@ -2,7 +2,7 @@
 name: CI
 on:
   push:
-    branches: [main]
+    branches: [main, staging]
   pull_request:
 jobs:
   test:
@@ -15,4 +15,6 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm test
-      - run: npm run build
+      - run: npm run build | tee build.log
+      # Feature #98: keep pages fast. Fails if a public page ships more than 200 kB of JavaScript.
+      - run: node scripts/speed-budget.mjs build.log

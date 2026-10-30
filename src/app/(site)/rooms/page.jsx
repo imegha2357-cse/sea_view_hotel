@@ -5,6 +5,7 @@ import { rupees } from '@/lib/enquiry';
 import { getRooms, getSite } from '@/lib/cms-server';
 import PageTop from '@/components/site/PageTop';
 import RoomCarousel from '@/components/rooms/RoomCarousel';
+import RecentRooms from '@/components/rooms/RecentRooms';
 import { Chevron, Reveal } from '@/components/site/ui';
 
 export const metadata = meta('/rooms');
@@ -84,6 +85,9 @@ export default async function RoomsPage() {
             <div className="rule-title sm">
               <h2 id="compare-h">Compare rooms</h2>
             </div>
+            <p className="rule-intro">
+              <Link href="/rooms/compare">Pick rooms to compare</Link> · <Link href="/room-finder">Help me choose a room</Link>
+            </p>
             <Reveal className="table-wrap">
               <table className="compare-table">
                 <thead>
@@ -113,6 +117,7 @@ export default async function RoomsPage() {
           </div>
         </section>
       )}
+      <RecentRooms />
     </>
   );
 }

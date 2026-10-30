@@ -6,6 +6,7 @@ import PageTop from '@/components/site/PageTop';
 import Split from '@/components/site/Split';
 import Photo from '@/components/Photo';
 import { Chevron, LineTitle, Reveal } from '@/components/site/ui';
+import RequestLinks from '@/components/site/RequestLinks';
 
 export const metadata = meta('/experiences');
 
@@ -53,6 +54,7 @@ export default function Experiences() {
           </p>
         </div>
       </section>
+      <RequestLinks types={['tour', 'group', 'celebration']} />
     </>
   );
 }

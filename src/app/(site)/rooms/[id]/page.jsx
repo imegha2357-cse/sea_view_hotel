@@ -14,6 +14,7 @@ import RoomActions from '@/components/site/RoomActions';
 import RoomAmenities from '@/components/site/RoomAmenities';
 import RoomGallery from '@/components/rooms/RoomGallery';
 import RoomFacts from '@/components/rooms/RoomFacts';
+import RoomExtras from '@/components/rooms/RoomExtras';
 import EnquiryForm from '@/components/EnquiryForm';
 import { Chevron, LineTitle, Reveal } from '@/components/site/ui';
 
@@ -83,9 +84,13 @@ export default async function RoomPage({ params }) {
             <Link href="/room-tour" className="more-link">
               Watch the room tour video <Chevron />
             </Link>
+            <Link href={`/rooms/compare?a=${r.id}`} className="more-link">
+              Compare with other rooms <Chevron />
+            </Link>
           </Reveal>
         </div>
       </section>
+      <RoomExtras room={r} />
       <section className="sec cream" id="book" aria-labelledby="book-h">
         <div className="container" style={{ maxWidth: 980 }}>
           <div className="sec-head">

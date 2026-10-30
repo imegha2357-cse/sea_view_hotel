@@ -2,6 +2,10 @@ import { meta } from '@/lib/meta';
 import PageTop from '@/components/site/PageTop';
 import PlanVisitView from '@/components/site/PlanVisitView';
 import PhotoStrip from '@/components/site/PhotoStrip';
+import { LocalTimings } from '@/components/site/ListSections';
+import RainyDay from '@/components/site/RainyDay';
+
+export const revalidate = 600;
 
 export const metadata = meta('/plan-your-visit');
 
@@ -10,6 +14,8 @@ export default function PlanVisit() {
     <>
       <PageTop slot="plan" title="Plan your visit" text="Sunrise times, the weather and the easiest ways to reach the hotel." trail={[{ label: 'Plan your visit', href: '/plan-your-visit' }]} />
       <PlanVisitView />
+      <RainyDay />
+      <LocalTimings />
       <PhotoStrip
         id="sights"
         tone="cream"

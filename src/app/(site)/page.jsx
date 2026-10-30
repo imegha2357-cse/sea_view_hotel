@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { POLICIES, ATTRACTIONS, EXPERIENCES, FACTS, FAQS, HIGHLIGHT_SLIDES, HOTEL, OVERVIEW } from '@/data/content';
 import { meta } from '@/lib/meta';
-import { JsonLd, faqLd, hotelLd } from '@/lib/ld';
+import { JsonLd, faqLd, hotelLdWith } from '@/lib/ld';
 import Hero from '@/components/site/Hero';
 import SectionTabs from '@/components/site/SectionTabs';
 import Highlights from '@/components/site/Highlights';
@@ -12,7 +12,8 @@ import FeatureCards from '@/components/site/FeatureCards';
 import HighlightTabs from '@/components/site/HighlightTabs';
 import OfferCard from '@/components/site/OfferCard';
 import { EventGrid } from '@/components/site/EventTypes';
-import { getOffers, getRooms, getSite } from '@/lib/cms-server';
+import { getList, getOffers, getRooms, getSettings, getSite } from '@/lib/cms-server';
+import SunriseCountdown from '@/components/site/SunriseCountdown';
 import { slugify } from '@/data/catalog';
 import HotelInfo from '@/components/site/HotelInfo';
 import Faq from '@/components/site/Faq';
@@ -41,11 +42,11 @@ const TABS = [
 ];
 
 export default async function Home() {
-  const [rooms, offers, site] = await Promise.all([getRooms(), getOffers(), getSite()]);
+  const [rooms, offers, site, reviews, settings] = await Promise.all([getRooms(), getOffers(), getSite(), getList('testimonials'), getSettings()]);
   const dining = EXPERIENCES.filter((e) => e.id !== 'meetings');
   return (
     <>
-      <JsonLd data={[hotelLd, faqLd()]} />
+      <JsonLd data={[hotelLdWith(settings.social), faqLd()]} />
       <Hero slides={site.hero} gallery={site.gallery} />
       <SectionTabs items={TABS} />
 
@@ -176,6 +177,8 @@ export default async function Home() {
         </div>
       </section>
 
+      <SunriseCountdown />
+
       <HotelInfo />
 
       {site.gallery.length > 0 && (
@@ -192,7 +195,7 @@ export default async function Home() {
       </section>
       )}
 
-      <Reviews />
+      <Reviews items={reviews} reviewLink={settings.review_link || ''} />
 
       <LocationSection />
 

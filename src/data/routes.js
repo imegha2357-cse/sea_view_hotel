@@ -112,3 +112,27 @@ export const PAGES = [
 ];
 
 export const pageMeta = (path) => PAGES.find((p) => p.path === path) || PAGES[0];
+
+// Pages added in update 5 (forms, menu, news, room tools, local and language pages).
+PAGES.push(
+  { path: '/dining/menu', title: 'Restaurant menu | Sea View Restaurant, Kanyakumari', description: 'The menu at Sea View Restaurant, Hotel Sea View, Kanyakumari: Indian, Chinese and Continental dishes, vegetarian and non-vegetarian.', priority: '0.6' },
+  { path: '/news', title: 'News and travel notes | Hotel Sea View, Kanyakumari', description: 'News from Hotel Sea View and travel notes about Kanyakumari: sunrise, temples, ferries and festivals.', priority: '0.5' },
+  { path: '/rooms/compare', title: 'Compare rooms | Hotel Sea View, Kanyakumari', description: 'Compare the rooms at Hotel Sea View side by side: view, beds, size, guests and amenities.', priority: '0.6' },
+  { path: '/room-finder', title: 'Find your room | Hotel Sea View, Kanyakumari', description: 'Answer three quick questions and we suggest the room at Hotel Sea View that suits your trip.', priority: '0.5' },
+  { path: '/request/group', title: 'Group and pilgrim bookings | Hotel Sea View, Kanyakumari', description: 'Bringing a tour, pilgrim or family group to Kanyakumari? Tell us your dates and numbers and our team will send a quote.', priority: '0.6' },
+  { path: '/request/corporate', title: 'Corporate stays | Hotel Sea View, Kanyakumari', description: 'Company stays, conferences and team trips at Hotel Sea View, Kanyakumari. Ask for a corporate quote.', priority: '0.5' },
+  { path: '/request/gift', title: 'Gift a stay | Hotel Sea View, Kanyakumari', description: 'Give someone a sunrise stay in Kanyakumari. Tell us who it is for and our team will arrange a gift voucher.', priority: '0.5' },
+  { path: '/request/tour', title: 'Sightseeing and taxi | Hotel Sea View, Kanyakumari', description: 'Book sightseeing, airport and station transfers and day trips from Kanyakumari through our travel desk.', priority: '0.5' },
+  { path: '/request/table', title: 'Reserve a table | Sea View Restaurant, Kanyakumari', description: 'Reserve a table at Sea View Restaurant, Hotel Sea View, Kanyakumari.', priority: '0.5' },
+  { path: '/request/celebration', title: 'Birthday and anniversary set-ups | Hotel Sea View, Kanyakumari', description: 'Cake, flowers and room decoration for birthdays, anniversaries and proposals at Hotel Sea View.', priority: '0.5' },
+  { path: '/request/agent', title: 'Travel agents | Hotel Sea View, Kanyakumari', description: 'Travel agents and tour operators: register with Hotel Sea View, Kanyakumari for group and agent rates.', priority: '0.4' },
+  { path: '/request/callback', title: 'Request a call back | Hotel Sea View, Kanyakumari', description: 'Leave your number and a good time to call, and our team will call you back.', priority: '0.4' },
+  { path: '/kanyakumari-sunrise-hotel', title: 'Hotel with sunrise view in Kanyakumari | Hotel Sea View', description: 'Watch the sunrise over three seas from your room. Sea-facing rooms at Hotel Sea View look towards the Vivekananda Rock and Thiruvalluvar Statue.', priority: '0.6' },
+  { path: '/hotel-near-kanyakumari-beach', title: 'Hotel near Kanyakumari beach | Hotel Sea View', description: 'Hotel Sea View is on East Car Street, a short walk from Kanyakumari beach, the ferry point and the Bhagavathy Amman temple.', priority: '0.6' },
+  { path: '/family-hotel-kanyakumari', title: 'Family hotel in Kanyakumari | Hotel Sea View', description: 'Family rooms, 24-hour room service, a multi-cuisine restaurant and free parking near the beach in Kanyakumari.', priority: '0.6' },
+  { path: '/ta', title: 'ஹோட்டல் சீ வியூ, கன்னியாகுமரி | கடல் காட்சி அறைகள்', description: 'கன்னியாகுமரி கிழக்கு கார் தெருவில், கடற்கரை அருகே, சூரிய உதயம் காணும் கடல் காட்சி அறைகள்.', priority: '0.5' },
+  { path: '/hi', title: 'होटल सी व्यू, कन्याकुमारी | समुद्र के नज़ारे वाले कमरे', description: 'कन्याकुमारी में ईस्ट कार स्ट्रीट पर, समुद्र तट के पास, सूर्योदय के नज़ारे वाले कमरे।', priority: '0.5' },
+  { path: '/ml', title: 'ഹോട്ടൽ സീ വ്യൂ, കന്യാകുമാരി | കടൽ കാഴ്ചയുള്ള മുറികൾ', description: 'കന്യാകുമാരി ഈസ്റ്റ് കാർ സ്ട്രീറ്റിൽ, ബീച്ചിനടുത്ത്, സൂര്യോദയം കാണാവുന്ന മുറികൾ.', priority: '0.5' },
+  { path: '/brochure', title: 'Brochure | Hotel Sea View, Kanyakumari', description: 'A printable one-page brochure for Hotel Sea View, Kanyakumari: rooms, dining, events and how to reach us.', priority: '0.3' },
+  { path: '/brand', title: 'Brand and press | Hotel Sea View, Kanyakumari', description: 'Logo, colours and approved photos of Hotel Sea View for travel agents, press and partners.', priority: '0.3' }
+);

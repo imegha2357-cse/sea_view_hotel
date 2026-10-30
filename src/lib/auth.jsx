@@ -132,6 +132,9 @@ export function AuthProvider({ children }) {
         const data = { name: (patch.name ?? profile?.name ?? '').trim(), phone: (patch.phone ?? profile?.phone ?? '').trim() };
         if (patch.preferences) data.preferences = patch.preferences;
         if (patch.saved_rooms) data.saved_rooms = patch.saved_rooms;
+        if (patch.saved_items) data.saved_items = patch.saved_items.slice(0, 30);
+        for (const k of ['birthday', 'anniversary']) if (k in patch) data[k] = String(patch[k] || '').slice(0, 10);
+        if ('occasion_offers' in patch) data.occasion_offers = Boolean(patch.occasion_offers);
         const ref = fbx.F.doc(fbx.db, 'users', user.uid);
         const exists = (await fbx.F.getDoc(ref)).exists();
         if (exists) await fbx.F.updateDoc(ref, data);

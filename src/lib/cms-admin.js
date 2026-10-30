@@ -71,33 +71,123 @@ export async function importCurrentContent(me) {
 
 const clean = (o) => Object.fromEntries(Object.entries(o).filter(([, v]) => v !== undefined));
 
+// Keep a copy of a document before it changes, so staff can see who changed what and undo it.
+const plain = (v) => JSON.parse(JSON.stringify(v ?? null, (k, x) => (x && typeof x === 'object' && typeof x.toDate === 'function' ? x.toDate().toISOString() : x)));
+export async function remember(path, note, me) {
+  try {
+    const { db, F } = fb();
+    const [col, id] = path.split('/');
+    const snap = await F.getDoc(F.doc(db, col, id));
+    const data = snap.exists() ? plain(snap.data()) : null;
+    if (data && JSON.stringify(data).length > 900000) return; // too large to keep a copy (photo data)
+    await F.addDoc(F.collection(db, 'history'), { path, data, at: F.serverTimestamp(), by: String(me || '').slice(0, 120), note: String(note || '').slice(0, 200) });
+  } catch {
+    /* history is best effort; never block a save */
+  }
+}
+
+export async function loadHistory(n = 60) {
+  const { db, F } = fb();
+  const s = await F.getDocs(F.query(F.collection(db, 'history'), F.orderBy('at', 'desc'), F.limit(n)));
+  return s.docs.map((d) => ({ id: d.id, ...d.data() }));
+}
+
+export async function restore(entry, me) {
+  const { db, F } = fb();
+  const [col, id] = entry.path.split('/');
+  await remember(entry.path, 'Before undo', me);
+  if (entry.data === null) await F.deleteDoc(F.doc(db, col, id));
+  else {
+    const { updated_at: _u, ...rest } = entry.data;
+    await F.setDoc(F.doc(db, col, id), { ...rest, ...stamp(me) });
+  }
+  await publishChanges();
+}
+
+// ---------- Lists, settings, blog, inventory ----------
+
+export async function loadList(id) {
+  const { db, F } = fb();
+  const s = await F.getDoc(F.doc(db, 'lists', id));
+  return s.exists() ? s.data().items || [] : [];
+}
+export async function saveList(id, items, me) {
+  const { db, F } = fb();
+  await remember(`lists/${id}`, `Changed ${id}`, me);
+  await F.setDoc(F.doc(db, 'lists', id), { items, ...stamp(me) });
+  await publishChanges();
+}
+export async function loadSettings() {
+  const { db, F } = fb();
+  const s = await F.getDoc(F.doc(db, 'site', 'settings'));
+  return s.exists() ? s.data() : {};
+}
+export async function saveSettings(patch, me) {
+  const { db, F } = fb();
+  await remember('site/settings', 'Changed settings', me);
+  await F.setDoc(F.doc(db, 'site', 'settings'), { ...patch, ...stamp(me) }, { merge: true });
+  await publishChanges();
+}
+export async function loadPosts() {
+  const { db, F } = fb();
+  const s = await F.getDocs(F.collection(db, 'posts'));
+  return s.docs.map((d) => ({ slug: d.id, ...d.data() })).sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')));
+}
+export async function savePost(slug, post, me) {
+  const { db, F } = fb();
+  await remember(`posts/${slug}`, `Changed post ${post.title}`, me);
+  await F.setDoc(F.doc(db, 'posts', slug), clean({ ...post, ...stamp(me) }));
+  await publishChanges();
+}
+export async function deletePost(slug, me) {
+  const { db, F } = fb();
+  await remember(`posts/${slug}`, 'Deleted post', me);
+  await F.deleteDoc(F.doc(db, 'posts', slug));
+  await publishChanges();
+}
+export async function loadInventory() {
+  const { db, F } = fb();
+  const s = await F.getDocs(F.collection(db, 'inventory'));
+  return Object.fromEntries(s.docs.map((d) => [d.id, d.data().counts || {}]));
+}
+export async function saveInventory(roomId, counts, me) {
+  const { db, F } = fb();
+  await F.setDoc(F.doc(db, 'inventory', roomId), { counts, ...stamp(me) });
+  await publishChanges();
+}
+
 export async function saveRoom(id, room, me) {
   const { db, F } = fb();
+  await remember(`rooms/${id}`, `Changed room ${room.name || id}`, me);
   const { id: _drop, ...data } = room;
   await F.setDoc(F.doc(db, 'rooms', id), clean({ ...data, ...stamp(me) }));
   await publishChanges();
 }
 
-export async function deleteRoom(id) {
+export async function deleteRoom(id, me) {
   const { db, F } = fb();
+  await remember(`rooms/${id}`, 'Deleted room', me);
   await F.deleteDoc(F.doc(db, 'rooms', id));
   await publishChanges();
 }
 
 export async function saveOffer(code, offer, me) {
   const { db, F } = fb();
+  await remember(`offers/${code}`, `Changed offer ${offer.title || code}`, me);
   await F.setDoc(F.doc(db, 'offers', code), clean({ ...offer, code, ...stamp(me) }));
   await publishChanges();
 }
 
-export async function deleteOffer(code) {
+export async function deleteOffer(code, me) {
   const { db, F } = fb();
+  await remember(`offers/${code}`, 'Deleted offer', me);
   await F.deleteDoc(F.doc(db, 'offers', code));
   await publishChanges();
 }
 
 export async function saveSite(patch, me) {
   const { db, F } = fb();
+  await remember('site/content', 'Changed slides, banners or gallery', me);
   await F.setDoc(F.doc(db, 'site', 'content'), { ...patch, seeded: true, ...stamp(me) }, { merge: true });
   await publishChanges();
 }

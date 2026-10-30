@@ -30,8 +30,21 @@ export function roomFacts(r) {
 }
 
 // The fact sheet given to the AI model.
+// Facts the staff keep in the admin panel (Settings and Lists → Hotel policies). Set by /api/chat
+// before each answer, so the assistant always uses the latest check-in times and house rules.
+let EXTRA = { checkIn: '', checkOut: '', policies: [] };
+export function setLiveFacts(x = {}) {
+  EXTRA = { checkIn: x.checkIn || '', checkOut: x.checkOut || '', policies: (x.policies || []).filter((p) => p && p.title && p.text) };
+}
+const checkIn = () => EXTRA.checkIn || HOTEL.checkIn;
+const checkOut = () => EXTRA.checkOut || HOTEL.checkOut;
+
 export function knowledgeText(rooms = []) {
-  const policies = POLICIES.map((p) => `- ${p.title}: ${p.text}${p.confirmed ? '' : ' (NOT confirmed by the hotel; tell the guest to ask)'}`);
+  const own = new Set(EXTRA.policies.map((p) => p.title.toLowerCase()));
+  const policies = [
+    ...EXTRA.policies.map((p) => `- ${p.title}: ${p.text}`),
+    ...POLICIES.filter((p) => !own.has(p.title.toLowerCase()) && !(p.title === 'Check-in and check-out' && checkIn())).map((p) => `- ${p.title}: ${p.text}${p.confirmed ? '' : ' (NOT confirmed by the hotel; tell the guest to ask)'}`),
+  ];
   return [
     `HOTEL: ${HOTEL.name}, ${HOTEL.addressLines.join(', ')}.`,
     `Reservations phone and WhatsApp: ${HOTEL.phone}. Restaurant phone: ${HOTEL.restaurantPhone}. Email: ${HOTEL.email}.`,
@@ -56,7 +69,7 @@ export function knowledgeText(rooms = []) {
     '',
     'POLICIES:',
     ...policies,
-    `- Check-in and check-out times: ${HOTEL.checkIn ? `${HOTEL.checkIn} / ${HOTEL.checkOut}` : 'not published; ask the hotel'}.`,
+    `- Check-in and check-out times: ${checkIn() ? `${checkIn()} / ${checkOut() || 'ask the hotel'}` : 'not published; ask the hotel'}.`,
     '',
     'FREQUENT QUESTIONS:',
     ...FAQS.map((f) => `- Q: ${f.q} A: ${f.a}`),
@@ -109,7 +122,7 @@ export const INTENTS = [
     return `${RATE_NOTE}${list} You can [send an enquiry](/enquire) or ask on WhatsApp. [[WHATSAPP]]`;
   } },
   { id: 'avail', words: ['available', 'availability', 'vacancy', 'vacant', 'free room', 'book', 'booking', 'reserve', 'reservation', 'confirm'], answer: () => `I can't check live availability or make bookings. [Send an enquiry](/enquire) with your dates, or message us on WhatsApp, and our team will confirm availability and the rate. [[WHATSAPP]]` },
-  { id: 'checkin', words: ['check in', 'check-in', 'checkin', 'check out', 'check-out', 'checkout', 'early', 'late', 'arrival time', 'timing'], answer: () => (HOTEL.checkIn ? `Check-in is from ${HOTEL.checkIn} and check-out is by ${HOTEL.checkOut}.` : notConfirmed('check-in and check-out times')) },
+  { id: 'checkin', words: ['check in', 'check-in', 'checkin', 'check out', 'check-out', 'checkout', 'early', 'late', 'arrival time', 'timing'], answer: () => (checkIn() ? `Check-in is from ${checkIn()}${checkOut() ? ` and check-out is by ${checkOut()}` : ''}. Early check-in and late check-out depend on availability; just ask. [[WHATSAPP]]` : notConfirmed('check-in and check-out times')) },
   { id: 'photos', words: ['photo', 'photos', 'picture', 'pictures', 'image', 'images', 'pic', 'pics', 'look like', 'gallery', 'video', 'tour'], answer: () => `Here are our rooms. Tap one to see all its photos. You can also browse the [gallery](/gallery) or watch the [room tour video](/room-tour).`, showRooms: true },
   { id: 'seaview', words: ['sea view', 'seaview', 'sea-facing', 'sea facing', 'face the sea', 'faces the sea', 'sunrise', 'ocean', 'facing', 'balcony view'], answer: ({ rooms }) => {
     const sea = rooms.filter((r) => /sea/i.test(`${r.view} ${r.name}`) || (r.amenities || []).includes('sea_view'));

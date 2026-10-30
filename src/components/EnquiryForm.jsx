@@ -7,6 +7,7 @@ import { HOTEL } from '../data/content';
 import { useSiteData } from './SiteData';
 import {
   ADDONS,
+  ROOM_PREFS,
   CALLBACK_TIMES,
   draft,
   emptyEnquiry,
@@ -280,7 +281,7 @@ export default function EnquiryForm({ prefill, compact = false, onSubmitted, def
                 <>
                   <Counter label="Adults" hint="Age 6+" value={+v.adults} min={1} max={8} onChange={(n) => update({ adults: n })} />
                   <Counter label="Children" hint="Under 6" value={+v.children} min={0} max={6} onChange={(n) => update({ children: n })} />
-                  <Field id="room_type" label="Room preference" error={errors.room_type} className="full" staticLabel>
+                  <Field id="room_type" label="Room type" error={errors.room_type} staticLabel>
                     <select id="room_type" name="room_type" value={v.room_type} onChange={set('room_type')}>
                       <option value="">No preference</option>
                       {rooms.map((r) => (
@@ -288,6 +289,15 @@ export default function EnquiryForm({ prefill, compact = false, onSubmitted, def
                       ))}
                     </select>
                   </Field>
+                  <Counter label="Rooms" hint="How many" value={+v.rooms || 1} min={1} max={30} onChange={(n) => update({ rooms: n })} />
+                  <Field id="preference" label="Any room request?" className="full" staticLabel>
+                    <select id="preference" name="preference" value={v.preference} onChange={set('preference')}>
+                      {ROOM_PREFS.map((p) => (
+                        <option key={p}>{p}</option>
+                      ))}
+                    </select>
+                  </Field>
+                  <RoomsLeft room={rooms.find((r) => r.name === v.room_type)} from={v.check_in} to={v.check_out} />
                 </>
               ) : (
                 <Field id="event_guests" label="Number of guests (approx.)" error={errors.event_guests} className="full">
@@ -399,5 +409,37 @@ export default function EnquiryForm({ prefill, compact = false, onSubmitted, def
         )}
       </AnimatePresence>
     </div>
+  );
+}
+
+// Feature #15: "Only N left" from the room counts the front desk keeps (Admin → Room availability).
+function RoomsLeft({ room, from, to }) {
+  const [left, setLeft] = useState(null);
+  useEffect(() => {
+    setLeft(null);
+    if (!room || !from || !to || to <= from) return undefined;
+    let off = false;
+    import('@/lib/firebase').then(({ config }) =>
+      fetch(`https://firestore.googleapis.com/v1/projects/${config.projectId}/databases/(default)/documents/inventory/${room.id}?key=${config.apiKey}`)
+        .then((r) => (r.ok ? r.json() : null))
+        .then((j) => {
+          if (off || !j?.fields?.counts?.mapValue?.fields) return;
+          const counts = j.fields.counts.mapValue.fields;
+          const nights = [];
+          for (let d = new Date(`${from}T00:00:00Z`); d < new Date(`${to}T00:00:00Z`); d = new Date(d.getTime() + 864e5)) nights.push(d.toISOString().slice(0, 10));
+          const vals = nights.map((n) => counts[n]).filter(Boolean).map((v) => +(v.integerValue ?? v.doubleValue ?? NaN)).filter((n) => !Number.isNaN(n));
+          if (vals.length) setLeft(Math.min(...vals));
+        })
+        .catch(() => {})
+    );
+    return () => {
+      off = true;
+    };
+  }, [room, from, to]);
+  if (left === null || left > 3) return null;
+  return (
+    <p className={`full rooms-left ${left === 0 ? 'none' : ''}`} role="status">
+      {left === 0 ? `The ${room.name} is marked full for at least one of these nights. Try other dates or another room, or ask us on WhatsApp.` : `Only ${left} ${room.name}${left === 1 ? '' : 's'} left for these dates.`}
+    </p>
   );
 }

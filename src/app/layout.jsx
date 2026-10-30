@@ -6,6 +6,7 @@ import { SITE_URL } from '@/data/site';
 import { AuthProvider } from '@/lib/auth';
 import CookieConsent from '@/components/CookieConsent';
 import Boot from '@/components/site/Boot';
+import MotionPrefs from '@/components/MotionPrefs';
 import Loader, { loaderScript } from '@/components/site/Loader';
 import { SiteDataProvider } from '@/components/SiteData';
 import { getSiteData } from '@/lib/cms-server';
@@ -27,7 +28,7 @@ export const viewport = {
 };
 
 // Applied before the first paint so dark mode and larger text never flash.
-const prefs = `try{var p=JSON.parse(localStorage.getItem('seaview-display')||'{}');var r=document.documentElement;if(p.theme)r.dataset.theme=p.theme;if(p.large)r.dataset.text='large'}catch(e){}`;
+const prefs = `try{var p=JSON.parse(localStorage.getItem('seaview-display')||'{}');var r=document.documentElement;if(p.theme)r.dataset.theme=p.theme;if(p.large)r.dataset.text='large';if(p.contrast)r.dataset.contrast='high';if(p.still)r.dataset.motion='reduce';if(p.lowData)r.dataset.data='low'}catch(e){}`;
 
 export default async function RootLayout({ children }) {
   const data = await getSiteData();
@@ -44,7 +45,9 @@ export default async function RootLayout({ children }) {
           Skip to content
         </a>
         <AuthProvider>
-          <SiteDataProvider value={data}>{children}</SiteDataProvider>
+          <SiteDataProvider value={data}>
+            <MotionPrefs>{children}</MotionPrefs>
+          </SiteDataProvider>
           <CookieConsent />
           <Boot />
         </AuthProvider>

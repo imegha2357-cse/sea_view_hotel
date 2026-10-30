@@ -11,6 +11,11 @@ export default function Boot() {
   const pathname = usePathname();
   useEffect(() => {
     captureSource();
+    // Feature #57: a friend's referral link (?ref=CODE) is remembered for this browser.
+    try {
+      const ref = new URLSearchParams(window.location.search).get('ref');
+      if (ref && /^[A-Z0-9-]{4,20}$/i.test(ref)) localStorage.setItem('sv-ref', ref.toUpperCase());
+    } catch {}
     initErrorReporting();
     if ('serviceWorker' in navigator && process.env.NODE_ENV === 'production') navigator.serviceWorker.register('/sw.js').catch(() => {});
   }, []);
