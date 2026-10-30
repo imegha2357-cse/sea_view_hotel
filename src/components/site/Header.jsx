@@ -227,7 +227,7 @@ export default function Header() {
   };
 
   const solid = !hero || scrolled || Boolean(openId);
-  const account = user ? { href: isAdmin ? '/admin' : '/account', label: isAdmin ? 'Dashboard' : 'My account' } : { href: '/login', label: 'Login / Join' };
+  const account = user ? { href: isAdmin ? '/admin' : '/account', label: isAdmin ? 'Admin dashboard' : 'My dashboard' } : { href: '/login', label: 'Login / Join' };
   const active = (item) => item.href && (pathname === item.href || pathname.startsWith(`${item.href}/`));
 
   return (

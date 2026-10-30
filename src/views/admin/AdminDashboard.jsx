@@ -75,6 +75,7 @@ export default function AdminDashboard() {
             <span className="who">
               {me} · {staffRole === 'viewer' ? 'view only' : staffRole}
             </span>
+            <Link to="/account">Guest dashboard</Link>
             <Link to="/">View website</Link>
             <button className="text-btn" onClick={logout}>
               Sign out
@@ -111,7 +112,7 @@ export default function AdminDashboard() {
         <main id="main" className="dash-body">
           <div className="dash-head">
             <div>
-              <p className="dash-crumb">{isWebsite ? 'Website' : 'Hotel'}</p>
+              <p className="dash-crumb">Admin dashboard · {isWebsite ? 'Website' : 'Hotel'}</p>
               <h1>{TITLES[tab]}</h1>
               <p>{INTRO[tab]}</p>
             </div>

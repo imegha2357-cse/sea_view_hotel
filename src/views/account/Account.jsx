@@ -192,11 +192,11 @@ function EnquiryCard({ it, i, author, onRebook }) {
 
 export default function Account() {
   const { rooms } = useSiteData();
-  const { user, profile, logout, saveProfile } = useAuth();
+  const { user, profile, logout, saveProfile, isAdmin } = useAuth();
   const idleWarn = useIdleSignOut(30);
   const [items, setItems] = useState(null);
   const [error, setError] = useState('');
-  const [showForm, setShowForm] = useState(false);
+  const [tab, setTab] = useState('overview');
   const [prefill, setPrefill] = useState(null);
   const [p, setP] = useState({ name: '', phone: '' });
   const [prefs, setPrefs] = useState({ floor: '', bed: '', diet: '', notes: '' });
@@ -265,7 +265,7 @@ export default function Account() {
       check_out: '',
       message: prefs.notes ? `Preferences: ${prefs.notes}` : '',
     });
-    setShowForm(true);
+    setTab('new');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -290,16 +290,59 @@ export default function Account() {
     }
   };
 
+  const openCount = (items || []).filter((it) => !['Cancelled', 'Closed'].includes(it.status) && !(it.check_out?.toDate && it.check_out.toDate() < new Date())).length;
+  const savedCount = savedRooms.length + (profile?.saved_items?.length || 0);
+  const showPoints = Boolean(settings?.loyalty_rules && loyalty);
+  const go = (t) => {
+    setTab(t);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+  const NAV = [
+    ['overview', 'Overview', 'M3 12l9-8 9 8 M5 10v10h14V10'],
+    ['enquiries', 'My enquiries', 'M4 4h16v16H4z M8 9h8 M8 13h8 M8 17h5'],
+    ['new', 'New enquiry', 'M12 5v14 M5 12h14'],
+    ['saved', 'Saved rooms and guides', 'M12 21l-8-8a5 5 0 0 1 8-6 5 5 0 0 1 8 6z'],
+    ...(showPoints ? [['points', 'My points', 'M12 2l3 7h7l-5.5 4.5 2 7.5-6.5-4.5L5.5 21l2-7.5L2 9h7z']] : []),
+    ['profile', 'Profile and preferences', 'M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8z M4 21a8 8 0 0 1 16 0'],
+    ['invite', 'Invite a friend', 'M16 11a4 4 0 1 0-8 0 M3 21a9 9 0 0 1 18 0 M19 8v6 M16 11h6'],
+    ['help', 'Help', 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.7 M12 17h.01'],
+    ['data', 'Privacy and my data', 'M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z'],
+  ];
+  const TITLE = Object.fromEntries(NAV.map(([k, l]) => [k, l]));
+  const first = p.name ? p.name.split(' ')[0] : '';
+
+  const enquiriesPanel = (
+    <section className="panel" aria-labelledby="my-enq">
+      <h2 id="my-enq">My enquiries</h2>
+      {error && <div className="form-alert">{error}</div>}
+      {items === null && !error && <p className="meta">Loading…</p>}
+      {items?.length === 0 && (
+        <div className="empty">
+          <p>No enquiries yet.</p>
+          <button className="btn outline" onClick={() => go('new')}>
+            Send your first enquiry
+          </button>
+        </div>
+      )}
+      <div className="enq-list">
+        {items?.map((it, i) => (
+          <EnquiryCard key={it.id} it={it} i={i} author={p.name} onRebook={rebook} />
+        ))}
+      </div>
+    </section>
+  );
+
   return (
-    <div className="dash">
+    <div className="dash guest-dash">
       <header className="dash-top">
-        <div className="container">
+        <div className="container wide">
           <Link to="/" style={{ textDecoration: 'none' }} aria-label="Hotel Sea View home">
             <Brand />
           </Link>
           <nav aria-label="Account">
-            <span className="who">{user?.email}</span>
-            <Link to="/">Website</Link>
+            <span className="who">{user?.email} · {isAdmin ? 'staff preview' : 'guest'}</span>
+            {isAdmin && <Link to="/admin">Admin dashboard</Link>}
+            <Link to="/">View website</Link>
             <button className="text-btn" onClick={logout}>
               Sign out
             </button>
@@ -311,56 +354,192 @@ export default function Account() {
           You will be signed out in one minute because of inactivity. Move the mouse or press a key to stay signed in.
         </div>
       )}
-      <main id="main" className="container dash-body">
-        <div className="dash-head">
-          <div>
-            <h1>{p.name ? `Hello, ${p.name.split(' ')[0]}` : 'Welcome back'}</h1>
-            <p>Your enquiries and their status. Our team updates these as they follow up with you.</p>
-          </div>
-          <button className="btn solid" onClick={() => { setPrefill(null); setShowForm((s) => !s); }}>
-            {showForm ? 'Close form' : 'New enquiry'}
-          </button>
-        </div>
-
-        {upcoming && (
-          <div className="info-box upcoming">
-            <b>Your next stay:</b> {formatDate(upcoming.check_in)} to {formatDate(upcoming.check_out)}
-            {upcoming.room_type ? `, ${upcoming.room_type}` : ''}. {upcoming.checkin ? 'Online check-in done.' : 'Complete online check-in below to save time at the desk.'}
-          </div>
-        )}
-
-        <AnimatePresence initial={false}>
-          {showForm && (
-            <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.4, ease: EASE }} style={{ overflow: 'hidden' }}>
-              <EnquiryForm prefill={prefill} />
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        <div className="acct-grid">
-          <section className="panel" aria-labelledby="my-enq">
-            <h2 id="my-enq">My enquiries</h2>
-            {error && <div className="form-alert">{error}</div>}
-            {items === null && !error && <p className="meta">Loading…</p>}
-            {items?.length === 0 && (
-              <div className="empty">
-                <p>No enquiries yet.</p>
-                <button className="btn outline" onClick={() => setShowForm(true)}>
-                  Send your first enquiry
-                </button>
-              </div>
-            )}
-            <div className="enq-list">
-              {items?.map((it, i) => (
-                <EnquiryCard key={it.id} it={it} i={i} author={p.name} onRebook={rebook} />
+      <div className="container wide dash-shell">
+        <aside className="dash-side" aria-label="My dashboard">
+          <div className="dash-side-group">
+            <p className="dash-side-k">My dashboard</p>
+            <ul>
+              {NAV.map(([id, label, d]) => (
+                <li key={id}>
+                  <button type="button" className={tab === id ? 'on' : ''} aria-current={tab === id ? 'page' : undefined} onClick={() => go(id)}>
+                    {tab === id && <motion.span layoutId="guest-side-on" className="dash-side-on" transition={{ duration: 0.35, ease: EASE }} />}
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path d={d} />
+                    </svg>
+                    <span>{label}</span>
+                    {id === 'enquiries' && openCount > 0 && <small className="dash-count">{openCount}</small>}
+                  </button>
+                </li>
               ))}
+            </ul>
+          </div>
+        </aside>
+        <main id="main" className="dash-body">
+          <div className="dash-head">
+            <div>
+              <p className="dash-crumb">My dashboard</p>
+              <h1>{tab === 'overview' ? (first ? `Hello, ${first}` : 'Welcome back') : TITLE[tab]}</h1>
+              {tab === 'overview' && <p>Your enquiries, stays and saved places at Hotel Sea View, Kanyakumari.</p>}
             </div>
-          </section>
+            {tab !== 'new' && (
+              <button className="btn solid" onClick={() => { setPrefill(null); go('new'); }}>
+                New enquiry
+              </button>
+            )}
+          </div>
 
-          <aside style={{ display: 'grid', gap: 24 }}>
+          {tab === 'overview' && (
+            <>
+              {upcoming && (
+                <div className="info-box upcoming">
+                  <b>Your next stay:</b> {formatDate(upcoming.check_in)} to {formatDate(upcoming.check_out)}
+                  {upcoming.room_type ? `, ${upcoming.room_type}` : ''}. {upcoming.checkin ? 'Online check-in done.' : 'Complete online check-in in My enquiries to save time at the desk.'}
+                </div>
+              )}
+              <ul className="gd-stats" role="list">
+                <li>
+                  <button type="button" onClick={() => go('enquiries')}>
+                    <b>{items ? openCount : '–'}</b>
+                    <span>Open enquiries</span>
+                  </button>
+                </li>
+                <li>
+                  <button type="button" onClick={() => go('enquiries')}>
+                    <b>{upcoming ? formatDate(upcoming.check_in) : 'None yet'}</b>
+                    <span>Next stay</span>
+                  </button>
+                </li>
+                <li>
+                  <button type="button" onClick={() => go('saved')}>
+                    <b>{savedCount}</b>
+                    <span>Saved rooms and guides</span>
+                  </button>
+                </li>
+                {showPoints && (
+                  <li>
+                    <button type="button" onClick={() => go('points')}>
+                      <b>{loyalty.points || 0}</b>
+                      <span>Loyalty points</span>
+                    </button>
+                  </li>
+                )}
+              </ul>
+              <div className="gd-quick">
+                <a className="gd-q" href={whatsappUrl({ guest_name: p.name })} target="_blank" rel="noreferrer">
+                  <b>WhatsApp the hotel</b>
+                  <span>Fastest answers about dates and rates</span>
+                </a>
+                <Link className="gd-q" to="/stay">
+                  <b>Room guide</b>
+                  <span>Wi-Fi, breakfast, requests during your stay</span>
+                </Link>
+                <Link className="gd-q" to="/plan-your-visit">
+                  <b>Plan your visit</b>
+                  <span>Sunrise times, weather and directions</span>
+                </Link>
+                <Link className="gd-q" to="/room-finder">
+                  <b>Help me choose a room</b>
+                  <span>Three quick questions</span>
+                </Link>
+              </div>
+              {items?.length > 0 && (
+                <section className="panel" aria-labelledby="latest-h">
+                  <div className="cm-editor-head">
+                    <h2 id="latest-h">Latest enquiry</h2>
+                    <button type="button" className="text-btn" onClick={() => go('enquiries')}>
+                      All enquiries →
+                    </button>
+                  </div>
+                  <div className="enq-list">
+                    <EnquiryCard it={items[0]} i={0} author={p.name} onRebook={rebook} />
+                  </div>
+                </section>
+              )}
+            </>
+          )}
+
+          {tab === 'enquiries' && enquiriesPanel}
+
+          {tab === 'new' && (
+            <section className="panel">
+              <EnquiryForm prefill={prefill} />
+            </section>
+          )}
+
+          {tab === 'saved' && (
+            <>
+              <section className="panel" aria-labelledby="my-rooms">
+                <h2 id="my-rooms">Saved rooms</h2>
+                <p className="meta">Tick the rooms you like; they are remembered for your next enquiry.</p>
+                <form className="profile-form" onSubmit={onSave}>
+                  <fieldset className="addons">
+                    <legend className="sr-only">Saved rooms</legend>
+                    {rooms.map((r) => (
+                      <label key={r.id} className="check">
+                        <input type="checkbox" checked={savedRooms.includes(r.id)} onChange={() => toggleRoom(r.id)} />
+                        <span>
+                          <Link to={`/rooms/${r.id}`}>{r.name}</Link>
+                        </span>
+                      </label>
+                    ))}
+                  </fieldset>
+                  <div className="form-actions">
+                    <button className="btn outline" type="submit">
+                      Save
+                    </button>
+                    {saved && <span className="saved">{saved}</span>}
+                  </div>
+                </form>
+              </section>
+              <section className="panel" aria-labelledby="my-saved">
+                <h2 id="my-saved">Saved guides</h2>
+                {profile?.saved_items?.length ? (
+                  <ul className="saved-list">
+                    {profile.saved_items.map((x) => (
+                      <li key={x.href}>
+                        <Link to={x.href}>{x.title}</Link>
+                        <button type="button" className="text-btn muted" onClick={() => removeSaved(x.href)}>
+                          Remove
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="meta">
+                    Nothing saved yet. Tap "Save for later" on any <Link to="/guides">travel guide</Link>.
+                  </p>
+                )}
+              </section>
+            </>
+          )}
+
+          {tab === 'points' && showPoints && (
+            <section className="panel loyalty" aria-labelledby="my-points">
+              <p className="points">
+                <b>{loyalty.points || 0}</b> points
+              </p>
+              <p className="meta" style={{ whiteSpace: 'pre-line' }}>
+                {settings.loyalty_rules}
+              </p>
+              {loyalty.history?.length > 0 && (
+                <ul className="points-hist">
+                  {loyalty.history.slice(0, 20).map((h) => (
+                    <li key={h.at}>
+                      {h.pts > 0 ? '+' : ''}
+                      {h.pts} · {h.note || 'Points'} · {new Date(h.at).toLocaleDateString('en-IN')}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </section>
+          )}
+
+          {tab === 'profile' && (
             <section className="panel" aria-labelledby="my-details">
-              <h2 id="my-details">My details and preferences</h2>
-              <form className="profile-form" onSubmit={onSave}>
+              <h2 id="my-details" className="sr-only">
+                Profile and preferences
+              </h2>
+              <form className="profile-form gd-profile" onSubmit={onSave}>
                 <div className="field">
                   <input id="p-name" placeholder=" " autoComplete="name" value={p.name} onChange={(e) => setP((s) => ({ ...s, name: e.target.value }))} maxLength={80} />
                   <label htmlFor="p-name">Full name</label>
@@ -407,67 +586,25 @@ export default function Account() {
                   <input id="p-anniv" type="date" value={occ.anniversary} onChange={(e) => setOcc((s) => ({ ...s, anniversary: e.target.value }))} />
                   <label htmlFor="p-anniv">Anniversary (optional)</label>
                 </div>
-                <label className="check">
+                <label className="check gd-wide">
                   <input type="checkbox" checked={occ.occasion_offers} onChange={(e) => setOcc((s) => ({ ...s, occasion_offers: e.target.checked }))} />
                   <span>Send me an offer for my birthday or anniversary</span>
                 </label>
-                <fieldset className="addons">
-                  <legend>Saved rooms</legend>
-                  {rooms.map((r) => (
-                    <label key={r.id} className="check">
-                      <input type="checkbox" checked={savedRooms.includes(r.id)} onChange={() => toggleRoom(r.id)} />
-                      <span>
-                        <Link to={`/rooms/${r.id}`}>{r.name}</Link>
-                      </span>
-                    </label>
-                  ))}
-                </fieldset>
-                <div className="form-actions">
-                  <button className="btn outline" type="submit">
+                <div className="form-actions gd-wide">
+                  <button className="btn solid" type="submit">
                     Save details
                   </button>
                   {saved && <span className="saved">{saved}</span>}
                 </div>
               </form>
             </section>
-            {settings?.loyalty_rules && loyalty && (
-              <section className="panel loyalty" aria-labelledby="my-points">
-                <h2 id="my-points">My points</h2>
-                <p className="points">
-                  <b>{loyalty.points || 0}</b> points
-                </p>
-                <p className="meta" style={{ whiteSpace: 'pre-line' }}>
-                  {settings.loyalty_rules}
-                </p>
-                {loyalty.history?.length > 0 && (
-                  <ul className="points-hist">
-                    {loyalty.history.slice(0, 6).map((h) => (
-                      <li key={h.at}>
-                        {h.pts > 0 ? '+' : ''}
-                        {h.pts} · {h.note || 'Points'} · {new Date(h.at).toLocaleDateString('en-IN')}
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </section>
-            )}
-            {profile?.saved_items?.length > 0 && (
-              <section className="panel" aria-labelledby="my-saved">
-                <h2 id="my-saved">Saved for later</h2>
-                <ul className="saved-list">
-                  {profile.saved_items.map((x) => (
-                    <li key={x.href}>
-                      <Link to={x.href}>{x.title}</Link>
-                      <button type="button" className="text-btn muted" onClick={() => removeSaved(x.href)}>
-                        Remove
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              </section>
-            )}
+          )}
+
+          {tab === 'invite' && (
             <section className="panel" aria-labelledby="refer">
-              <h2 id="refer">Invite a friend</h2>
+              <h2 id="refer" className="sr-only">
+                Invite a friend
+              </h2>
               <p className="meta">Share your link. When a friend sends an enquiry through it, our team sees that you referred them.</p>
               <div className="cm-inline">
                 <input className="cm-input" readOnly value={refLink} aria-label="Your invite link" onFocus={(e) => e.target.select()} />
@@ -483,17 +620,35 @@ export default function Account() {
                 </button>
               </div>
             </section>
+          )}
+
+          {tab === 'help' && (
             <section className="panel" aria-labelledby="help">
-              <h2 id="help">Need help?</h2>
+              <h2 id="help" className="sr-only">
+                Help
+              </h2>
               <p className="meta" style={{ marginBottom: 12 }}>
-                Call {HOTEL.phone} or message us on WhatsApp.
+                Call {HOTEL.phone}, email {HOTEL.email}, or message us on WhatsApp. For an enquiry you have already sent, use Messages on that enquiry.
               </p>
-              <a className="btn solid wa" href={whatsappUrl({ guest_name: p.name })} target="_blank" rel="noreferrer">
-                WhatsApp the hotel
-              </a>
+              <div className="form-actions">
+                <a className="btn solid wa" href={whatsappUrl({ guest_name: p.name })} target="_blank" rel="noreferrer">
+                  WhatsApp the hotel
+                </a>
+                <a className="btn outline" href={`tel:${HOTEL.phoneHref}`}>
+                  Call {HOTEL.phone}
+                </a>
+                <Link className="btn outline" to="/policies#faqs">
+                  Questions and answers
+                </Link>
+              </div>
             </section>
+          )}
+
+          {tab === 'data' && (
             <section className="panel" aria-labelledby="my-data">
-              <h2 id="my-data">Your data</h2>
+              <h2 id="my-data" className="sr-only">
+                Privacy and my data
+              </h2>
               <p className="meta" style={{ marginBottom: 12 }}>
                 Download a copy of everything we hold about you, or delete it. See the <Link to="/privacy">privacy notice</Link>.
               </p>
@@ -507,9 +662,9 @@ export default function Account() {
               </div>
               {privacyMsg && <p className="meta" role="status">{privacyMsg}</p>}
             </section>
-          </aside>
-        </div>
-      </main>
+          )}
+        </main>
+      </div>
     </div>
   );
 }
