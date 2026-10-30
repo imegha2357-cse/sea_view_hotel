@@ -8,6 +8,7 @@ import PhotoStrip from '@/components/site/PhotoStrip';
 import { Chevron, LineTitle, Reveal } from '@/components/site/ui';
 import Photo from '@/components/Photo';
 import { Awards } from '@/components/site/ListSections';
+import ServiceBand from '@/components/site/ServiceBand';
 
 export const revalidate = 600;
 
@@ -57,6 +58,7 @@ export default function About() {
           { image: 'lobbyEntrance', caption: 'Lobby' },
         ]}
       />
+      <ServiceBand image="lobbyEntrance" alt="The lobby at Hotel Sea View" kicker="Hotel Sea View, Kanyakumari" title="A warm welcome at any hour" panelTitle="At your service" items={[['bell', '24-hour room service'], ['map', 'Sightseeing and taxis'], ['sun', 'Sunrise sea views'], ['car', 'Free parking']]} />
       <Highlights slides={HIGHLIGHT_SLIDES} title="What to expect" id="expect" />
       <section className="sec" aria-labelledby="fac-h">
         <div className="container wide">

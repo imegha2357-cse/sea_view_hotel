@@ -66,7 +66,7 @@ export default function Brand() {
           </ul>
           <h2>Contact</h2>
           <p>
-            For press and partnerships, email <a href={`mailto:${HOTEL.email}`}>{HOTEL.email}</a> or call {HOTEL.phone}. Travel agents can <a href="/request/agent">register here</a>.
+            For press and partnerships, email <a href={`mailto:${HOTEL.email}`}>{HOTEL.email}</a> or call {HOTEL.phone}.
           </p>
         </div>
       </section>

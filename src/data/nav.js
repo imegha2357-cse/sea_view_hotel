@@ -1,5 +1,6 @@
 // Header and footer structure, modelled on the Taj layout but pointing only at things Hotel Sea View has.
 import { ATTRACTIONS, HOTEL } from './content.js';
+import { waRequest } from './wa-requests.js';
 
 // Rooms and offers come from the admin panel, so the menu is built from the live data.
 export const buildNav = ({ rooms = [], offers = [] } = {}) => [
@@ -75,11 +76,10 @@ export const buildNav = ({ rooms = [], offers = [] } = {}) => [
         { label: 'Hotel policies', href: '/policies' },
         { label: 'Frequently asked questions', href: '/policies#faqs' },
         { label: 'Contact us', href: '/contact' },
-    { label: 'Group and pilgrim bookings', href: '/request/group' },
-    { label: 'Corporate stays', href: '/request/corporate' },
-    { label: 'Gift a stay', href: '/request/gift' },
-    { label: 'Travel agents', href: '/request/agent' },
-    { label: 'Request a call back', href: '/request/callback' },
+    { label: 'Group and pilgrim bookings', href: waRequest('group') },
+    { label: 'Corporate stays', href: waRequest('corporate') },
+    { label: 'Gift a stay', href: waRequest('gift') },
+    { label: 'Request a call back', href: waRequest('callback') },
     { label: 'News', href: '/news' },
         { label: 'Manage my enquiry', href: '/account', arrow: true },
       ],
@@ -115,11 +115,10 @@ export const FOOTER_LINKS = [
     { label: 'Hotel policies', href: '/policies' },
     { label: 'FAQs', href: '/policies#faqs' },
     { label: 'Contact us', href: '/contact' },
-    { label: 'Group and pilgrim bookings', href: '/request/group' },
-    { label: 'Corporate stays', href: '/request/corporate' },
-    { label: 'Gift a stay', href: '/request/gift' },
-    { label: 'Travel agents', href: '/request/agent' },
-    { label: 'Request a call back', href: '/request/callback' },
+    { label: 'Group and pilgrim bookings', href: waRequest('group') },
+    { label: 'Corporate stays', href: waRequest('corporate') },
+    { label: 'Gift a stay', href: waRequest('gift') },
+    { label: 'Request a call back', href: waRequest('callback') },
     { label: 'News', href: '/news' },
   ],
 ];

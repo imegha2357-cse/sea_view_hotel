@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { HOTEL } from '@/data/content';
 import { REQUEST_FORMS, REQUEST_SLUGS } from '@/data/requests';
+import { WA_REQUESTS, waRequest } from '@/data/wa-requests';
 import { meta } from '@/lib/meta';
 import { waLink } from '@/lib/enquiry';
 import PageTop from '@/components/site/PageTop';
@@ -39,6 +40,13 @@ export default function RequestPage({ params }) {
               {others.map((s) => (
                 <li key={s}>
                   <a href={`/request/${s}`}>{REQUEST_FORMS[s].title}</a>
+                </li>
+              ))}
+              {Object.entries(WA_REQUESTS).map(([k, w]) => (
+                <li key={k}>
+                  <a href={waRequest(k)} target="_blank" rel="noopener noreferrer">
+                    {w.title} (WhatsApp)
+                  </a>
                 </li>
               ))}
             </ul>

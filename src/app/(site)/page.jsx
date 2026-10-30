@@ -14,6 +14,7 @@ import OfferCard from '@/components/site/OfferCard';
 import { EventGrid } from '@/components/site/EventTypes';
 import { getList, getOffers, getRooms, getSettings, getSite } from '@/lib/cms-server';
 import SunriseCountdown from '@/components/site/SunriseCountdown';
+import ServiceBand from '@/components/site/ServiceBand';
 import { slugify } from '@/data/catalog';
 import HotelInfo from '@/components/site/HotelInfo';
 import Faq from '@/components/site/Faq';
@@ -86,6 +87,8 @@ export default async function Home() {
           </p>
         </div>
       </section>
+
+      <ServiceBand />
 
       <Highlights slides={HIGHLIGHT_SLIDES.map((h) => ({ ...h, image: site.highlights[slugify(h.title)] || h.image }))} />
 

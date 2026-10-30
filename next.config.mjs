@@ -64,6 +64,6 @@ export default {
       ['/room-type/:slug*', '/rooms'],
       ['/rooms-2/:slug*', '/rooms'],
     ].filter(([a, b]) => a !== b);
-    return [{ source: '/admin/', destination: '/admin', permanent: true }, ...old.map(([source, destination]) => ({ source, destination, permanent: true }))];
+    return [{ source: '/admin/', destination: '/admin', permanent: true }, { source: '/request/agent', destination: '/contact', permanent: true }, ...old.map(([source, destination]) => ({ source, destination, permanent: true }))];
   },
 };

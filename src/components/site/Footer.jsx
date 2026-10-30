@@ -143,7 +143,13 @@ export default function Footer() {
             <ul className="ftr-list">
               {FOOTER_LINKS[0].map((l) => (
                 <li key={l.href}>
-                  <Link href={l.href}>{l.label}</Link>
+                  {/^https?:/.test(l.href) ? (
+                    <a href={l.href} target="_blank" rel="noopener noreferrer">
+                      {l.label} <span className="sr-only">(opens WhatsApp)</span>
+                    </a>
+                  ) : (
+                    <Link href={l.href}>{l.label}</Link>
+                  )}
                 </li>
               ))}
             </ul>
@@ -156,7 +162,13 @@ export default function Footer() {
             <ul className="ftr-list">
               {FOOTER_LINKS[1].map((l) => (
                 <li key={l.href}>
-                  <Link href={l.href}>{l.label}</Link>
+                  {/^https?:/.test(l.href) ? (
+                    <a href={l.href} target="_blank" rel="noopener noreferrer">
+                      {l.label} <span className="sr-only">(opens WhatsApp)</span>
+                    </a>
+                  ) : (
+                    <Link href={l.href}>{l.label}</Link>
+                  )}
                 </li>
               ))}
             </ul>

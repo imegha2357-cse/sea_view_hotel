@@ -40,9 +40,15 @@ function MegaPanel({ item, onNavigate }) {
                 <ul key={ci}>
                   {col.map((l) => (
                     <motion.li key={l.href + l.label} variants={el}>
-                      <Link href={l.href} onClick={onNavigate}>
-                        {l.arrow && <Chevron />} {l.label}
-                      </Link>
+                      {/^https?:/.test(l.href) ? (
+                        <a href={l.href} target="_blank" rel="noopener noreferrer" onClick={onNavigate}>
+                          {l.label} <span className="sr-only">(opens WhatsApp)</span>
+                        </a>
+                      ) : (
+                        <Link href={l.href} onClick={onNavigate}>
+                          {l.arrow && <Chevron />} {l.label}
+                        </Link>
+                      )}
                     </motion.li>
                   ))}
                 </ul>
