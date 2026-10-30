@@ -137,7 +137,7 @@ export default function AdminDashboard() {
           {tab === 'guests' && <GuestsPanel canEdit={canEdit} me={me} />}
           {tab === 'qr' && <QrPanel />}
           {tab === 'newsletter' && <NewsletterPanel canEdit={canEdit} me={me} />}
-          {tab === 'setup' && <SetupPanel />}
+          {tab === 'setup' && <SetupPanel me={me} canEdit={canEdit} />}
           {tab === 'staff' && <StaffPanel me={me} user={user} staffRole={staffRole} />}
           {tab === 'availability' && <AvailabilityEditor canEdit={canEdit} me={me} />}
           {tab === 'inbox' && <Inbox canEdit={canEdit} />}

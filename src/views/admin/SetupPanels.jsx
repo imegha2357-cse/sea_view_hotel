@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { fb } from '@/lib/firebase';
+import { clearDemo, loadDemo } from '@/lib/demo-data';
 
 const authed = async (path, opts = {}) => {
   const token = await fb().auth.currentUser?.getIdToken();
@@ -132,10 +133,50 @@ const ITEMS = [
   ['cloudinary', 'Faster photos', 'NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME', 'Serves photos from Cloudinary’s image network.'],
   ['analytics', 'Visitor statistics', 'NEXT_PUBLIC_GA_ID', 'Google Analytics, only for visitors who accept cookies.'],
 ];
-export function SetupPanel() {
+function DemoData({ me, canEdit }) {
+  const [busy, setBusy] = useState('');
+  const [msg, setMsg] = useState(null);
+  const run = async (kind) => {
+    if (kind === 'clear' && !window.confirm('Remove all demo data?')) return;
+    setBusy(kind);
+    setMsg(null);
+    try {
+      if (kind === 'load') setMsg({ ok: true, text: `Added ${(await loadDemo(me)).join(', ')}. Open Requests, Housekeeping, Menu and News to see them.` });
+      else {
+        await clearDemo(me);
+        setMsg({ ok: true, text: 'Demo data removed.' });
+      }
+    } catch (e) {
+      setMsg({ ok: false, text: e.message });
+    } finally {
+      setBusy('');
+    }
+  };
+  return (
+    <section className="panel">
+      <h2>Demo data</h2>
+      <p className="meta">Fills the panel with sample data so you can try it: 15 requests, 15 rooms on the housekeeping board, 15 menu dishes (hidden from guests) and 3 draft posts. Guests never see any of it. Remove it before going live.</p>
+      <div className="form-actions">
+        <button type="button" className="btn solid sm" disabled={!canEdit || busy} onClick={() => run('load')}>
+          {busy === 'load' && <span className="spin" aria-hidden="true" />}
+          Load demo data
+        </button>
+        <button type="button" className="btn outline sm" disabled={!canEdit || busy} onClick={() => run('clear')}>
+          {busy === 'clear' && <span className="spin" aria-hidden="true" />}
+          Remove demo data
+        </button>
+      </div>
+      {msg && <p className={msg.ok ? 'cm-ok' : 'form-alert'}>{msg.text}</p>}
+    </section>
+  );
+}
+
+export function SetupPanel({ me, canEdit }) {
   const st = useStatus();
   const [keys, setKeys] = useState(null);
   return (
+    <>
+    <DemoData me={me} canEdit={canEdit} />
     <section className="panel">
       <p className="meta">
         Each service is switched on by adding its key in Vercel: Project → Settings → Environment Variables, then Redeploy. Keys are never shown here. The full step-by-step guide is in the setup document.
@@ -173,5 +214,6 @@ export function SetupPanel() {
         </button>
       )}
     </section>
+    </>
   );
 }
