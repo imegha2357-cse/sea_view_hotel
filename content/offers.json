@@ -1,0 +1,78 @@
+[
+  {
+    "id": "EXPLORE",
+    "includes": [
+      "Any room type",
+      "Sightseeing tour arranged by our travel desk",
+      "Pick-up from the station or bus stand on request"
+    ],
+    "code": "EXPLORE",
+    "text": "Your room plus a sightseeing plan from our travel desk: the island memorials, the Gandhi Memorial Mandapam, the beach and Sunset Point.",
+    "order": 3,
+    "image": "vivekananda",
+    "title": "Stay and sightseeing",
+    "published": true,
+    "tag": "With our travel desk",
+    "room": "",
+    "type": "stay",
+    "updated_at": "2026-10-29T17:43:13.217Z",
+    "updated_by": "imegha2357@gmail.com"
+  },
+  {
+    "id": "FAMILY",
+    "type": "stay",
+    "room": "Twin Room (interconnected)",
+    "tag": "Families",
+    "title": "Family together",
+    "includes": [
+      "Interconnected Twin Rooms",
+      "Sleeps 4 adults and 4 children under 6",
+      "24-hour room service"
+    ],
+    "image": "roomTwin",
+    "code": "FAMILY",
+    "text": "Two interconnected rooms with a door between them: everyone close, everyone with their own space. One balcony faces the sea.",
+    "order": 2,
+    "updated_at": "2026-10-29T17:43:13.217Z",
+    "published": true,
+    "updated_by": "imegha2357@gmail.com"
+  },
+  {
+    "id": "LONGSTAY",
+    "type": "stay",
+    "title": "Longer stays",
+    "order": 4,
+    "image": "roomSuite",
+    "updated_at": "2026-10-29T17:43:13.217Z",
+    "room": "",
+    "updated_by": "imegha2357@gmail.com",
+    "includes": [
+      "Any room type",
+      "Rate quoted for your dates",
+      "Restaurant and 24-hour room service on site"
+    ],
+    "published": true,
+    "code": "LONGSTAY",
+    "text": "Staying four nights or more? Tell us your dates and ask our team for a rate for a longer stay.",
+    "tag": "4 nights or more"
+  },
+  {
+    "id": "MEET",
+    "updated_at": "2026-10-29T17:43:13.217Z",
+    "updated_by": "imegha2357@gmail.com",
+    "tag": "Business",
+    "type": "meeting",
+    "published": true,
+    "code": "MEET",
+    "text": "Hold your meeting or training in our conference hall, with catering from Sea View Restaurant and rooms for people travelling in.",
+    "title": "Meeting and stay",
+    "includes": [
+      "Conference hall",
+      "Catering from Sea View Restaurant",
+      "Rooms for attendees"
+    ],
+    "room": "",
+    "image": "meeting",
+    "order": 5
+  }
+]

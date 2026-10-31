@@ -1,0 +1,129 @@
+[
+  {
+    "id": "menu",
+    "updated_at": "2026-10-30T13:23:32.540Z",
+    "updated_by": "imegha2357@gmail.com",
+    "items": [
+      {
+        "name": "Idli with sambar and chutney",
+        "section": "Breakfast",
+        "diet": "Veg",
+        "price": "",
+        "note": "Demo dish: replace with the real menu",
+        "hidden": true
+      },
+      {
+        "name": "Masala dosa",
+        "section": "Breakfast",
+        "diet": "Veg",
+        "price": "",
+        "note": "Demo dish: replace with the real menu",
+        "hidden": true
+      },
+      {
+        "name": "Pongal with vada",
+        "section": "Breakfast",
+        "diet": "Veg",
+        "price": "",
+        "note": "Demo dish: replace with the real menu",
+        "hidden": true
+      },
+      {
+        "name": "Gobi 65",
+        "section": "Starters",
+        "diet": "Veg",
+        "price": "",
+        "note": "Demo dish: replace with the real menu",
+        "hidden": true
+      },
+      {
+        "name": "Chicken 65",
+        "section": "Starters",
+        "diet": "Non-veg",
+        "price": "",
+        "note": "Demo dish: replace with the real menu",
+        "hidden": true
+      },
+      {
+        "name": "Fish fry",
+        "section": "Starters",
+        "diet": "Non-veg",
+        "price": "",
+        "note": "Demo dish: replace with the real menu",
+        "hidden": true
+      },
+      {
+        "name": "South Indian meals",
+        "section": "Mains",
+        "diet": "Veg",
+        "price": "",
+        "note": "Demo dish: replace with the real menu",
+        "hidden": true
+      },
+      {
+        "name": "Kerala fish curry",
+        "section": "Mains",
+        "diet": "Non-veg",
+        "price": "",
+        "note": "Demo dish: replace with the real menu",
+        "hidden": true
+      },
+      {
+        "name": "Chettinad chicken",
+        "section": "Mains",
+        "diet": "Non-veg",
+        "price": "",
+        "note": "Demo dish: replace with the real menu",
+        "hidden": true
+      },
+      {
+        "name": "Paneer butter masala",
+        "section": "Mains",
+        "diet": "Veg",
+        "price": "",
+        "note": "Demo dish: replace with the real menu",
+        "hidden": true
+      },
+      {
+        "name": "Veg fried rice",
+        "section": "Breads and rice",
+        "diet": "Veg",
+        "price": "",
+        "note": "Demo dish: replace with the real menu",
+        "hidden": true
+      },
+      {
+        "name": "Parotta",
+        "section": "Breads and rice",
+        "diet": "Veg",
+        "price": "",
+        "note": "Demo dish: replace with the real menu",
+        "hidden": true
+      },
+      {
+        "name": "Egg biryani",
+        "section": "Breads and rice",
+        "diet": "Egg",
+        "price": "",
+        "note": "Demo dish: replace with the real menu",
+        "hidden": true
+      },
+      {
+        "name": "Gulab jamun",
+        "section": "Desserts",
+        "diet": "Veg",
+        "price": "",
+        "note": "Demo dish: replace with the real menu",
+        "hidden": true
+      },
+      {
+        "name": "Fresh lime soda",
+        "section": "Drinks",
+        "diet": "Vegan",
+        "price": "",
+        "note": "Demo dish: replace with the real menu",
+        "hidden": true
+      }
+    ]
+  }
+]

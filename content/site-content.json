@@ -1,0 +1,183 @@
+{
+  "seeded": true,
+  "gallery": [
+    {
+      "image": "building",
+      "alt": "",
+      "cat": "Hotel"
+    },
+    {
+      "image": "roomDeluxe",
+      "alt": "",
+      "cat": "Rooms"
+    },
+    {
+      "image": "vivekananda",
+      "alt": "",
+      "cat": "Views"
+    },
+    {
+      "image": "lobby",
+      "alt": "",
+      "cat": "Hotel"
+    },
+    {
+      "image": "restaurant1",
+      "alt": "",
+      "cat": "Dining"
+    },
+    {
+      "image": "roomSuite",
+      "alt": "",
+      "cat": "Rooms"
+    },
+    {
+      "image": "thiruvalluvar",
+      "alt": "",
+      "cat": "Views"
+    },
+    {
+      "image": "entrance",
+      "alt": "",
+      "cat": "Hotel"
+    },
+    {
+      "image": "bar1",
+      "alt": "",
+      "cat": "Dining"
+    },
+    {
+      "image": "roomCorner",
+      "alt": "",
+      "cat": "Rooms"
+    },
+    {
+      "image": "sunset",
+      "alt": "",
+      "cat": "Views"
+    },
+    {
+      "image": "dining",
+      "alt": "",
+      "cat": "Dining"
+    },
+    {
+      "image": "roomTwin",
+      "alt": "",
+      "cat": "Rooms"
+    },
+    {
+      "image": "meeting",
+      "alt": "",
+      "cat": "Hotel"
+    },
+    {
+      "image": "beach",
+      "alt": "",
+      "cat": "Views"
+    },
+    {
+      "image": "restaurant2",
+      "alt": "",
+      "cat": "Dining"
+    },
+    {
+      "image": "roomStandard",
+      "alt": "",
+      "cat": "Rooms"
+    },
+    {
+      "image": "bar2",
+      "alt": "",
+      "cat": "Dining"
+    },
+    {
+      "image": "gandhi",
+      "alt": "",
+      "cat": "Views"
+    },
+    {
+      "image": "lounge",
+      "alt": "Lounge beside the lobby",
+      "cat": "Hotel"
+    },
+    {
+      "image": "lobbyEntrance",
+      "alt": "Lobby and entrance",
+      "cat": "Hotel"
+    },
+    {
+      "image": "foyer",
+      "alt": "Marble steps up to the lobby",
+      "cat": "Hotel"
+    },
+    {
+      "image": "roomCornerView",
+      "alt": "The view from a corner room",
+      "cat": "Rooms"
+    },
+    {
+      "image": "buffetArea",
+      "alt": "Buffet area",
+      "cat": "Dining"
+    },
+    {
+      "image": "buffet",
+      "alt": "Buffet counter",
+      "cat": "Dining"
+    },
+    {
+      "image": "restaurantHall",
+      "alt": "Restaurant seating",
+      "cat": "Dining"
+    },
+    {
+      "image": "conferenceTheatre",
+      "alt": "Conference hall in theatre seating",
+      "cat": "Hotel"
+    },
+    {
+      "image": "meetingHall",
+      "alt": "Hall set for a function",
+      "cat": "Hotel"
+    }
+  ],
+  "categories": [
+    {
+      "id": "sea-view",
+      "title": "Sea-view rooms",
+      "text": "Rooms on the sea side of the hotel, facing the Vivekananda Rock Memorial and the Thiruvalluvar Statue. The sunrise comes to you."
+    },
+    {
+      "id": "city-family",
+      "title": "City and family rooms",
+      "text": "Standard Rooms look over the town, and the interconnected Twin Rooms keep families together, with one balcony facing the sea."
+    }
+  ],
+  "banners": {},
+  "updated_at": "2026-10-30T11:31:11.379Z",
+  "updated_by": "imegha2357@gmail.com",
+  "highlights": {},
+  "hero": [
+    {
+      "image": "vivekananda",
+      "caption": "Vivekananda Rock Memorial, a short ferry ride away"
+    },
+    {
+      "image": "building",
+      "caption": "Hotel Sea View, East Car Street"
+    },
+    {
+      "image": "roomDeluxe",
+      "caption": "Deluxe Seaview Room"
+    },
+    {
+      "image": "restaurant1",
+      "caption": "Sea View Restaurant"
+    },
+    {
+      "image": "frontNight",
+      "caption": "Hotel Sea View, East Car Street, at night"
+    }
+  ]
+}
