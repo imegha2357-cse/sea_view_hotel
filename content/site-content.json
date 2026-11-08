@@ -1,19 +1,27 @@
 {
-  "seeded": true,
   "banners": {},
-  "categories": [
+  "hero": [
     {
-      "id": "sea-view",
-      "title": "Sea-view rooms",
-      "text": "Rooms on the sea side of the hotel, facing the Vivekananda Rock Memorial and the Thiruvalluvar Statue. The sunrise comes to you."
+      "image": "vivekananda",
+      "caption": "Vivekananda Rock Memorial, a short ferry ride away"
     },
     {
-      "id": "city-family",
-      "title": "City and family rooms",
-      "text": "Standard Rooms look over the town, and the interconnected Twin Rooms keep families together, with one balcony facing the sea."
+      "image": "building",
+      "caption": "Hotel Sea View, East Car Street"
+    },
+    {
+      "image": "roomDeluxe",
+      "caption": "Deluxe Seaview Room"
+    },
+    {
+      "image": "restaurant1",
+      "caption": "Sea View Restaurant"
+    },
+    {
+      "image": "frontNight",
+      "caption": "Hotel Sea View, East Car Street, at night"
     }
   ],
-  "updated_by": "imegha2357@gmail.com",
   "updated_at": "2026-10-30T11:31:11.379Z",
   "gallery": [
     {
@@ -157,27 +165,19 @@
       "cat": "Hotel"
     }
   ],
-  "hero": [
+  "updated_by": "imegha2357@gmail.com",
+  "categories": [
     {
-      "image": "vivekananda",
-      "caption": "Vivekananda Rock Memorial, a short ferry ride away"
+      "id": "sea-view",
+      "title": "Sea-view rooms",
+      "text": "Rooms on the sea side of the hotel, facing the Vivekananda Rock Memorial and the Thiruvalluvar Statue. The sunrise comes to you."
     },
     {
-      "image": "building",
-      "caption": "Hotel Sea View, East Car Street"
-    },
-    {
-      "image": "roomDeluxe",
-      "caption": "Deluxe Seaview Room"
-    },
-    {
-      "image": "restaurant1",
-      "caption": "Sea View Restaurant"
-    },
-    {
-      "image": "frontNight",
-      "caption": "Hotel Sea View, East Car Street, at night"
+      "id": "city-family",
+      "title": "City and family rooms",
+      "text": "Standard Rooms look over the town, and the interconnected Twin Rooms keep families together, with one balcony facing the sea."
     }
   ],
+  "seeded": true,
   "highlights": {}
 }
