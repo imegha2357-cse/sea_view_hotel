@@ -1,5 +1,6 @@
 {
-  "banners": {},
+  "updated_by": "imegha2357@gmail.com",
+  "seeded": true,
   "hero": [
     {
       "image": "vivekananda",
@@ -23,6 +24,7 @@
     }
   ],
   "updated_at": "2026-10-30T11:31:11.379Z",
+  "highlights": {},
   "gallery": [
     {
       "image": "building",
@@ -165,7 +167,6 @@
       "cat": "Hotel"
     }
   ],
-  "updated_by": "imegha2357@gmail.com",
   "categories": [
     {
       "id": "sea-view",
@@ -178,6 +179,5 @@
       "text": "Standard Rooms look over the town, and the interconnected Twin Rooms keep families together, with one balcony facing the sea."
     }
   ],
-  "seeded": true,
-  "highlights": {}
+  "banners": {}
 }
