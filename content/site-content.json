@@ -1,5 +1,8 @@
 {
+  "highlights": {},
   "updated_at": "2026-10-30T11:31:11.379Z",
+  "banners": {},
+  "seeded": true,
   "gallery": [
     {
       "image": "building",
@@ -142,7 +145,6 @@
       "cat": "Hotel"
     }
   ],
-  "highlights": {},
   "categories": [
     {
       "id": "sea-view",
@@ -177,7 +179,5 @@
       "image": "frontNight",
       "caption": "Hotel Sea View, East Car Street, at night"
     }
-  ],
-  "banners": {},
-  "seeded": true
+  ]
 }
