@@ -1,11 +1,11 @@
 {
-  "social": {},
-  "loyalty_rules": "",
-  "check_in": "",
-  "updated_at": "2026-10-30T14:09:19.168Z",
-  "check_out": "",
-  "theme": "diwali",
   "stay_info": {},
+  "social": {},
+  "updated_at": "2026-10-30T14:09:19.168Z",
+  "updated_by": "imegha2357@gmail.com",
   "review_link": "",
-  "updated_by": "imegha2357@gmail.com"
+  "loyalty_rules": "",
+  "theme": "diwali",
+  "check_out": "",
+  "check_in": ""
 }
