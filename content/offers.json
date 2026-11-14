@@ -1,65 +1,66 @@
 [
   {
     "id": "EXPLORE",
+    "published": true,
+    "updated_by": "imegha2357@gmail.com",
+    "tag": "With our travel desk",
+    "code": "EXPLORE",
+    "text": "Your room plus a sightseeing plan from our travel desk: the island memorials, the Gandhi Memorial Mandapam, the beach and Sunset Point.",
+    "updated_at": "2026-10-29T17:43:13.217Z",
+    "type": "stay",
+    "title": "Stay and sightseeing",
     "image": "vivekananda",
+    "room": "",
+    "order": 3,
     "includes": [
       "Any room type",
       "Sightseeing tour arranged by our travel desk",
       "Pick-up from the station or bus stand on request"
-    ],
-    "type": "stay",
-    "room": "",
-    "updated_at": "2026-10-29T17:43:13.217Z",
-    "tag": "With our travel desk",
-    "updated_by": "imegha2357@gmail.com",
-    "published": true,
-    "title": "Stay and sightseeing",
-    "text": "Your room plus a sightseeing plan from our travel desk: the island memorials, the Gandhi Memorial Mandapam, the beach and Sunset Point.",
-    "order": 3,
-    "code": "EXPLORE"
+    ]
   },
   {
     "id": "FAMILY",
+    "order": 2,
+    "room": "Twin Room (interconnected)",
+    "title": "Family together",
+    "image": "roomTwin",
+    "published": true,
+    "type": "stay",
+    "code": "FAMILY",
+    "text": "Two interconnected rooms with a door between them: everyone close, everyone with their own space. One balcony faces the sea.",
+    "tag": "Families",
+    "updated_by": "imegha2357@gmail.com",
+    "updated_at": "2026-10-29T17:43:13.217Z",
     "includes": [
       "Interconnected Twin Rooms",
       "Sleeps 4 adults and 4 children under 6",
       "24-hour room service"
-    ],
-    "code": "FAMILY",
-    "order": 2,
-    "text": "Two interconnected rooms with a door between them: everyone close, everyone with their own space. One balcony faces the sea.",
-    "title": "Family together",
-    "published": true,
-    "updated_at": "2026-10-29T17:43:13.217Z",
-    "tag": "Families",
-    "room": "Twin Room (interconnected)",
-    "updated_by": "imegha2357@gmail.com",
-    "type": "stay",
-    "image": "roomTwin"
+    ]
   },
   {
     "id": "LONGSTAY",
-    "code": "LONGSTAY",
-    "published": true,
-    "updated_at": "2026-10-29T17:43:13.217Z",
-    "order": 4,
-    "updated_by": "imegha2357@gmail.com",
-    "text": "Staying four nights or more? Tell us your dates and ask our team for a rate for a longer stay.",
-    "title": "Longer stays",
     "tag": "4 nights or more",
-    "room": "",
-    "type": "stay",
     "includes": [
       "Any room type",
       "Rate quoted for your dates",
       "Restaurant and 24-hour room service on site"
     ],
-    "image": "roomSuite"
+    "text": "Staying four nights or more? Tell us your dates and ask our team for a rate for a longer stay.",
+    "code": "LONGSTAY",
+    "type": "stay",
+    "updated_at": "2026-10-29T17:43:13.217Z",
+    "published": true,
+    "title": "Longer stays",
+    "image": "roomSuite",
+    "updated_by": "imegha2357@gmail.com",
+    "room": "",
+    "order": 4
   },
   {
     "id": "MEET",
+    "updated_at": "2026-10-29T17:43:13.217Z",
+    "published": true,
     "room": "",
-    "image": "meeting",
     "updated_by": "imegha2357@gmail.com",
     "includes": [
       "Conference hall",
@@ -67,12 +68,11 @@
       "Rooms for attendees"
     ],
     "type": "meeting",
-    "updated_at": "2026-10-29T17:43:13.217Z",
     "code": "MEET",
-    "published": true,
-    "title": "Meeting and stay",
     "text": "Hold your meeting or training in our conference hall, with catering from Sea View Restaurant and rooms for people travelling in.",
+    "tag": "Business",
     "order": 5,
-    "tag": "Business"
+    "image": "meeting",
+    "title": "Meeting and stay"
   }
 ]
