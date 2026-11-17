@@ -1,31 +1,4 @@
 {
-  "updated_by": "imegha2357@gmail.com",
-  "highlights": {},
-  "seeded": true,
-  "hero": [
-    {
-      "image": "vivekananda",
-      "caption": "Vivekananda Rock Memorial, a short ferry ride away"
-    },
-    {
-      "image": "building",
-      "caption": "Hotel Sea View, East Car Street"
-    },
-    {
-      "image": "roomDeluxe",
-      "caption": "Deluxe Seaview Room"
-    },
-    {
-      "image": "restaurant1",
-      "caption": "Sea View Restaurant"
-    },
-    {
-      "image": "frontNight",
-      "caption": "Hotel Sea View, East Car Street, at night"
-    }
-  ],
-  "updated_at": "2026-10-30T11:31:11.379Z",
-  "banners": {},
   "gallery": [
     {
       "image": "building",
@@ -168,6 +141,31 @@
       "cat": "Hotel"
     }
   ],
+  "banners": {},
+  "hero": [
+    {
+      "image": "vivekananda",
+      "caption": "Vivekananda Rock Memorial, a short ferry ride away"
+    },
+    {
+      "image": "building",
+      "caption": "Hotel Sea View, East Car Street"
+    },
+    {
+      "image": "roomDeluxe",
+      "caption": "Deluxe Seaview Room"
+    },
+    {
+      "image": "restaurant1",
+      "caption": "Sea View Restaurant"
+    },
+    {
+      "image": "frontNight",
+      "caption": "Hotel Sea View, East Car Street, at night"
+    }
+  ],
+  "seeded": true,
+  "updated_at": "2026-10-30T11:31:11.379Z",
   "categories": [
     {
       "id": "sea-view",
@@ -179,5 +177,7 @@
       "title": "City and family rooms",
       "text": "Standard Rooms look over the town, and the interconnected Twin Rooms keep families together, with one balcony facing the sea."
     }
-  ]
+  ],
+  "updated_by": "imegha2357@gmail.com",
+  "highlights": {}
 }
