@@ -1,29 +1,29 @@
 [
   {
     "id": "corner-deluxe",
+    "size": "",
+    "order": 3,
+    "rate": null,
+    "category": "sea-view",
+    "occupancy": "2 adults + 2 children under 6",
     "features": [
       "Corner position",
       "Sea view on the sunrise side",
       "Private bathroom",
       "Television"
     ],
-    "size": "",
-    "category": "sea-view",
-    "guests": 4,
-    "rate": null,
     "updated_by": "imegha2357@gmail.com",
+    "view": "Sea view",
+    "guests": 4,
+    "updated_at": "2026-10-30T11:31:27.190Z",
+    "summary": "Set on a corner of the building on the sunrise side, looking out over the sea.",
     "images": [
       "roomCorner",
       "roomCornerView"
     ],
-    "summary": "Set on a corner of the building on the sunrise side, looking out over the sea.",
-    "view": "Sea view",
-    "occupancy": "2 adults + 2 children under 6",
     "description": "Set on a corner of the building on the sunrise side, looking out over the sea.",
     "beds": "King or twin",
-    "published": true,
     "name": "Corner Deluxe Room",
-    "updated_at": "2026-10-30T11:31:27.190Z",
     "amenities": [
       "sea_view",
       "sunrise",
@@ -32,21 +32,25 @@
       "phone",
       "room_service"
     ],
-    "order": 3
+    "published": true
   },
   {
     "id": "deluxe-seaview",
-    "rate": null,
+    "summary": "Our classic sea-facing room. Look straight out to the Vivekananda Rock Memorial and the Thiruvalluvar Statue, and watch the sunrise without leaving your bed.",
     "updated_by": "imegha2357@gmail.com",
-    "occupancy": "2 adults + 2 children under 6",
-    "size": "",
-    "category": "sea-view",
-    "view": "Sea view",
+    "beds": "King or twin",
     "guests": 4,
     "images": [
       "roomDeluxe",
       "seaView"
     ],
+    "occupancy": "2 adults + 2 children under 6",
+    "name": "Deluxe Seaview Room",
+    "description": "Our classic sea-facing room. Look straight out to the Vivekananda Rock Memorial and the Thiruvalluvar Statue, and watch the sunrise without leaving your bed.",
+    "order": 1,
+    "category": "sea-view",
+    "rate": null,
+    "size": "",
     "features": [
       "Faces the island memorials",
       "Sunrise from the bed",
@@ -54,32 +58,6 @@
       "Television",
       "Work area"
     ],
-    "published": true,
-    "description": "Our classic sea-facing room. Look straight out to the Vivekananda Rock Memorial and the Thiruvalluvar Statue, and watch the sunrise without leaving your bed.",
-    "beds": "King or twin",
-    "summary": "Our classic sea-facing room. Look straight out to the Vivekananda Rock Memorial and the Thiruvalluvar Statue, and watch the sunrise without leaving your bed.",
-    "amenities": [
-      "sea_view",
-      "sunrise",
-      "bathroom",
-      "tv",
-      "phone",
-      "room_service",
-      "work_area"
-    ],
-    "updated_at": "2026-10-30T10:43:45.759Z",
-    "name": "Deluxe Seaview Room",
-    "order": 1
-  },
-  {
-    "id": "executive-suite",
-    "rate": null,
-    "guests": 4,
-    "images": [
-      "roomSuite",
-      "vivekananda"
-    ],
-    "size": "",
     "amenities": [
       "sea_view",
       "sunrise",
@@ -91,26 +69,56 @@
     ],
     "view": "Sea view",
     "published": true,
-    "updated_at": "2026-10-29T17:43:13.217Z",
-    "beds": "King or twin",
+    "updated_at": "2026-10-30T10:43:45.759Z"
+  },
+  {
+    "id": "executive-suite",
+    "view": "Sea view",
+    "order": 5,
     "summary": "The hotel’s suite category: sea views across to the two island memorials, the sunrise from the bed, and a work area for longer stays.",
-    "description": "The hotel’s suite category: sea views across to the two island memorials, the sunrise from the bed, and a work area for longer stays.",
     "updated_by": "imegha2357@gmail.com",
+    "images": [
+      "roomSuite",
+      "vivekananda"
+    ],
+    "guests": 4,
+    "amenities": [
+      "sea_view",
+      "sunrise",
+      "bathroom",
+      "tv",
+      "phone",
+      "room_service",
+      "work_area"
+    ],
+    "rate": null,
     "category": "sea-view",
-    "occupancy": "2 adults + 2 children under 6",
+    "published": true,
+    "size": "",
     "features": [
       "Suite",
       "Sea views to the island memorials",
       "Sunrise from the bed",
       "Work area"
     ],
-    "order": 5,
-    "name": "Executive Suite"
+    "description": "The hotel’s suite category: sea views across to the two island memorials, the sunrise from the bed, and a work area for longer stays.",
+    "name": "Executive Suite",
+    "beds": "King or twin",
+    "occupancy": "2 adults + 2 children under 6",
+    "updated_at": "2026-10-29T17:43:13.217Z"
   },
   {
     "id": "standard",
-    "updated_at": "2026-10-29T19:43:14.311Z",
+    "updated_by": "imegha2357@gmail.com",
+    "name": "Standard Room",
+    "summary": "Wooden furnishings, a work area and views over the town as the evening lights come on.",
     "published": true,
+    "images": [
+      "roomStandard"
+    ],
+    "guests": 4,
+    "beds": "King or twin",
+    "category": "city-family",
     "amenities": [
       "city_view",
       "bathroom",
@@ -119,52 +127,39 @@
       "room_service",
       "work_area"
     ],
-    "name": "Standard Room",
-    "summary": "Wooden furnishings, a work area and views over the town as the evening lights come on.",
-    "beds": "King or twin",
     "features": [
       "Private bathroom",
       "Television",
       "Direct-dial phone",
       "Work area"
     ],
-    "category": "city-family",
     "description": "Wooden furnishings, a work area and views over the town as the evening lights come on.",
-    "view": "City view",
-    "occupancy": "2 adults + 2 children under 6",
-    "images": [
-      "roomStandard"
-    ],
-    "guests": 4,
-    "rate": null,
     "order": 2,
-    "updated_by": "imegha2357@gmail.com",
-    "size": "300 sq ft"
+    "view": "City view",
+    "rate": null,
+    "updated_at": "2026-10-29T19:43:14.311Z",
+    "size": "300 sq ft",
+    "occupancy": "2 adults + 2 children under 6"
   },
   {
     "id": "twin",
-    "view": "Sea and city view",
+    "beds": "King or twin",
     "updated_at": "2026-10-29T17:43:13.217Z",
-    "rate": null,
+    "guests": 8,
     "occupancy": "4 adults + 4 children under 6",
-    "size": "",
-    "features": [
-      "Two balconies",
-      "Interconnecting door",
-      "Sea and city views"
-    ],
     "images": [
       "roomTwin"
     ],
-    "category": "city-family",
-    "description": "Two interconnected rooms for families staying together. One balcony faces the sea and sunrise; the other overlooks the town.",
-    "guests": 8,
     "name": "Twin Room (interconnected)",
-    "summary": "Two interconnected rooms for families staying together. One balcony faces the sea and sunrise; the other overlooks the town.",
-    "beds": "King or twin",
     "order": 4,
-    "published": true,
+    "rate": null,
     "updated_by": "imegha2357@gmail.com",
+    "summary": "Two interconnected rooms for families staying together. One balcony faces the sea and sunrise; the other overlooks the town.",
+    "size": "",
+    "view": "Sea and city view",
+    "description": "Two interconnected rooms for families staying together. One balcony faces the sea and sunrise; the other overlooks the town.",
+    "category": "city-family",
+    "published": true,
     "amenities": [
       "sea_view",
       "city_view",
@@ -174,6 +169,11 @@
       "tv",
       "phone",
       "room_service"
+    ],
+    "features": [
+      "Two balconies",
+      "Interconnecting door",
+      "Sea and city views"
     ]
   }
 ]
