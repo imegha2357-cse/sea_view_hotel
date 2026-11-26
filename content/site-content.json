@@ -1,7 +1,4 @@
 {
-  "banners": {},
-  "seeded": true,
-  "updated_by": "imegha2357@gmail.com",
   "categories": [
     {
       "id": "sea-view",
@@ -14,7 +11,6 @@
       "text": "Standard Rooms look over the town, and the interconnected Twin Rooms keep families together, with one balcony facing the sea."
     }
   ],
-  "updated_at": "2026-10-30T11:31:11.379Z",
   "hero": [
     {
       "image": "vivekananda",
@@ -37,6 +33,7 @@
       "caption": "Hotel Sea View, East Car Street, at night"
     }
   ],
+  "highlights": {},
   "gallery": [
     {
       "image": "building",
@@ -179,5 +176,8 @@
       "cat": "Hotel"
     }
   ],
-  "highlights": {}
+  "updated_by": "imegha2357@gmail.com",
+  "updated_at": "2026-10-30T11:31:11.379Z",
+  "seeded": true,
+  "banners": {}
 }
