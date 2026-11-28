@@ -1,18 +1,4 @@
 {
-  "banners": {},
-  "updated_by": "imegha2357@gmail.com",
-  "categories": [
-    {
-      "id": "sea-view",
-      "title": "Sea-view rooms",
-      "text": "Rooms on the sea side of the hotel, facing the Vivekananda Rock Memorial and the Thiruvalluvar Statue. The sunrise comes to you."
-    },
-    {
-      "id": "city-family",
-      "title": "City and family rooms",
-      "text": "Standard Rooms look over the town, and the interconnected Twin Rooms keep families together, with one balcony facing the sea."
-    }
-  ],
   "highlights": {},
   "seeded": true,
   "updated_at": "2026-10-30T11:31:11.379Z",
@@ -38,6 +24,7 @@
       "caption": "Hotel Sea View, East Car Street, at night"
     }
   ],
+  "updated_by": "imegha2357@gmail.com",
   "gallery": [
     {
       "image": "building",
@@ -178,6 +165,19 @@
       "image": "meetingHall",
       "alt": "Hall set for a function",
       "cat": "Hotel"
+    }
+  ],
+  "banners": {},
+  "categories": [
+    {
+      "id": "sea-view",
+      "title": "Sea-view rooms",
+      "text": "Rooms on the sea side of the hotel, facing the Vivekananda Rock Memorial and the Thiruvalluvar Statue. The sunrise comes to you."
+    },
+    {
+      "id": "city-family",
+      "title": "City and family rooms",
+      "text": "Standard Rooms look over the town, and the interconnected Twin Rooms keep families together, with one balcony facing the sea."
     }
   ]
 }
